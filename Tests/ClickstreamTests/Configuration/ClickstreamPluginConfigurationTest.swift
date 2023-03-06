@@ -148,7 +148,7 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
             dictionaryLiteral:
             (AWSClickstreamConfiguration.appIdKey, appId),
             (AWSClickstreamConfiguration.endpointKey, endpoint),
-            (AWSClickstreamConfiguration.trackAppExceptionKey, false)
+            (AWSClickstreamConfiguration.isTrackAppExceptionKey, false)
         )
         do {
             let config = try AWSClickstreamConfiguration(configJson)
@@ -168,7 +168,7 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
             dictionaryLiteral:
             (AWSClickstreamConfiguration.appIdKey, appId),
             (AWSClickstreamConfiguration.endpointKey, endpoint),
-            (AWSClickstreamConfiguration.trackAppExceptionKey, 10)
+            (AWSClickstreamConfiguration.isTrackAppExceptionKey, 10)
         )
         let errString = "isTrackAppException is not a boolean value"
         assertInitPluginError(errString: errString, configJson: configJson)

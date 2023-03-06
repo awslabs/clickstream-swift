@@ -1,0 +1,165 @@
+//
+// Copyright Amazon.com Inc. or its affiliates.
+// All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+import Amplify
+import Foundation
+
+enum Event {
+    /// Check the attribute error.
+    /// - Parameters:
+    ///   - currentNumber: current attribute number
+    ///   - key: attribute key
+    ///   - value: attribute value
+    /// - Returns: the ErrorType
+    public static func checkAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
+        if currentNumber >= Limit.MAX_NUM_OF_ATTRIBUTES {
+            log.error("reached the max number of attributes limit (\(Limit.MAX_NUM_OF_ATTRIBUTES)). and the attribute: \(key) will not be recorded")
+            let errorString = "attribute name: \(key)"
+            return EventError(errorType: ErrorType.ATTRIBUTE_SIZE_EXCEED,
+                              errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+        }
+        let nameLength = key.utf8.count
+        if nameLength > Limit.MAX_LENGTH_OF_NAME {
+            log.error("attribute : \(key), reached the max length of attributes name limit(\(Limit.MAX_LENGTH_OF_NAME). current length is:(\(nameLength)) and the attribute will not be recorded")
+            let errorString = "attribute name length is:(\(nameLength)) name is: \(key)"
+            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_LENGTH_EXCEED,
+                              errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+        }
+        if !isValidName(name: key) {
+            log.error("attribute : \(key), was not valid, attribute name can only contains uppercase and lowercase letters, underscores, number, and is not start with a number. so the attribute will not be recorded")
+            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_INVALID,
+                              errorMessage: "\(key.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+        }
+        if let value = value as? String {
+            let valueLength = value.utf8.count
+            if valueLength > Limit.MAX_LENGTH_OF_VALUE {
+                log.error("attribute : \(key), reached the max length of attributes value limit (\(Limit.MAX_LENGTH_OF_VALUE)). current length is:(\(valueLength)). and the attribute will not be recorded, attribute value: \(value)")
+                let errrorString = "attribute name: \(key), attribute value: \(value)"
+                return EventError(errorType: ErrorType.ATTRIBUTE_VALUE_LENGTH_EXCEED,
+                                  errorMessage: "\(errrorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+            }
+        }
+        return nil
+    }
+    
+    /// Check the user attribute error.
+    /// - Parameters:
+    ///   - currentNumber: current attribute number
+    ///   - key: attribute key
+    ///   - value: attribute value
+    /// - Returns: the ErrorType
+    public static func checkUserAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
+        if currentNumber >= Limit.MAX_NUM_OF_USER_ATTRIBUTES {
+            log.error("reached the max number of user attributes limit (\(Limit.MAX_NUM_OF_USER_ATTRIBUTES)). and the user attribute: \(key) will not be recorded")
+            let errorString = "attribute name: \(key)"
+            return EventError(errorType: ErrorType.ATTRIBUTE_SIZE_EXCEED,
+                              errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+        }
+        let nameLength = key.utf8.count
+        if nameLength > Limit.MAX_LENGTH_OF_NAME {
+            log.error("user attribute : \(key), reached the max length of attributes name limit(\(Limit.MAX_LENGTH_OF_NAME). current length is:(\(nameLength)) and the attribute will not be recorded")
+            let errorString = "user attribute name length is:(\(nameLength)) name is: \(key)"
+            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_LENGTH_EXCEED,
+                              errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+        }
+        if !isValidName(name: key) {
+            log.error("user attribute : \(key), was not valid, user attribute name can only contains uppercase and lowercase letters, underscores, number, and is not start with a number. so the attribute will not be recorded")
+            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_INVALID,
+                              errorMessage: "\(key.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+        }
+        if let value = value as? String {
+            let valueLength = value.utf8.count
+            if valueLength > Limit.MAX_LENGTH_OF_USER_VALUE {
+                log.error("user attribute : \(key), reached the max length of attributes value limit (\(Limit.MAX_LENGTH_OF_USER_VALUE)). current length is:(\(valueLength)). and the attribute will not be recorded, attribute value: \(value)")
+                let errrorString = "attribute name: \(key), attribute value: \(value)"
+                return EventError(errorType: ErrorType.ATTRIBUTE_VALUE_LENGTH_EXCEED,
+                                  errorMessage: "\(errrorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
+            }
+        }
+        return nil
+    }
+    
+    /// Check the event name whether valide
+    /// - Parameter eventType: the event name
+    /// - Returns: the eventType is valide and the error type
+    public static func isValidEventType(eventType: String) -> (Bool, String) {
+        if eventType.utf8.count > Event.Limit.MAX_EVENT_TYPE_LENGTH {
+            return (false, "Event name is too long, the max event type length is \(Limit.MAX_EVENT_TYPE_LENGTH) characters. event name: \(eventType)")
+        } else if !isValidName(name: eventType) {
+            return (false, "Event name can only contains uppercase and lowercase letters, underscores, number, and is not start with a number. event name: \(eventType)")
+        }
+        return (true, "")
+    }
+    
+    /// Verify the string whether only contains number, uppercase and lowercase letters, underscores, and is not start with a number
+    /// - Parameter name: the name to verify
+    /// - Returns: the name is valid.
+    public static func isValidName(name: String) -> Bool {
+        let regex = try! NSRegularExpression(pattern: "^(?![0-9])[0-9a-zA-Z_]+$")
+        let range = NSRange(location: 0, length: name.utf8.count)
+        let matches = regex.matches(in: name, range: range)
+        return matches.count > 0
+    }
+    
+    enum ReservedAttribute {
+        public static let USER_ID = "_user_id"
+    }
+    
+    enum User {
+        public static let USER_ID_NIL = "_clickstream_user_id_nil"
+        public static let USER_ID_EMPTY = "_clickstream_user_id_empty"
+    }
+    
+    enum Limit {
+        /// max event type length
+        public static let MAX_EVENT_TYPE_LENGTH = 50
+        
+        /// max limit of single event attribute number.
+        public static let MAX_NUM_OF_ATTRIBUTES = 500
+        
+        /// max limit of single event user attribute number.
+        public static let MAX_NUM_OF_USER_ATTRIBUTES = 100
+        
+        /// max limit of attribute name character length.
+        public static let MAX_LENGTH_OF_NAME = 50
+        
+        /// max limit of attribute value character length.
+        public static let MAX_LENGTH_OF_VALUE = 1024
+        
+        /// max limit of user attribute value character length.
+        public static let MAX_LENGTH_OF_USER_VALUE = 256
+        
+        /// max limit of one batch event number.
+        public static let MAX_EVENT_NUMBER_OF_BATCH = 100
+        
+        /// max limit of error attribute value length.
+        public static let MAX_LENGTH_OF_ERROR_VALUE = 256
+    }
+
+    enum PresetEvent {
+        public static let SESSION_START = "_session_start"
+        public static let SESSION_STOP = "_session_stop"
+    }
+    
+    enum ErrorType {
+        public static let ATTRIBUTE_NAME_INVALID = "_error_name_invalid"
+        public static let ATTRIBUTE_NAME_LENGTH_EXCEED = "_error_name_length_exceed"
+        public static let ATTRIBUTE_VALUE_LENGTH_EXCEED = "_error_value_length_exceed"
+        public static let ATTRIBUTE_SIZE_EXCEED = "_error_attribute_size_exceed"
+    }
+    
+    class EventError {
+        let errorType: String
+        let errorMessage: String
+        init(errorType: String, errorMessage: String) {
+            self.errorType = errorType
+            self.errorMessage = errorMessage
+        }
+    }
+}
+
+extension Event: DefaultLogger {}

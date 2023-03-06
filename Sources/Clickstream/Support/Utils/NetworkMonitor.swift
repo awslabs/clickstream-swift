@@ -10,6 +10,7 @@ import Network
 
 protocol NetworkMonitor: AnyObject {
     var isOnline: Bool { get }
+    var netWorkType: String { get }
     func startMonitoring(using queue: DispatchQueue)
     func stopMonitoring()
 }
@@ -17,6 +18,20 @@ protocol NetworkMonitor: AnyObject {
 extension NWPathMonitor: NetworkMonitor {
     var isOnline: Bool {
         currentPath.status == .satisfied
+    }
+
+    var netWorkType: String {
+        var type = "UNKNOWN"
+        pathUpdateHandler = { path in
+            if path.usesInterfaceType(.wifi) {
+                type = "WIFI"
+            } else if path.usesInterfaceType(.cellular) {
+                type = "Mobile"
+            } else {
+                type = "UNKNOWN"
+            }
+        }
+        return type
     }
 
     func startMonitoring(using queue: DispatchQueue) {

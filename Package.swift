@@ -10,18 +10,18 @@ let package = Package(
     products: [
         .library(
             name: "Clickstream",
-            targets: ["Clickstream"]),
+            targets: ["Clickstream"])
     ],
     dependencies: [
-        .package(url: "https://github.com/aws-amplify/amplify-swift.git", exact: "2.4.0"),
+        .package(url: "https://github.com/aws-amplify/amplify-swift.git", exact: "2.4.0")
     ],
     targets: [
         .target(
             name: "Clickstream",
             dependencies: [
-                .product(name: "AWSPluginsCore", package: "amplify-swift"),
+                .product(name: "AWSPluginsCore", package: "amplify-swift")
             ]),
         .testTarget(
             name: "ClickstreamTests",
-            dependencies: ["Clickstream"]),
+            dependencies: ["Clickstream"])
     ])

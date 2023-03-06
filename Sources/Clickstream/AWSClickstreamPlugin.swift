@@ -6,24 +6,28 @@
 //
 
 import Amplify
-import AWSPluginsCore
 import Foundation
 
 public final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
+    var clickstream: ClickstreamContext!
+
     /// Automatically flushes the events that have been recorded on an interval
     var autoFlushEventsTimer: DispatchSourceTimer?
-    
+
     /// An observer to monitor connectivity changes
     var networkMonitor: NetworkMonitor!
-    
+
     /// Specifies whether the plugin is enabled
     var isEnabled: Bool!
-    
+
+    /// ClickstreamClient for evnet handle
+    var analyticsClient: AnalyticsClientBehaviour!
+
     /// The configuration file plugin key of clickstream plugin
     public var key: PluginKey {
         "awsClickstreamPlugin"
     }
-    
+
     /// Instantiates an instance of the AWSClickstreamPlugin
     public init() {}
 }
