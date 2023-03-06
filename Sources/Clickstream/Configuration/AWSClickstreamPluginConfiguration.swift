@@ -6,14 +6,12 @@
 //
 
 import Amplify
-import AWSClientRuntime
-import Foundation
 
 public struct AWSClickstreamConfiguration {
     static let appIdKey = "appId"
     static let endpointKey = "endpoint"
     static let sendEventsIntervalKey = "autoFlushEventsInterval"
-    static let trackAppExceptionKey = "isTrackAppExceptionEvents"
+    static let isTrackAppExceptionKey = "isTrackAppExceptionEvents"
     static let isCompressEventsKey = "isCompressEvents"
 
     static let defaultSendEventsInterval = 10000
@@ -133,7 +131,7 @@ public struct AWSClickstreamConfiguration {
     }
 
     private static func getIsTrackAppExceptionEvents(_ configuration: [String: JSONValue]) throws -> Bool {
-        guard let isTrackAppException = configuration[trackAppExceptionKey] else {
+        guard let isTrackAppException = configuration[isTrackAppExceptionKey] else {
             return AWSClickstreamConfiguration.defaulTrackAppException
         }
 

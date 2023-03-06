@@ -5,10 +5,12 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-import Foundation
-
 public extension AWSClickstreamPlugin {
-    func reset() async {
+    func reset() {
+        if clickstream != nil {
+            clickstream = nil
+        }
+
         if autoFlushEventsTimer != nil {
             autoFlushEventsTimer?.setEventHandler {}
             autoFlushEventsTimer?.cancel()

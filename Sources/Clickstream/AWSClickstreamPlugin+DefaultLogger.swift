@@ -6,6 +6,5 @@
 //
 
 import Amplify
-import Foundation
 
 extension AWSClickstreamPlugin: DefaultLogger {}

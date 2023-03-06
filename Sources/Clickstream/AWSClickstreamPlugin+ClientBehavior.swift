@@ -9,17 +9,79 @@ import Amplify
 import Foundation
 
 public extension AWSClickstreamPlugin {
-    func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {}
+    func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {
+        Task {
+            if userId == Event.User.USER_ID_NIL {
+                await analyticsClient.removeUserAttribute(forKey: userId)
+            } else if userId != Event.User.USER_ID_EMPTY {
+                await analyticsClient.addUserAttribute(userId, forKey: Event.ReservedAttribute.USER_ID)
+            }
+        }
+        userProfile?.properties?.forEach { key, value in
+            Task {
+                await analyticsClient.addUserAttribute(value, forKey: key)
+            }
+        }
+    }
 
-    func record(event: AnalyticsEvent) {}
+    func record(event: AnalyticsEvent) {
+        if !isEnabled {
+            log.warn("Cannot record events. Clickstream is disabled")
+            return
+        }
+        let clickstreamEvent = analyticsClient.createEvent(withEventType: event.name)
+        if let properties = event.properties {
+            clickstreamEvent.addProperties(properties)
+        }
 
-    func record(eventWithName eventName: String) {}
+        Task {
+            do {
+                try await analyticsClient.record(clickstreamEvent)
+            } catch {
+                log.error("Record event error:\(error)")
+            }
+        }
+    }
 
-    func registerGlobalProperties(_ properties: AnalyticsProperties) {}
+    func record(eventWithName eventName: String) {
+        let event = BasicAnalyticsEvent(name: eventName)
+        record(event: event)
+    }
 
-    func unregisterGlobalProperties(_ keys: Set<String>?) {}
+    func registerGlobalProperties(_ properties: AnalyticsProperties) {
+        properties.forEach { key, value in
+            Task {
+                await analyticsClient.addGlobalAttribute(value, forKey: key)
+            }
+        }
+    }
 
-    func flushEvents() {}
+    func unregisterGlobalProperties(_ keys: Set<String>?) {
+        keys?.forEach { key in
+            Task {
+                await analyticsClient.removeGlobalAttribute(forKey: key)
+            }
+        }
+    }
+
+    func flushEvents() {
+        if !isEnabled {
+            log.warn("Cannot flushEvents. Clickstream is disabled")
+            return
+        }
+        // Do not attempt to submit events if we detect the device is offline, as it's gonna fail anyway
+        guard networkMonitor.isOnline else {
+            log.error("Device is offline, skipping submitting events to Clickstream server")
+            return
+        }
+        Task {
+            try await analyticsClient.submitEvents()
+        }
+    }
+
+    func getEscapeHatch() -> ClickstreamContextConfiguration {
+        clickstream.configuration
+    }
 
     func enable() {
         isEnabled = true
