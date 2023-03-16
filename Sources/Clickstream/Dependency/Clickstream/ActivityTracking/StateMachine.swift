@@ -15,8 +15,9 @@ extension AnyCancellable: StateMachineSubscriberToken {}
 
 class StateMachine<State, Event> {
     typealias Reducer = (State, Event) -> State
-    private let queue = DispatchQueue(label: "com.amazonaws.solution.Clickstream.StateMachine<\(State.self), \(Event.self)>",
-                                      target: DispatchQueue.global())
+    private let queue = DispatchQueue(
+        label: "com.amazonaws.solution.Clickstream.StateMachine<\(State.self), \(Event.self)>",
+        target: DispatchQueue.global())
     private var reducer: Reducer
 #if canImport(Combine)
     @Published private var state: State
@@ -36,9 +37,9 @@ class StateMachine<State, Event> {
 
     func process(_ event: Event) {
         queue.sync {
-            log.verbose("Processing event \(event) for current state \(self.state)")
+            log.info("Processing event \(event) for current state \(self.state)")
             let newState = self.reducer(self.state, event)
-            log.verbose("New state: \(newState)")
+            log.info("New state: \(newState)")
             self.state = newState
         }
     }
@@ -106,4 +107,4 @@ class StateMachine<State, Event> {
 
 protocol StateMachineSubscriberToken: AnyObject {}
 
-extension StateMachine: DefaultLogger {}
+extension StateMachine: ClickstreamLogger {}

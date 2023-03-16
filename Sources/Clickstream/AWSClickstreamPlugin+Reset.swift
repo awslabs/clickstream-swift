@@ -18,7 +18,7 @@ public extension AWSClickstreamPlugin {
         }
 
         if isEnabled != nil {
-            isEnabled = nil
+            isEnabled = false
         }
 
         if networkMonitor != nil {

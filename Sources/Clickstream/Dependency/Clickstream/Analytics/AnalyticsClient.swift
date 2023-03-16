@@ -13,13 +13,13 @@ protocol AnalyticsClientBehaviour: Actor {
 
     nonisolated func createEvent(withEventType eventType: String) -> ClickstreamEvent
     func record(_ event: ClickstreamEvent) async throws
-    @discardableResult func submitEvents() async throws -> [ClickstreamEvent]
+    func submitEvents() throws
 }
 
 typealias SessionProvider = () -> Session
 
 actor AnalyticsClient: AnalyticsClientBehaviour {
-    private let eventRecorder: AnalyticsEventRecording
+    private(set) var eventRecorder: AnalyticsEventRecording
     private let sessionProvider: SessionProvider
     private(set) lazy var globalAttributes: [String: AttributeValue] = [:]
     private(set) lazy var userAttributes: [String: AttributeValue] = [:]
@@ -87,8 +87,7 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
         try eventRecorder.save(event)
     }
 
-    @discardableResult
-    func submitEvents() async throws -> [ClickstreamEvent] {
-        try await eventRecorder.submitEvents()
+    func submitEvents() throws {
+        try eventRecorder.submitEvents()
     }
 }

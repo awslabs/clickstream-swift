@@ -13,7 +13,7 @@ class ClickstreamPluginResetTest: ClickstreamPluginTestBase {
         analyticsPlugin.reset()
         XCTAssertNil(analyticsPlugin.clickstream)
         XCTAssertNil(analyticsPlugin.autoFlushEventsTimer)
-        XCTAssertNil(analyticsPlugin.isEnabled)
+        XCTAssertFalse(analyticsPlugin.isEnabled)
         XCTAssertNil(analyticsPlugin.networkMonitor)
     }
 }

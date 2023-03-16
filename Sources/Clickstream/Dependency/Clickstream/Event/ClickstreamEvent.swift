@@ -9,9 +9,9 @@ import Amplify
 import Foundation
 
 private typealias Limit = Event.Limit
-private typealias JsonObject = [String: Any]
+typealias JsonObject = [String: Any]
 
-class ClickstreamEvent: AnalyticsPropertiesModel {
+class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
     var hashCode: Int!
     let eventId: String
     let appId: String
@@ -23,7 +23,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
     private(set) lazy var userAttributes: [String: AttributeValue] = [:]
     let systemInfo: SystemInfo
     let netWorkType: String
-    
+
     init(eventId: String = UUID().uuidString,
          eventType: String,
          appId: String,
@@ -42,7 +42,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         self.systemInfo = systemInfo
         self.netWorkType = netWorkType
     }
-    
+
     func addAttribute(_ attribute: AttributeValue, forKey key: String) {
         let eventError = Event.checkAttribute(currentNumber: attributes.count, key: key, value: attribute)
         if eventError != nil {
@@ -51,36 +51,27 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
             attributes[key] = attribute
         }
     }
-    
+
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
         attributes[key] = attribute
     }
-    
+
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
         userAttributes[key] = attribute
     }
-    
+
     func attribute(forKey key: String) -> AttributeValue? {
         attributes[key]
     }
-    
-    private func trimmedKey(_ string: String) -> String {
-        if string.count > Limit.MAX_LENGTH_OF_NAME {
-            log.warn("The \(string) key has been trimmed to a length of \(Limit.MAX_LENGTH_OF_NAME) characters")
-        }
-        return String(string.prefix(Limit.MAX_LENGTH_OF_NAME))
-    }
-    
-    private func trimmedValue(_ string: String, forKey key: String) -> String {
-        if string.count > Limit.MAX_LENGTH_OF_VALUE {
-            log.warn("The value for key \(key) has been trimmed to a length of \(Limit.MAX_LENGTH_OF_VALUE) characters")
-        }
-        return String(string.prefix(Limit.MAX_LENGTH_OF_VALUE))
-    }
-    
-    func toJson() -> String {
+
+    func toJson(forHashCode: Bool = false) -> String {
         var event = JsonObject()
-        event["hashCode"] = String(format: "%08X", hashCode)
+        if !forHashCode {
+            if hashCode == nil {
+                hashCode = hashValue
+            }
+            event["hashCode"] = String(format: "%08X", hashCode)
+        }
         event["unique_id"] = uniqueId
         event["event_type"] = eventType
         event["event_id"] = eventId
@@ -98,7 +89,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         event["network_type"] = netWorkType
         event["screen_height"] = systemInfo.screenHeight
         event["screen_width"] = systemInfo.screenWidth
-        event["zone_offset"] = TimeZone.current.secondsFromGMT() * 1000
+        event["zone_offset"] = TimeZone.current.secondsFromGMT() * 1_000
         event["system_language"] = Locale.current.languageCode ?? "UNKNOWN"
         event["country_code"] = Locale.current.regionCode ?? "UNKNOWN"
         event["sdk_version"] = PackageInfo.version
@@ -108,18 +99,24 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         event["app_title"] = systemInfo.appTitle
         event["user"] = getAttributeObject(from: userAttributes)
         event["attributes"] = getAttributeObject(from: attributes)
-        
+        return getJsonStringFromObject(jsonObject: event)
+    }
+
+    func getJsonStringFromObject(jsonObject: JsonObject) -> String {
         do {
-            let jsonData = try JSONSerialization.data(withJSONObject: event, options: [.sortedKeys])
+            let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [.sortedKeys])
             return String(data: jsonData, encoding: .utf8)!
         } catch {
             log.error("Error serializing dictionary to JSON: \(error.localizedDescription)")
         }
         return ""
     }
-    
+
     private func getAttributeObject(from dictionary: AnalyticsProperties) -> JsonObject {
         var attribute = JsonObject()
+        attribute["_session_id"] = session.sessionId
+        attribute["_session_start_timestamp"] = session.startTime.millisecondsSince1970
+        attribute["_session_duration"] = session.duration
         if dictionary.isEmpty {
             return attribute
         }
@@ -132,8 +129,16 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         }
         return attribute
     }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(toJson(forHashCode: true))
+    }
+
+    static func == (lhs: ClickstreamEvent, rhs: ClickstreamEvent) -> Bool {
+        lhs.toJson() == rhs.toJson()
+    }
 }
 
-// MARK: - DefaultLogger
+// MARK: - ClickstreamLogger
 
-extension ClickstreamEvent: DefaultLogger {}
+extension ClickstreamEvent: ClickstreamLogger {}

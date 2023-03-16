@@ -1,5 +1,4 @@
 //
-//
 // Copyright Amazon.com Inc. or its affiliates.
 // All Rights Reserved.
 //
@@ -18,8 +17,7 @@ class MockEventRecorder: AnalyticsEventRecording {
     }
 
     var submitCount = 0
-    func submitEvents() async throws -> [ClickstreamEvent] {
+    func submitEvents() {
         submitCount += 1
-        return []
     }
 }

@@ -7,31 +7,10 @@
 
 import Foundation
 
-extension DateFormatter {
-    static let iso8601Formatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter
-    }()
-}
-
 extension Date {
     typealias Timestamp = Int64
 
     var millisecondsSince1970: Int64 {
-        Int64(self.timeIntervalSince1970 * 1000)
-    }
-
-    var asISO8601String: String {
-        DateFormatter.iso8601Formatter.string(from: self)
-    }
-}
-
-extension Date.Timestamp {
-    var asDate: Date {
-        Date(timeIntervalSince1970: TimeInterval(self / 1000))
-            .addingTimeInterval(TimeInterval(Double(self % 1000) / 1000))
+        Int64(timeIntervalSince1970 * 1_000)
     }
 }

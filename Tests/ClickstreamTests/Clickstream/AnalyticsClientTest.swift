@@ -13,12 +13,12 @@ class AnalyticsClientTest: XCTestCase {
     private var eventRecorder: MockEventRecorder!
     private var session: Session!
     let testAppId = "testAppId"
-    let testEndpoint = "https://yourhost/collect"
+    let testEndpoint = "https://example.com/collect"
 
     override func setUp() async throws {
         let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
                                                                    endpoint: testEndpoint,
-                                                                   sendEventsInterval: 10000,
+                                                                   sendEventsInterval: 10_000,
                                                                    isTrackAppExceptionEvents: false,
                                                                    isCompressEvents: false)
         let clickstream = try ClickstreamContext(with: contextConfiguration)
@@ -67,7 +67,7 @@ class AnalyticsClientTest: XCTestCase {
     }
 
     func testAddGlobalAttributeForExceedValueLength() async {
-        let exceedValue = String(repeating: "a", count: 1025)
+        let exceedValue = String(repeating: "a", count: 1_025)
         await analyticsClient.addGlobalAttribute(exceedValue, forKey: "name01")
         let errorValue = await analyticsClient.globalAttributes["_error_value_length_exceed"] as? String
         XCTAssertNotNil(errorValue)

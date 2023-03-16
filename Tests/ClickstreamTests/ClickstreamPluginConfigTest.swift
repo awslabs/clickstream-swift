@@ -18,7 +18,7 @@ class ClickstreamPluginConfigTest: ClickstreamPluginTestBase {
     func testConfigSuccess() {
         let appId = JSONValue(stringLiteral: testAppId)
         let endpoint = JSONValue(stringLiteral: testEndpoint)
-        let sendEventsInterval: JSONValue = 15000
+        let sendEventsInterval: JSONValue = 15_000
         let isTrackAppExceptionEvents: JSONValue = false
         let isCompressEvents: JSONValue = false
         let configJson = JSONValue(

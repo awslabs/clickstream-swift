@@ -10,18 +10,27 @@ let package = Package(
     products: [
         .library(
             name: "Clickstream",
-            targets: ["Clickstream"])
+            targets: ["Clickstream"]
+        )
     ],
     dependencies: [
-        .package(url: "https://github.com/aws-amplify/amplify-swift.git", exact: "2.4.0")
+        .package(url: "https://github.com/aws-amplify/amplify-swift.git", exact: "2.4.0"),
+        .package(url: "https://github.com/stephencelis/SQLite.swift.git", exact: "0.13.2"),
+        .package(url: "https://github.com/1024jp/GzipSwift", exact: "5.2.0"),
+        .package(url: "https://github.com/httpswift/swifter", exact: "1.5.0")
     ],
     targets: [
         .target(
             name: "Clickstream",
             dependencies: [
-                .product(name: "AWSPluginsCore", package: "amplify-swift")
-            ]),
+                .product(name: "AWSPluginsCore", package: "amplify-swift"),
+                .product(name: "SQLite", package: "SQLite.swift"),
+                .product(name: "Gzip", package: "GzipSwift")
+            ]
+        ),
         .testTarget(
             name: "ClickstreamTests",
-            dependencies: ["Clickstream"])
-    ])
+            dependencies: ["Clickstream", .product(name: "Swifter", package: "swifter")]
+        )
+    ]
+)

@@ -21,14 +21,12 @@ extension NWPathMonitor: NetworkMonitor {
     }
 
     var netWorkType: String {
-        var type = "UNKNOWN"
+        var type = NetWorkType.UnKnow
         pathUpdateHandler = { path in
             if path.usesInterfaceType(.wifi) {
-                type = "WIFI"
+                type = NetWorkType.Wifi
             } else if path.usesInterfaceType(.cellular) {
-                type = "Mobile"
-            } else {
-                type = "UNKNOWN"
+                type = NetWorkType.Mobile
             }
         }
         return type
@@ -41,4 +39,10 @@ extension NWPathMonitor: NetworkMonitor {
     func stopMonitoring() {
         cancel()
     }
+}
+
+enum NetWorkType {
+    static let Wifi = "WIFI"
+    static let UnKnow = "UNKNOWN"
+    static let Mobile = "Mobile"
 }

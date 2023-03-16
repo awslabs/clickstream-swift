@@ -28,22 +28,22 @@ class SystemInfo {
     var appTitle: String! = ""
     init() {
         #if canImport(UIKit)
-            idfv = UIDevice.current.identifierForVendor?.uuidString ?? ""
-            idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
-            model = UIDevice.current.name
+            self.idfv = UIDevice.current.identifierForVendor?.uuidString ?? ""
+            self.idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+            self.model = UIDevice.current.name
 
-            osVersion = UIDevice.current.systemVersion
-            screenWidth = Int(UIScreen.main.bounds.size.width * UIScreen.main.scale)
-            screenHeight = Int(UIScreen.main.bounds.size.height * UIScreen.main.scale)
+            self.osVersion = UIDevice.current.systemVersion
+            self.screenWidth = Int(UIScreen.main.bounds.size.width * UIScreen.main.scale)
+            self.screenHeight = Int(UIScreen.main.bounds.size.height * UIScreen.main.scale)
             let infoDictionary = Bundle.main.infoDictionary
-            appTitle = (infoDictionary?["CFBundleName"] ?? "") as? String
-            appVersion = (infoDictionary?["CFBundleShortVersionString"] ?? "") as? String
-            appPackgeName = (infoDictionary?["CFBundleIdentifier"] ?? "") as? String
+            self.appTitle = (infoDictionary?["CFBundleName"] ?? "") as? String
+            self.appVersion = (infoDictionary?["CFBundleShortVersionString"] ?? "") as? String
+            self.appPackgeName = (infoDictionary?["CFBundleIdentifier"] ?? "") as? String
         #endif
-        platform = "iOS"
-        make = "apple"
-        brand = "apple"
-        carrier = Self.getCarrier()
+        self.platform = "iOS"
+        self.make = "apple"
+        self.brand = "apple"
+        self.carrier = Self.getCarrier()
     }
 
     private static func getCarrier() -> String {
