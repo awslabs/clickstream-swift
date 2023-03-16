@@ -49,7 +49,7 @@ enum ApplicationState {
 
 extension ApplicationState: Equatable {}
 
-extension ApplicationState: DefaultLogger {}
+extension ApplicationState: ClickstreamLogger {}
 
 protocol ActivityTrackerBehaviour {
     func beginActivityTracking(_ listener: @escaping (ApplicationState) -> Void)
@@ -70,7 +70,7 @@ class ActivityTracker: ActivityTrackerBehaviour {
     private let stateMachine: StateMachine<ApplicationState, ActivityEvent>
     private var stateMachineSubscriberToken: StateMachineSubscriberToken?
 
-    private static let applicationDidMoveToBackgroundNotification: Notification.Name = {
+    private static let applicationDidMoveToBackground: Notification.Name = {
         #if canImport(UIKit)
             UIApplication.didEnterBackgroundNotification
         #else
@@ -78,7 +78,7 @@ class ActivityTracker: ActivityTrackerBehaviour {
         #endif
     }()
 
-    private static let applicationWillMoveToForegoundNotification: Notification.Name = {
+    private static let applicationWillMoveToForegound: Notification.Name = {
         #if canImport(UIKit)
             UIApplication.willEnterForegroundNotification
         #else
@@ -86,7 +86,7 @@ class ActivityTracker: ActivityTrackerBehaviour {
         #endif
     }()
 
-    private static var applicationWillTerminateNotification: Notification.Name = {
+    private static var applicationWillTerminate: Notification.Name = {
         #if canImport(UIKit)
             UIApplication.willTerminateNotification
         #else
@@ -95,17 +95,18 @@ class ActivityTracker: ActivityTrackerBehaviour {
     }()
 
     private let notifications = [
-        applicationDidMoveToBackgroundNotification,
-        applicationWillMoveToForegoundNotification,
-        applicationWillTerminateNotification,
+        applicationDidMoveToBackground,
+        applicationWillMoveToForegound,
+        applicationWillTerminate
     ]
 
     init(backgroundTrackingTimeout: TimeInterval,
          stateMachine: StateMachine<ApplicationState, ActivityEvent>? = nil)
     {
         self.backgroundTrackingTimeout = backgroundTrackingTimeout
-        self.stateMachine = stateMachine ?? StateMachine(initialState: .initializing,
-                                                         resolver: ApplicationState.Resolver.resolve(currentState:event:))
+        self.stateMachine = stateMachine ??
+            StateMachine(initialState: .initializing,
+                         resolver: ApplicationState.Resolver.resolve(currentState:event:))
         for notification in notifications {
             NotificationCenter.default.addObserver(self,
                                                    selector: #selector(handleApplicationStateChange),
@@ -130,17 +131,19 @@ class ActivityTracker: ActivityTrackerBehaviour {
     private func beginBackgroundTracking() {
         #if canImport(UIKit)
             if backgroundTrackingTimeout > 0 {
-                backgroundTask = UIApplication.shared.beginBackgroundTask(withName: Constants.backgroundTask) { [weak self] in
-                    self?.stateMachine.process(.backgroundTrackingDidTimeout)
-                    self?.stopBackgroundTracking()
-                }
+                backgroundTask = UIApplication.shared.beginBackgroundTask(withName:
+                    Constants.backgroundTask) { [weak self] in
+                        self?.stateMachine.process(.backgroundTrackingDidTimeout)
+                        self?.stopBackgroundTracking()
+                    }
             }
         #endif
         guard backgroundTrackingTimeout != .infinity else { return }
-        backgroundTimer = Timer.scheduledTimer(withTimeInterval: backgroundTrackingTimeout, repeats: false) { [weak self] _ in
-            self?.stateMachine.process(.backgroundTrackingDidTimeout)
-            self?.stopBackgroundTracking()
-        }
+        backgroundTimer = Timer.scheduledTimer(withTimeInterval:
+            backgroundTrackingTimeout, repeats: false) { [weak self] _ in
+                self?.stateMachine.process(.backgroundTrackingDidTimeout)
+                self?.stopBackgroundTracking()
+            }
     }
 
     private func stopBackgroundTracking() {
@@ -156,13 +159,13 @@ class ActivityTracker: ActivityTrackerBehaviour {
 
     @objc private func handleApplicationStateChange(_ notification: Notification) {
         switch notification.name {
-        case Self.applicationDidMoveToBackgroundNotification:
+        case Self.applicationDidMoveToBackground:
             beginBackgroundTracking()
             stateMachine.process(.applicationDidMoveToBackground)
-        case Self.applicationWillMoveToForegoundNotification:
+        case Self.applicationWillMoveToForegound:
             stopBackgroundTracking()
             stateMachine.process(.applicationWillMoveToForeground)
-        case Self.applicationWillTerminateNotification:
+        case Self.applicationWillTerminate:
             stateMachine.process(.applicationWillTerminate)
         default:
             return

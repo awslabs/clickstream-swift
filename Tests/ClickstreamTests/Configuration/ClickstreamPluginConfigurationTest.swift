@@ -12,10 +12,10 @@ import XCTest
 class ClickstreamPluginConfigurationTest: XCTestCase {
     let appId: JSONValue = "myAppId"
     let testAppId = "myAppId"
-    let endpoint: JSONValue = "https://yourhost.com/collect"
-    let testEndpoint = "https://yourhost.com/collect"
-    let sendEventsInterval: JSONValue = 15000
-    let testSendEventsInterval = 15000
+    let endpoint: JSONValue = "https://example.com/collect"
+    let testEndpoint = "https://example.com/collect"
+    let sendEventsInterval: JSONValue = 15_000
+    let testSendEventsInterval = 15_000
 
     func testConfigureSuccessWithDefaultValue() {
         let configJson = JSONValue(

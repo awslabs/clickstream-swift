@@ -11,7 +11,7 @@ import XCTest
 
 class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     var analyticsClient: MockAnalyticsClient!
-    let testProperty: ClickstreamAttribute = [
+    let testAttribute: ClickstreamAttribute = [
         "isSuccess": true,
         "userName": "carl",
         "userAge": 12,
@@ -46,7 +46,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
 
     func testRecordEvent() async {
         await analyticsClient.setRecordExpectation(expectation(description: "record event"))
-        let event = BaseClickstreamEvent(name: "testEvent", properties: testProperty)
+        let event = BaseClickstreamEvent(name: "testEvent", attribute: testAttribute)
         analyticsPlugin.record(event: event)
         await waitForExpectations(timeout: 1)
         let recordCount = await analyticsClient.recordCount
@@ -55,7 +55,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
 
     func testRecordEventWhenIsEnableFalse() async {
         analyticsPlugin.isEnabled = false
-        let event = BaseClickstreamEvent(name: "testName", properties: testProperty)
+        let event = BaseClickstreamEvent(name: "testName", attribute: testAttribute)
         analyticsPlugin.record(event: event)
         let recordCount = await analyticsClient.recordCount
         XCTAssertEqual(0, recordCount)
@@ -78,18 +78,18 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
 
     func testRegisterGlobalAttribute() async {
         await analyticsClient.setAddGlobalAttributeExpectation(expectation(description: "add global attribute"), count: 4)
-        analyticsPlugin.registerGlobalProperties(testProperty)
+        analyticsPlugin.registerGlobalProperties(testAttribute)
         await waitForExpectations(timeout: 1)
         let addGlobalAttributeCallCount = await analyticsClient.addGlobalAttributeCalls.count
-        XCTAssertEqual(addGlobalAttributeCallCount, testProperty.count)
+        XCTAssertEqual(addGlobalAttributeCallCount, testAttribute.count)
     }
 
     func testUnregisterGlobalAttribute() async {
         await analyticsClient.setRemoveGlobalAttributeExpectation(expectation(description: "add global attribute"), count: 4)
-        analyticsPlugin.unregisterGlobalProperties(Set<String>(testProperty.keys))
+        analyticsPlugin.unregisterGlobalProperties(Set<String>(testAttribute.keys))
         await waitForExpectations(timeout: 1)
         let removeGlobalAttributeCallCount = await analyticsClient.removeGlobalAttributeCalls.count
-        XCTAssertEqual(removeGlobalAttributeCallCount, testProperty.count)
+        XCTAssertEqual(removeGlobalAttributeCallCount, testAttribute.count)
     }
 
     func testFlushEvent() async {

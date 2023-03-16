@@ -12,18 +12,19 @@ import XCTest
 class ClickstreamPluginTestBase: XCTestCase {
     var analyticsPlugin: AWSClickstreamPlugin!
     var mockNetworkMonitor: MockNetworkMonitor!
+    var clickstream: ClickstreamContext!
     let testAppId = "testAppId"
-    let testEndpoint = "https://yourhost/collect"
+    let testEndpoint = "https://example.com/collect"
 
     override func setUp() async throws {
         mockNetworkMonitor = MockNetworkMonitor()
         analyticsPlugin = AWSClickstreamPlugin()
         let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
                                                                    endpoint: testEndpoint,
-                                                                   sendEventsInterval: 10000,
+                                                                   sendEventsInterval: 10_000,
                                                                    isTrackAppExceptionEvents: false,
                                                                    isCompressEvents: false)
-        let clickstream = try ClickstreamContext(with: contextConfiguration)
+        clickstream = try ClickstreamContext(with: contextConfiguration)
 
         let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.uniqueId,
                                                                sessionBackgroundTimeout: TimeInterval(10)),
@@ -45,8 +46,7 @@ class ClickstreamPluginTestBase: XCTestCase {
         sessionClient.analyticsClient = analyticsClient
         clickstream.networkMonitor = mockNetworkMonitor
 
-        analyticsPlugin.configure(clickstream: clickstream,
-                                  autoFlushEventsTimer: nil,
+        analyticsPlugin.configure(autoFlushEventsTimer: nil,
                                   networkMonitor: mockNetworkMonitor)
         sessionClient.startSession()
 

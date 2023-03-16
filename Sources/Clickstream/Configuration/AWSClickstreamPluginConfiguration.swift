@@ -14,7 +14,7 @@ public struct AWSClickstreamConfiguration {
     static let isTrackAppExceptionKey = "isTrackAppExceptionEvents"
     static let isCompressEventsKey = "isCompressEvents"
 
-    static let defaultSendEventsInterval = 10000
+    static let defaultSendEventsInterval = 10_000
     static let defaulTrackAppException = true
     static let defaulCompressEvents = true
 
@@ -161,4 +161,4 @@ public struct AWSClickstreamConfiguration {
     }
 }
 
-extension AWSClickstreamConfiguration: DefaultLogger {}
+extension AWSClickstreamConfiguration: ClickstreamLogger {}

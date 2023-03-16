@@ -36,7 +36,7 @@ class SessionClient: SessionClientBehaviour {
             ActivityTracker(backgroundTrackingTimeout: configuration.sessionBackgroundTimeout)
         self.configuration = configuration
         self.userDefaults = userDefaults
-        session = Session.invalid
+        self.session = Session.invalid
     }
 
     var currentSession: Session {
@@ -54,7 +54,7 @@ class SessionClient: SessionClientBehaviour {
 
         activityTracker.beginActivityTracking { [weak self] newState in
             guard let self else { return }
-            self.log.verbose("New state received: \(newState)")
+            self.log.info("New state received: \(newState)")
             self.sessionClientQueue.sync(flags: .barrier) {
                 self.respond(to: newState)
             }
@@ -71,7 +71,7 @@ class SessionClient: SessionClientBehaviour {
 
         // Update Endpoint and record Session Start event
         Task {
-            log.verbose("Firing Session Event: Start")
+            log.info("Firing Session Event: Start")
             record(eventType: Event.PresetEvent.SESSION_START)
         }
     }
@@ -81,7 +81,7 @@ class SessionClient: SessionClientBehaviour {
         log.info("Session Stopped.")
 
         Task {
-            log.verbose("Firing Session Event: Stop")
+            log.info("Firing Session Event: Stop")
             record(eventType: Event.PresetEvent.SESSION_STOP)
         }
     }
@@ -114,9 +114,9 @@ class SessionClient: SessionClientBehaviour {
     }
 }
 
-// MARK: - DefaultLogger
+// MARK: - ClickstreamLogger
 
-extension SessionClient: DefaultLogger {}
+extension SessionClient: ClickstreamLogger {}
 extension SessionClient {
     enum Constants {
         static let queue = "com.amazonaws.solution.Clickstream.SessionClientQueue"

@@ -78,7 +78,7 @@ class ClickstreamContext {
     var analyticsClient: AnalyticsClientBehaviour!
     var networkMonitor: NetworkMonitor!
     let systemInfo: SystemInfo
-    let configuration: ClickstreamContextConfiguration
+    var configuration: ClickstreamContextConfiguration
     let uniqueId: String
     let storage: ClickstreamContextStorage
 
@@ -86,30 +86,26 @@ class ClickstreamContext {
          userDefaults: UserDefaultsBehaviour = UserDefaults.standard,
          keychainStore: KeychainStoreBehavior = KeychainStore(service: ClickstreamContext.Constants.keychain)) throws
     {
-        storage = ClickstreamContextStorage(userDefaults: userDefaults, keychainStore: keychainStore)
-        uniqueId = Self.getUniqueId(storage: storage)
-        systemInfo = SystemInfo()
+        self.storage = ClickstreamContextStorage(userDefaults: userDefaults, keychainStore: keychainStore)
+        self.uniqueId = Self.getUniqueId(storage: storage)
+        self.systemInfo = SystemInfo()
         self.configuration = configuration
     }
 
     private static func getUniqueId(storage: ClickstreamContextStorage) -> String {
-        if let deviceUniqueId = try? storage.keychainStore._getString(Constants.uniqueIdKey) {
+        if let deviceUniqueId = storage.userDefaults.string(forKey: Constants.uniqueIdKey) {
             return deviceUniqueId
         }
         let newUniqueId = UUID().uuidString
-        do {
-            try storage.keychainStore._set(newUniqueId, key: Constants.uniqueIdKey)
-            log.verbose("Created new Clickstream UniqueId and saved it to Keychain: \(newUniqueId)")
-        } catch {
-            log.error("Failed to save UniqueId in Keychain")
-        }
+        storage.userDefaults.save(key: Constants.uniqueIdKey, value: newUniqueId)
+        log.info("Created new Clickstream UniqueId and saved it to Keychain: \(newUniqueId)")
         return newUniqueId
     }
 }
 
 // MARK: - extensions
 
-extension ClickstreamContext: DefaultLogger {}
+extension ClickstreamContext: ClickstreamLogger {}
 
 extension ClickstreamContext {
     enum Constants {

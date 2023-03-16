@@ -13,9 +13,9 @@ class Session: Codable {
     private(set) var stopTime: Date?
 
     init(uniqueId: String) {
-        sessionId = Self.generateSessionId(uniqueId: uniqueId)
-        startTime = Date()
-        stopTime = nil
+        self.sessionId = Self.generateSessionId(uniqueId: uniqueId)
+        self.startTime = Date()
+        self.stopTime = nil
     }
 
     init(sessionId: String, startTime: Date, stopTime: Date?) {
@@ -50,15 +50,15 @@ class Session: Codable {
     private static func generateSessionId(uniqueId: String) -> String {
         let now = Date()
         let dateFormatter = DateFormatter()
-        dateFormatter.timeZone = TimeZone(abbreviation: Constants.Date.defaultTimezone)
-        dateFormatter.locale = Locale(identifier: Constants.Date.defaultLocale)
+        dateFormatter.timeZone = TimeZone(abbreviation: Constants.defaultTimezone)
+        dateFormatter.locale = Locale(identifier: Constants.defaultLocale)
 
         // Timestamp: Day
-        dateFormatter.dateFormat = Constants.Date.dateFormat
+        dateFormatter.dateFormat = Constants.dateFormat
         let timestampDay = dateFormatter.string(from: now)
 
         // Timestamp: Time
-        dateFormatter.dateFormat = Constants.Date.timeFormat
+        dateFormatter.dateFormat = Constants.timeFormat
         let timestampTime = dateFormatter.string(from: now)
 
         let uniqueIdKey = uniqueId.padding(toLength: Constants.maxUniqueIdLength,
@@ -84,18 +84,9 @@ extension Session {
     enum Constants {
         static let maxUniqueIdLength = 8
         static let paddingChar = "_"
-
-        enum CodingKeys {
-            static let sessionId = "sessionId"
-            static let startTime = "startTime"
-            static let stopTime = "stopTime"
-        }
-
-        enum Date {
-            static let defaultTimezone = "GMT"
-            static let defaultLocale = "en_US"
-            static let dateFormat = "yyyyMMdd"
-            static let timeFormat = "HHmmssSSS"
-        }
+        static let defaultTimezone = "GMT"
+        static let defaultLocale = "en_US"
+        static let dateFormat = "yyyyMMdd"
+        static let timeFormat = "HHmmssSSS"
     }
 }

@@ -10,7 +10,7 @@ protocol AnalyticsPropertiesModel {
 }
 
 extension AnalyticsPropertiesModel {
-    func addProperties(_ properties: [String: AttributeValue]) {
+    func addAttribute(_ properties: [String: AttributeValue]) {
         for (key, value) in properties {
             addAttribute(value, forKey: key)
         }

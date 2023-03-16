@@ -12,7 +12,7 @@ public extension AWSClickstreamPlugin {
     func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {
         Task {
             if userId == Event.User.USER_ID_NIL {
-                await analyticsClient.removeUserAttribute(forKey: userId)
+                await analyticsClient.removeUserAttribute(forKey: Event.ReservedAttribute.USER_ID)
             } else if userId != Event.User.USER_ID_EMPTY {
                 await analyticsClient.addUserAttribute(userId, forKey: Event.ReservedAttribute.USER_ID)
             }
@@ -25,13 +25,17 @@ public extension AWSClickstreamPlugin {
     }
 
     func record(event: AnalyticsEvent) {
+        guard let event = event as? BaseClickstreamEvent else{
+            log.error("Event type does not match")
+            return
+        }
         if !isEnabled {
             log.warn("Cannot record events. Clickstream is disabled")
             return
         }
         let clickstreamEvent = analyticsClient.createEvent(withEventType: event.name)
-        if let properties = event.properties {
-            clickstreamEvent.addProperties(properties)
+        if let attributes = event.attribute {
+            clickstreamEvent.addAttribute(attributes)
         }
 
         Task {
@@ -44,7 +48,7 @@ public extension AWSClickstreamPlugin {
     }
 
     func record(eventWithName eventName: String) {
-        let event = BasicAnalyticsEvent(name: eventName)
+        let event = BaseClickstreamEvent(name: eventName)
         record(event: event)
     }
 

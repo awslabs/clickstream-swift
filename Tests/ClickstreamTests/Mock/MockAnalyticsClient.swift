@@ -107,10 +107,9 @@ actor MockAnalyticsClient: AnalyticsClientBehaviour {
     }
 
     var submitEventsCount = 0
-    func submitEvents() async throws -> [ClickstreamEvent] {
+    func submitEvents() {
         submitEventsCount += 1
         submitEventsExpectation?.fulfill()
-        return []
     }
 
     func resetCounters() {

@@ -5,6 +5,7 @@
 excluded:
   - Pods
   - .build
+  - Tests
 
 analyzer_rules:
   - unused_import
@@ -12,6 +13,9 @@ analyzer_rules:
 
 opt_in_rules:
   - empty_count
+
+disabled_rules:
+  - opening_brace
 
 # configurable rules can be customized from this configuration file
 closing_brace: error
@@ -28,10 +32,12 @@ identifier_name:
     - id
     - of
     - or
+  allowed_symbols:
+    - _
+  validates_start_with_lowercase: false
 line_length:
   warning: 120
   error: 160
-opening_brace: error
 return_arrow_whitespace: error
 statement_position:
   severity: error
