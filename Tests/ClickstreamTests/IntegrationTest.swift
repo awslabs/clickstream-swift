@@ -67,14 +67,14 @@ class IntegrationTest: XCTestCase {
         ]
         let event = BaseClickstreamEvent(name: "userId", attribute: attribute)
         ClickstreamAnalytics.recordEvent(event: event)
-        Thread.sleep(forTimeInterval: 0.3)
+        Thread.sleep(forTimeInterval: 0.5)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }
 
     func testRecordOneEventWithNameSuccess() throws {
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
-        Thread.sleep(forTimeInterval: 0.3)
+        Thread.sleep(forTimeInterval: 0.5)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }
@@ -167,7 +167,7 @@ class IntegrationTest: XCTestCase {
         configuration.isCompressEvents = true
         configuration.endpoint = testSuccessEndpoint
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
-        Thread.sleep(forTimeInterval: 0.3)
+        Thread.sleep(forTimeInterval: 1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }

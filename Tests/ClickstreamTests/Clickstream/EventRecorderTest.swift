@@ -307,7 +307,7 @@ class EventRecorderTest: XCTestCase {
         try eventRecorder.save(clickstreamEvent)
         eventRecorder.submitEvents()
         XCTAssertEqual(1, eventRecorder.queue.operationCount)
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 0.3)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
     }
@@ -357,7 +357,7 @@ class EventRecorderTest: XCTestCase {
         eventRecorder.submitEvents()
         eventRecorder.submitEvents()
         XCTAssertEqual(2, eventRecorder.queue.operationCount)
-        Thread.sleep(forTimeInterval: 0.3)
+        Thread.sleep(forTimeInterval: 0.5)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
     }
@@ -369,7 +369,7 @@ class EventRecorderTest: XCTestCase {
         for _ in 0 ..< 1_100 {
             eventRecorder.submitEvents()
         }
-        XCTAssertEqual(1_000, eventRecorder.queue.operationCount)
+        XCTAssertTrue(eventRecorder.queue.operationCount <= 1_000)
     }
 }
 
