@@ -132,7 +132,8 @@ class ActivityTracker: ActivityTrackerBehaviour {
         #if canImport(UIKit)
             if backgroundTrackingTimeout > 0 {
                 backgroundTask = UIApplication.shared.beginBackgroundTask(withName:
-                    Constants.backgroundTask) { [weak self] in
+                    Constants.backgroundTask)
+                    { [weak self] in
                         self?.stateMachine.process(.backgroundTrackingDidTimeout)
                         self?.stopBackgroundTracking()
                     }
@@ -140,7 +141,8 @@ class ActivityTracker: ActivityTrackerBehaviour {
         #endif
         guard backgroundTrackingTimeout != .infinity else { return }
         backgroundTimer = Timer.scheduledTimer(withTimeInterval:
-            backgroundTrackingTimeout, repeats: false) { [weak self] _ in
+            backgroundTrackingTimeout, repeats: false)
+            { [weak self] _ in
                 self?.stateMachine.process(.backgroundTrackingDidTimeout)
                 self?.stopBackgroundTracking()
             }

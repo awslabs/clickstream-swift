@@ -76,7 +76,7 @@ class ClickstreamDBUtil: ClickstreamDBProtocol {
         _ = try dbAdapter.executeQuery(deleteStatement, [])
     }
 
-    // swiftlint:disable: force_cast
+    // swiftlint:disable force_cast
     func getTotalSize() throws -> Int64 {
         let getTotalStatement = """
         SELECT SUM(eventSize) FROM Event
@@ -92,6 +92,7 @@ class ClickstreamDBUtil: ClickstreamDBProtocol {
         let totalCount = try dbAdapter.executeQuery(getEventCountStatement, []).scalar() as! Int64
         return totalCount
     }
+    // swiftlint:enable force_cast
 }
 
 extension ClickstreamDBUtil: ClickstreamLogger {}
