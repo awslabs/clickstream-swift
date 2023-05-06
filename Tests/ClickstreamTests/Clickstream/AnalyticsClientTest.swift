@@ -11,17 +11,19 @@ import XCTest
 class AnalyticsClientTest: XCTestCase {
     private var analyticsClient: AnalyticsClient!
     private var eventRecorder: MockEventRecorder!
+    private var clickstream: ClickstreamContext!
     private var session: Session!
     let testAppId = "testAppId"
     let testEndpoint = "https://example.com/collect"
 
     override func setUp() async throws {
+        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
                                                                    endpoint: testEndpoint,
                                                                    sendEventsInterval: 10_000,
                                                                    isTrackAppExceptionEvents: false,
                                                                    isCompressEvents: false)
-        let clickstream = try ClickstreamContext(with: contextConfiguration)
+        clickstream = try ClickstreamContext(with: contextConfiguration)
         clickstream.networkMonitor = MockNetworkMonitor()
         eventRecorder = MockEventRecorder()
         session = Session(uniqueId: "uniqueId")
@@ -118,15 +120,15 @@ class AnalyticsClientTest: XCTestCase {
     func testAddUserAttributeSuccess() async {
         await analyticsClient.addUserAttribute("appStore", forKey: "userChannel")
         let userAttributeCount = await analyticsClient.userAttributes.count
-        let attributeValue = await analyticsClient.userAttributes["userChannel"] as? String
-        XCTAssertEqual(userAttributeCount, 1)
+        let attributeValue = await (analyticsClient.userAttributes["userChannel"] as! JsonObject)["value"] as? String
+        XCTAssertEqual(userAttributeCount, 2)
         XCTAssertEqual(attributeValue, "appStore")
     }
 
     func testAddUserAttributeForExceedNameLength() async {
         let exceedName = String(repeating: "a", count: 51)
         await analyticsClient.addUserAttribute("value", forKey: exceedName)
-        let errorValue = await analyticsClient.userAttributes["_error_name_length_exceed"] as? String
+        let errorValue = await analyticsClient.globalAttributes["_error_name_length_exceed"] as? String
         XCTAssertNotNil(errorValue)
         XCTAssertTrue(errorValue!.contains(exceedName))
     }
@@ -134,7 +136,7 @@ class AnalyticsClientTest: XCTestCase {
     func testAddUserAttributeForInvalidName() async {
         let invalidName = "1_goods_expose"
         await analyticsClient.addUserAttribute("value", forKey: invalidName)
-        let errorValue = await analyticsClient.userAttributes["_error_name_invalid"] as? String
+        let errorValue = await analyticsClient.globalAttributes["_error_name_invalid"] as? String
         XCTAssertNotNil(errorValue)
         XCTAssertTrue(errorValue!.contains(invalidName))
     }
@@ -142,7 +144,7 @@ class AnalyticsClientTest: XCTestCase {
     func testAddUserAttributeForExceedValueLength() async {
         let exceedValue = String(repeating: "a", count: 257)
         await analyticsClient.addUserAttribute(exceedValue, forKey: "name01")
-        let errorValue = await analyticsClient.userAttributes["_error_value_length_exceed"] as? String
+        let errorValue = await analyticsClient.globalAttributes["_error_value_length_exceed"] as? String
         XCTAssertNotNil(errorValue)
         XCTAssertTrue(errorValue!.contains("name01"))
         XCTAssertTrue(errorValue!.contains("attribute value:"))
@@ -171,7 +173,7 @@ class AnalyticsClientTest: XCTestCase {
         for i in 0 ..< 101 {
             await analyticsClient.addUserAttribute("value", forKey: "name\(i)")
         }
-        let sizeExceedValue = await analyticsClient.userAttributes["_error_attribute_size_exceed"] as? String
+        let sizeExceedValue = await analyticsClient.globalAttributes["_error_attribute_size_exceed"] as? String
         XCTAssertNotNil(sizeExceedValue)
         XCTAssertTrue(sizeExceedValue!.contains("name100"))
     }
@@ -180,11 +182,58 @@ class AnalyticsClientTest: XCTestCase {
         for i in 0 ..< 100 {
             await analyticsClient.addUserAttribute("value\(i)", forKey: "name")
         }
-        let sizeExceedValue = await analyticsClient.userAttributes["_error_attribute_size_exceed"]
+        let sizeExceedValue = await analyticsClient.globalAttributes["_error_attribute_size_exceed"]
         XCTAssertNil(sizeExceedValue)
         let userAttributeCount = await analyticsClient.userAttributes.count
-        XCTAssertEqual(1, userAttributeCount)
+        XCTAssertEqual(2, userAttributeCount)
     }
+
+    func testInitialvalueInAnalyticsClient() async {
+        let userId = await analyticsClient.userId
+        let userUniqueId = clickstream.userUniqueId
+        XCTAssertNil(userId)
+        XCTAssertNotNil(userUniqueId)
+        let userAttribute = await analyticsClient.userAttributes
+        XCTAssertTrue(userAttribute.keys.contains(Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP))
+    }
+
+    func testUpdateSameUserIdTwice() async {
+        let userIdForA = "aaa"
+        let userUniqueId = clickstream.userUniqueId
+        await analyticsClient.updateUserId(userIdForA)
+        await analyticsClient.addUserAttribute(12, forKey: "user_age")
+        await analyticsClient.updateUserId(userIdForA)
+        let userAttribute = await analyticsClient.userAttributes
+        XCTAssertTrue(userAttribute.keys.contains("user_age"))
+        XCTAssertEqual(userUniqueId, clickstream.userUniqueId)
+    }
+
+    func testUpdateDifferentUserId() async {
+        let userIdForA = "aaa"
+        let userIdForB = "bbb"
+        let userUniqueId = clickstream.userUniqueId
+        await analyticsClient.updateUserId(userIdForA)
+        await analyticsClient.addUserAttribute(12, forKey: "user_age")
+        await analyticsClient.updateUserId(userIdForB)
+        let userAttribute = await analyticsClient.userAttributes
+        XCTAssertFalse(userAttribute.keys.contains("user_age"))
+        XCTAssertNotEqual(userUniqueId, clickstream.userUniqueId)
+    }
+
+    func testChangeToOriginUserId() async {
+        let userIdForA = "aaa"
+        let userIdForB = "bbb"
+        let userUniqueId = clickstream.userUniqueId
+        await analyticsClient.updateUserId(userIdForA)
+        await analyticsClient.updateUserId(userIdForB)
+        let userUniqueIdB = clickstream.userUniqueId
+        await analyticsClient.updateUserId(userIdForA)
+        XCTAssertEqual(userUniqueId, clickstream.userUniqueId)
+        await analyticsClient.updateUserId(userIdForB)
+        XCTAssertEqual(userUniqueIdB, clickstream.userUniqueId)
+    }
+
+    // MARK: - testEvent
 
     func testCreateEvent() {
         let eventType = "testEvent"
@@ -235,10 +284,10 @@ class AnalyticsClientTest: XCTestCase {
                 return
             }
 
-            XCTAssertEqual(savedEvent.userAttributes.count, 3)
-            XCTAssertEqual(savedEvent.userAttributes["attribute_0"] as? String, "test_0")
-            XCTAssertEqual(savedEvent.userAttributes["metric_0"] as? Int, 0)
-            XCTAssertEqual(savedEvent.userAttributes["metric_1"] as? Int, 1)
+            XCTAssertEqual(savedEvent.userAttributes.count, 4)
+            XCTAssertEqual((savedEvent.userAttributes["attribute_0"] as! JsonObject)["value"] as? String, "test_0")
+            XCTAssertEqual((savedEvent.userAttributes["metric_0"] as! JsonObject)["value"] as? Int, 0)
+            XCTAssertEqual((savedEvent.userAttributes["metric_1"] as! JsonObject)["value"] as? Int, 1)
 
         } catch {
             XCTFail("Unexpected exception while attempting to record event")

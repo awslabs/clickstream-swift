@@ -10,13 +10,14 @@ import Foundation
 import XCTest
 class ClickstreamEventTest: XCTestCase {
     let testAppId = "testAppId"
+    let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)
     var clickstreamEvent: ClickstreamEvent!
     override func setUp() {
         clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                             appId: testAppId,
                                             uniqueId: UUID().uuidString,
                                             session: Session(uniqueId: UUID().uuidString),
-                                            systemInfo: SystemInfo(),
+                                            systemInfo: SystemInfo(storage: storage),
                                             netWorkType: NetWorkType.Wifi)
     }
 
@@ -65,7 +66,7 @@ class ClickstreamEventTest: XCTestCase {
                                       appId: testAppId,
                                       uniqueId: UUID().uuidString,
                                       session: Session(uniqueId: UUID().uuidString),
-                                      systemInfo: SystemInfo(),
+                                      systemInfo: SystemInfo(storage: storage),
                                       netWorkType: NetWorkType.Wifi)
         XCTAssertFalse(event1 == event2)
     }

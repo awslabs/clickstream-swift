@@ -4,12 +4,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
+import Foundation
 
 protocol AnalyticsClientBehaviour: Actor {
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String)
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String)
     func removeGlobalAttribute(forKey key: String)
     func removeUserAttribute(forKey key: String)
+    func updateUserId(_ id: String?)
+    func updateUserAttributes()
 
     nonisolated func createEvent(withEventType eventType: String) -> ClickstreamEvent
     func record(_ event: ClickstreamEvent) async throws
@@ -22,8 +25,9 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var eventRecorder: AnalyticsEventRecording
     private let sessionProvider: SessionProvider
     private(set) lazy var globalAttributes: [String: AttributeValue] = [:]
-    private(set) lazy var userAttributes: [String: AttributeValue] = [:]
+    private(set) var userAttributes: [String: Any] = [:]
     private let clickstream: ClickstreamContext
+    private(set) var userId: String?
 
     init(clickstream: ClickstreamContext,
          eventRecorder: AnalyticsEventRecording,
@@ -32,6 +36,8 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
         self.clickstream = clickstream
         self.eventRecorder = eventRecorder
         self.sessionProvider = sessionProvider
+        userId = UserDefaultsUtil.getCurrentUserId(storage: clickstream.storage)
+        userAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
     }
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
@@ -46,9 +52,12 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
         let eventError = Event.checkUserAttribute(currentNumber: userAttributes.count, key: key, value: attribute)
         if eventError != nil {
-            userAttributes[eventError!.errorType] = eventError!.errorMessage
+            globalAttributes[eventError!.errorType] = eventError!.errorMessage
         } else {
-            userAttributes[key] = attribute
+            var userAttribute = JsonObject()
+            userAttribute["value"] = attribute
+            userAttribute["set_timestamp"] = Date().millisecondsSince1970
+            userAttributes[key] = userAttribute
         }
     }
 
@@ -60,6 +69,29 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
         userAttributes[key] = nil
     }
 
+    func updateUserId(_ id: String?) {
+        if userId != id {
+            userId = id
+            UserDefaultsUtil.saveCurrentUserId(storage: clickstream.storage, userId: userId)
+            if let newUserId = id, !newUserId.isEmpty {
+                userAttributes = JsonObject()
+                let userInfo = UserDefaultsUtil.getNewUserInfo(storage: clickstream.storage, userId: newUserId)
+                clickstream.userUniqueId = userInfo["user_unique_id"] as! String
+                let userFirstTouchTimestamp = userInfo["user_first_touch_timestamp"] as! Int64
+                addUserAttribute(userFirstTouchTimestamp, forKey: Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP)
+            }
+            if id == nil {
+                removeUserAttribute(forKey: Event.ReservedAttribute.USER_ID)
+            } else {
+                addUserAttribute(id!, forKey: Event.ReservedAttribute.USER_ID)
+            }
+        }
+    }
+
+    func updateUserAttributes() {
+        UserDefaultsUtil.updateUserAttributes(storage: clickstream.storage, userAttributes: userAttributes)
+    }
+
     // MARK: - Event recording
 
     nonisolated func createEvent(withEventType eventType: String) -> ClickstreamEvent {
@@ -68,7 +100,7 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
 
         let event = ClickstreamEvent(eventType: eventType,
                                      appId: clickstream.configuration.appId,
-                                     uniqueId: clickstream.uniqueId,
+                                     uniqueId: clickstream.userUniqueId,
                                      session: sessionProvider(),
                                      systemInfo: clickstream.systemInfo,
                                      netWorkType: clickstream.networkMonitor.netWorkType)
@@ -79,9 +111,7 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
         for (key, attribute) in globalAttributes {
             event.addGlobalAttribute(attribute, forKey: key)
         }
-        for (key, attribute) in userAttributes {
-            event.addUserAttribute(attribute, forKey: key)
-        }
+        event.setUserAttribute(userAttributes)
         let objId = ObjectIdentifier(event)
         event.hashCode = objId.hashValue
         try eventRecorder.save(event)

@@ -65,6 +65,34 @@ actor MockAnalyticsClient: AnalyticsClientBehaviour {
         removeGlobalAttributeExpectation?.fulfill()
     }
 
+    // MARK: - UpdateUserId
+
+    private var updateUserIdExpectation: XCTestExpectation?
+    func setUpdateUserIdExpectation(_ expectation: XCTestExpectation, count: Int = 1) {
+        updateUserIdExpectation = expectation
+        updateUserIdExpectation?.expectedFulfillmentCount = count
+    }
+
+    var updateUserIdCount = 0
+    func updateUserId(_ id: String?) {
+        updateUserIdCount += 1
+        updateUserIdExpectation?.fulfill()
+    }
+
+    // MARK: - UpdateUserAttributes
+
+    private var updateUserAttributesExpectation: XCTestExpectation?
+    func setUpdateUserAttributesExpectation(_ expectation: XCTestExpectation, count: Int = 1) {
+        updateUserAttributesExpectation = expectation
+        updateUserAttributesExpectation?.expectedFulfillmentCount = count
+    }
+
+    var updateUserAttributeCount = 0
+    func updateUserAttributes() {
+        updateUserAttributeCount += 1
+        updateUserAttributesExpectation?.fulfill()
+    }
+
     // MARK: - CreateEvent
 
     var createEventCount = 0
@@ -76,7 +104,9 @@ actor MockAnalyticsClient: AnalyticsClientBehaviour {
         Task {
             await increaseCreateEventCount()
         }
-        return ClickstreamEvent(eventType: eventType, appId: "", uniqueId: "", session: Session(uniqueId: ""), systemInfo: SystemInfo(), netWorkType: "WIFI")
+        let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)
+        return ClickstreamEvent(eventType: eventType, appId: "", uniqueId: "", session: Session(uniqueId: ""),
+                                systemInfo: SystemInfo(storage: storage), netWorkType: "WIFI")
     }
 
     // MARK: - RecordEvent
@@ -118,6 +148,7 @@ actor MockAnalyticsClient: AnalyticsClientBehaviour {
         createEventCount = 0
         addUserAttributeCount = 0
         removeUserAttributeCount = 0
+        updateUserIdCount = 0
         recordedEvents = []
         lastRecordedEvent = nil
         removeGlobalAttributeCalls = []

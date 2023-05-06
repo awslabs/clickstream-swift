@@ -35,7 +35,7 @@ class EventRecorderTest: XCTestCase {
                 return HttpResponse.ok(.text("request success"))
             }
             try! server.start()
-            let appId = testAppId + String(describing: Date().timeIntervalSince1970)
+            let appId = testAppId + String(describing: Date().millisecondsSince1970)
             var contextConfiguration = ClickstreamContextConfiguration(appId: appId,
                                                                        endpoint: testSuccessEndpoint,
                                                                        sendEventsInterval: 10_000,
@@ -45,9 +45,9 @@ class EventRecorderTest: XCTestCase {
             clickstream = try ClickstreamContext(with: contextConfiguration)
             clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                                 appId: testAppId,
-                                                uniqueId: clickstream.uniqueId,
+                                                uniqueId: clickstream.userUniqueId,
                                                 session: Session(uniqueId: UUID().uuidString),
-                                                systemInfo: SystemInfo(),
+                                                systemInfo: SystemInfo(storage: clickstream.storage),
                                                 netWorkType: NetWorkType.Wifi)
             eventRecorder = try! EventRecorder(clickstream: clickstream)
             dbUtil = eventRecorder.dbUtil
@@ -72,7 +72,7 @@ class EventRecorderTest: XCTestCase {
         try eventRecorder.save(clickstreamEvent)
         let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
         XCTAssertNotNil(event["hashCode"])
-        XCTAssertEqual(clickstream.uniqueId, event["unique_id"] as! String)
+        XCTAssertEqual(clickstream.userUniqueId, event["unique_id"] as! String)
         XCTAssertEqual("testEvent", event["event_type"] as! String)
         XCTAssertNotNil(event["event_id"])
         XCTAssertEqual(testAppId, event["app_id"] as! String)
@@ -117,17 +117,35 @@ class EventRecorderTest: XCTestCase {
     }
 
     func testGetEventWithUserAttribute() throws {
-        clickstreamEvent.addUserAttribute(21, forKey: "_user_age")
-        clickstreamEvent.addUserAttribute(true, forKey: "isFirstOpen")
-        clickstreamEvent.addUserAttribute(85.5, forKey: "score")
-        clickstreamEvent.addUserAttribute("carl", forKey: "_user_name")
+        var userInfo = JsonObject()
+        let currentTimeStamp = Date().millisecondsSince1970
+        var userAgeInfo = JsonObject()
+        userAgeInfo["value"] = 21
+        userAgeInfo["set_timestamp"] = currentTimeStamp
+        userInfo["_user_age"] = userAgeInfo
+
+        var isFirstOpenInfo = JsonObject()
+        isFirstOpenInfo["value"] = true
+        isFirstOpenInfo["set_timestamp"] = currentTimeStamp
+        userInfo["isFirstOpen"] = isFirstOpenInfo
+
+        var scoreInfo = JsonObject()
+        scoreInfo["value"] = 85.5
+        scoreInfo["set_timestamp"] = currentTimeStamp
+        userInfo["score"] = scoreInfo
+
+        var userNameInfo = JsonObject()
+        userNameInfo["value"] = "carl"
+        userNameInfo["set_timestamp"] = currentTimeStamp
+        userInfo["_user_name"] = userNameInfo
+        clickstreamEvent.setUserAttribute(userInfo)
         try eventRecorder.save(clickstreamEvent)
         let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
         let userAttributes = event["user"] as! [String: Any]
-        XCTAssertEqual(21, userAttributes["_user_age"] as! Int)
-        XCTAssertEqual(true, userAttributes["isFirstOpen"] as! Bool)
-        XCTAssertEqual(85.5, userAttributes["score"] as! Double)
-        XCTAssertEqual("carl", userAttributes["_user_name"] as! String)
+        XCTAssertEqual(21, (userAttributes["_user_age"] as! JsonObject)["value"] as! Int)
+        XCTAssertEqual(true, (userAttributes["isFirstOpen"] as! JsonObject)["value"] as! Bool)
+        XCTAssertEqual(85.5, (userAttributes["score"] as! JsonObject)["value"] as! Double)
+        XCTAssertEqual("carl", (userAttributes["_user_name"] as! JsonObject)["value"] as! String)
     }
 
     func testSaveMultiEvent() throws {
@@ -185,20 +203,6 @@ class EventRecorderTest: XCTestCase {
         XCTAssertEqual(testAppId, event["app_id"] as! String)
     }
 
-    func testGetBatchEventHasCorrectSequenceId() throws {
-        for _ in 0 ..< 5 {
-            try eventRecorder.save(clickstreamEvent)
-        }
-        let batchEvent = try eventRecorder.getBatchEvent()
-        let eventsJson = batchEvent.eventsJson
-        let eventArray = eventsJson.jsonArray()
-        XCTAssertEqual(5, eventArray.count)
-        let firstEvent = eventArray[0]
-        let lastEvent = eventArray[4]
-        XCTAssertEqual(1, firstEvent["event_sequence_id"] as! Int)
-        XCTAssertEqual(5, lastEvent["event_sequence_id"] as! Int)
-    }
-
     func testGetBatchEventReachedMaxSubmissionSize() throws {
         let longAttributeValue = String(repeating: "a", count: 1_024)
         for i in 0 ..< 40 {
@@ -215,13 +219,8 @@ class EventRecorderTest: XCTestCase {
         XCTAssertTrue(eventsJson.hasPrefix("[{"))
         XCTAssertTrue(eventsJson.hasSuffix("}]"))
 
-        let eventArray = eventsJson.jsonArray()
         XCTAssertTrue(eventCount < 15)
         XCTAssertEqual(12, lastEventId)
-        let firstEvent = eventArray[0]
-        let lastEvent = eventArray[11]
-        XCTAssertEqual(1, firstEvent["event_sequence_id"] as! Int)
-        XCTAssertEqual(12, lastEvent["event_sequence_id"] as! Int)
     }
 
     func testReachedMaxEventNumberOfBatch() throws {

@@ -61,7 +61,7 @@ class EventRecorder: AnalyticsEventRecording {
 
     /// process an batch event and send the events to server
     func processEvent() -> Int {
-        let startTime = Date().timeIntervalSince1970
+        let startTime = Date().millisecondsSince1970
         var submissions = 0
         var totalEventSend = 0
         do {
@@ -80,7 +80,7 @@ class EventRecorder: AnalyticsEventRecording {
                 totalEventSend += batchEvent.eventCount
                 submissions += 1
             } while submissions < Constants.maxSubmissionsAllowed
-            let costTime = String(describing: Date().timeIntervalSince1970 - startTime)
+            let costTime = String(describing: Date().millisecondsSince1970 - startTime)
             log.info("time of process event cost: \(costTime)s")
         } catch {
             log.error("Failed to send event:\(error)")
@@ -96,9 +96,7 @@ class EventRecorder: AnalyticsEventRecording {
 
         let events = try dbUtil.getEventsWith(limit: Constants.maxEventNumberOfBatch)
         for event in events {
-            let sequenceIdString = "\"event_sequence_id\": \(String(describing: event.id ?? 0)),"
-            var eventJson = event.eventJson
-            eventJson.insert(contentsOf: sequenceIdString, at: eventJson.index(after: eventJson.startIndex))
+            let eventJson = event.eventJson
             if eventsJson.count + eventJson.count > Constants.maxSubmissionSize {
                 eventsJson.append("]")
                 break

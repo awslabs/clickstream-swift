@@ -10,22 +10,29 @@ import Foundation
 
 public extension AWSClickstreamPlugin {
     func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {
-        Task {
-            if userId == Event.User.USER_ID_NIL {
-                await analyticsClient.removeUserAttribute(forKey: Event.ReservedAttribute.USER_ID)
-            } else if userId != Event.User.USER_ID_EMPTY {
-                await analyticsClient.addUserAttribute(userId, forKey: Event.ReservedAttribute.USER_ID)
+        if userId == Event.User.USER_ID_EMPTY {
+            userProfile?.properties?.forEach { key, value in
+                Task {
+                    await analyticsClient.addUserAttribute(value, forKey: key)
+                }
             }
-        }
-        userProfile?.properties?.forEach { key, value in
+        } else {
             Task {
-                await analyticsClient.addUserAttribute(value, forKey: key)
+                if userId == Event.User.USER_ID_NIL {
+                    await analyticsClient.updateUserId(nil)
+                } else {
+                    await analyticsClient.updateUserId(userId)
+                }
             }
         }
+        Task {
+            await analyticsClient.updateUserAttributes()
+        }
+        record(eventWithName: Event.PresetEvent.PROFILE_SET)
     }
 
     func record(event: AnalyticsEvent) {
-        guard let event = event as? BaseClickstreamEvent else{
+        guard let event = event as? BaseClickstreamEvent else {
             log.error("Event type does not match")
             return
         }

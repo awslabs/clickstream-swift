@@ -119,7 +119,7 @@ class SessionClient: SessionClientBehaviour {
 extension SessionClient: ClickstreamLogger {}
 extension SessionClient {
     enum Constants {
-        static let queue = "com.amazonaws.solution.Clickstream.SessionClientQueue"
+        static let queue = "software.aws.solution.Clickstream.SessionClientQueue"
     }
 }
 

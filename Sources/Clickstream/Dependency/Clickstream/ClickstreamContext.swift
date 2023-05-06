@@ -6,9 +6,9 @@
 //
 
 import Amplify
+import AWSPluginsCore
 import Foundation
 import Network
-@_spi(KeychainStore) import AWSPluginsCore
 
 // MARK: - UserDefaultsBehaviour
 
@@ -70,7 +70,6 @@ public struct ClickstreamContextConfiguration {
 
 struct ClickstreamContextStorage {
     let userDefaults: UserDefaultsBehaviour
-    let keychainStore: KeychainStoreBehavior
 }
 
 class ClickstreamContext {
@@ -79,37 +78,15 @@ class ClickstreamContext {
     var networkMonitor: NetworkMonitor!
     let systemInfo: SystemInfo
     var configuration: ClickstreamContextConfiguration
-    let uniqueId: String
+    var userUniqueId: String
     let storage: ClickstreamContextStorage
 
     init(with configuration: ClickstreamContextConfiguration,
-         userDefaults: UserDefaultsBehaviour = UserDefaults.standard,
-         keychainStore: KeychainStoreBehavior = KeychainStore(service: ClickstreamContext.Constants.keychain)) throws
+         userDefaults: UserDefaultsBehaviour = UserDefaults.standard) throws
     {
-        self.storage = ClickstreamContextStorage(userDefaults: userDefaults, keychainStore: keychainStore)
-        self.uniqueId = Self.getUniqueId(storage: storage)
-        self.systemInfo = SystemInfo()
+        self.storage = ClickstreamContextStorage(userDefaults: userDefaults)
+        self.userUniqueId = UserDefaultsUtil.getCurrentUserUniqueId(storage: storage)
+        self.systemInfo = SystemInfo(storage: storage)
         self.configuration = configuration
-    }
-
-    private static func getUniqueId(storage: ClickstreamContextStorage) -> String {
-        if let deviceUniqueId = storage.userDefaults.string(forKey: Constants.uniqueIdKey) {
-            return deviceUniqueId
-        }
-        let newUniqueId = UUID().uuidString
-        storage.userDefaults.save(key: Constants.uniqueIdKey, value: newUniqueId)
-        log.info("Created new Clickstream UniqueId and saved it to Keychain: \(newUniqueId)")
-        return newUniqueId
-    }
-}
-
-// MARK: - extensions
-
-extension ClickstreamContext: ClickstreamLogger {}
-
-extension ClickstreamContext {
-    enum Constants {
-        static let keychain = "com.amazonaws.solution.clickstream.Keychain"
-        static let uniqueIdKey = "com.amazonaws.solution.clickstream.UniqueIdKey"
     }
 }

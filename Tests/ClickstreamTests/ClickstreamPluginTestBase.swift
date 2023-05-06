@@ -26,7 +26,7 @@ class ClickstreamPluginTestBase: XCTestCase {
                                                                    isCompressEvents: false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
 
-        let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.uniqueId,
+        let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.userUniqueId,
                                                                sessionBackgroundTimeout: TimeInterval(10)),
                                           userDefaults: clickstream.storage.userDefaults)
         clickstream.sessionClient = sessionClient

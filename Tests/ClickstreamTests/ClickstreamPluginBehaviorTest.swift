@@ -29,19 +29,47 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
             "user_age": 22,
             "user_name": "carl",
         ])
-        await analyticsClient.setAddUserAttributeExpectation(expectation(description: "Identify user"), count: 3)
-        analyticsPlugin.identifyUser(userId: "testUserId", userProfile: userProfile)
+        await analyticsClient.setAddUserAttributeExpectation(expectation(description: "Identify user"), count: 2)
+        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
         await waitForExpectations(timeout: 1)
         let addCount = await analyticsClient.addUserAttributeCount
-        XCTAssertEqual(3, addCount)
+        XCTAssertEqual(2, addCount)
+    }
+
+    func testUpdateUserAttributes() async {
+        let userProfile = AnalyticsUserProfile(location: nil, properties: [
+            "user_age": 22,
+            "user_name": "carl",
+        ])
+        await analyticsClient.setUpdateUserAttributesExpectation(expectation(description: "Identify user"), count: 1)
+        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
+        await waitForExpectations(timeout: 1)
+        let updateCount = await analyticsClient.updateUserAttributeCount
+        XCTAssertEqual(1, updateCount)
+    }
+
+    func testIdentifyUserForSetUserId() async {
+        await analyticsClient.setUpdateUserIdExpectation(expectation(description: "Identify user set user id not nil"), count: 1)
+        analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
+        await waitForExpectations(timeout: 1)
+        let updateCount = await analyticsClient.updateUserIdCount
+        XCTAssertEqual(1, updateCount)
     }
 
     func testIdentifyUserForNilUserId() async {
-        await analyticsClient.setRemoveUserAttributeExpectation(expectation(description: "Identify user set user id nil"), count: 1)
+        await analyticsClient.setUpdateUserIdExpectation(expectation(description: "Identify user set user id nil"), count: 1)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_NIL, userProfile: nil)
         await waitForExpectations(timeout: 1)
-        let addCount = await analyticsClient.removeUserAttributeCount
-        XCTAssertEqual(1, addCount)
+        let updateCount = await analyticsClient.updateUserIdCount
+        XCTAssertEqual(1, updateCount)
+    }
+
+    func testUpdateUserAttributesForUserIdUpdate() async {
+        await analyticsClient.setUpdateUserAttributesExpectation(expectation(description: "Identify user"), count: 1)
+        analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
+        await waitForExpectations(timeout: 1)
+        let updateCount = await analyticsClient.updateUserAttributeCount
+        XCTAssertEqual(1, updateCount)
     }
 
     func testRecordEvent() async {

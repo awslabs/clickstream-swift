@@ -178,7 +178,7 @@ class ActivityTracker: ActivityTrackerBehaviour {
 #if canImport(UIKit)
     extension ActivityTracker {
         enum Constants {
-            static let backgroundTask = "com.amazonaws.solution.clickstream.SessionBackgroundTask"
+            static let backgroundTask = "software.aws.solution.clickstream.SessionBackgroundTask"
         }
     }
 #endif

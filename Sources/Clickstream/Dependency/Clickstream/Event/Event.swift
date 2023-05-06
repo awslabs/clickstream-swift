@@ -157,6 +157,7 @@ enum Event {
 
     enum ReservedAttribute {
         public static let USER_ID = "_user_id"
+        public static let USER_FIRST_TOUCH_TIMESTAMP = "_user_first_touch_timestamp"
     }
 
     enum User {
@@ -193,6 +194,7 @@ enum Event {
     enum PresetEvent {
         public static let SESSION_START = "_session_start"
         public static let SESSION_STOP = "_session_stop"
+        public static let PROFILE_SET = "_profile_set"
     }
 
     enum ErrorType {

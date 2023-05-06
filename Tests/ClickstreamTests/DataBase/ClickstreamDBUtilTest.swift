@@ -17,16 +17,17 @@ class ClickstreamDBUtiltest: XCTestCase {
 
     override func setUp() {
         do {
-            let appId = testAppId + String(describing: Date().timeIntervalSince1970)
+            let appId = testAppId + String(describing: Date().millisecondsSince1970)
             dbAdapter = try BaseDBAdapter(prefixPath: EventRecorder.Constants.dbPathPrefix,
                                           databaseName: appId)
             dbUtil = ClickstreamDBUtil(dbAdapter: dbAdapter)
             try dbUtil.createTable()
+            let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)
             clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                                 appId: appId,
                                                 uniqueId: UUID().uuidString,
                                                 session: Session(uniqueId: UUID().uuidString),
-                                                systemInfo: SystemInfo(),
+                                                systemInfo: SystemInfo(storage: storage),
                                                 netWorkType: NetWorkType.Wifi)
             let eventJson = clickstreamEvent.toJson()
             storageEvent = StorageEvent(eventJson: clickstreamEvent.toJson(), eventSize: Int64(eventJson.count))

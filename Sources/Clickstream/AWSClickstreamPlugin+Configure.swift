@@ -32,7 +32,7 @@ public extension AWSClickstreamPlugin {
                                                                    isCompressEvents: configuration.isCompressEvents)
         clickstream = try ClickstreamContext(with: contextConfiguration)
 
-        let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.uniqueId,
+        let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.userUniqueId,
                                                                sessionBackgroundTimeout: TimeInterval(10)),
                                           userDefaults: clickstream.storage.userDefaults)
         clickstream.sessionClient = sessionClient
@@ -84,7 +84,7 @@ public extension AWSClickstreamPlugin {
         self.networkMonitor = networkMonitor
         self.networkMonitor.startMonitoring(
             using: DispatchQueue(
-                label: "com.amazonaws.solution.clickstream.AnalyticsPlugin.NetworkMonitor"
+                label: "software.aws.solution.clickstream.AnalyticsPlugin.NetworkMonitor"
             )
         )
     }

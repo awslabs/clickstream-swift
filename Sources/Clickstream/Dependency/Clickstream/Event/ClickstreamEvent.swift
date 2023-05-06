@@ -20,7 +20,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
     let timestamp: Date.Timestamp
     let session: Session
     private(set) lazy var attributes: [String: AttributeValue] = [:]
-    private(set) lazy var userAttributes: [String: AttributeValue] = [:]
+    private(set) lazy var userAttributes: [String: Any] = [:]
     let systemInfo: SystemInfo
     let netWorkType: String
 
@@ -56,8 +56,8 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
         attributes[key] = attribute
     }
 
-    func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
-        userAttributes[key] = attribute
+    func setUserAttribute(_ attributes: [String: Any]) {
+        userAttributes = attributes
     }
 
     func attribute(forKey key: String) -> AttributeValue? {
@@ -77,7 +77,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
         event["event_id"] = eventId
         event["app_id"] = appId
         event["timestamp"] = timestamp
-        event["device_id"] = systemInfo.idfv
+        event["device_id"] = systemInfo.deviceId
         event["device_unique_id"] = systemInfo.idfa
         event["platform"] = systemInfo.platform
         event["os_version"] = systemInfo.osVersion
@@ -97,7 +97,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
         event["app_version"] = systemInfo.appVersion
         event["app_package_name"] = systemInfo.appPackgeName
         event["app_title"] = systemInfo.appTitle
-        event["user"] = getAttributeObject(from: userAttributes)
+        event["user"] = userAttributes
         event["attributes"] = getAttributeObject(from: attributes)
         return getJsonStringFromObject(jsonObject: event)
     }
