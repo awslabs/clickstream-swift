@@ -86,6 +86,14 @@ class SessionClient: SessionClientBehaviour {
         }
     }
 
+    private func handleAppEnterForeground() {
+        log.error("handleAppEnterForeground")
+    }
+
+    private func handleAppEnterBackground() {
+        log.error("handleAppEnterBackground")
+    }
+
     private func record(eventType: String) {
         guard let analyticsClient else {
             log.error("Clickstream Analytics is disabled.")
@@ -100,8 +108,10 @@ class SessionClient: SessionClientBehaviour {
 
     private func respond(to newState: ApplicationState) {
         switch newState {
-        case .terminated:
-            endSession()
+        case .runningInForeground:
+            handleAppEnterForeground()
+        case .runningInBackground(isStale: false):
+            handleAppEnterBackground()
         #if !os(macOS)
             case let .runningInBackground(isStale):
                 if isStale {

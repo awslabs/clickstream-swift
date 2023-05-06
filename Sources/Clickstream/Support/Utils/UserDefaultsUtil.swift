@@ -57,7 +57,7 @@ enum UserDefaultsUtil {
     static func saveCurrentUserUniqueId(storage: ClickstreamContextStorage, userUniqueId: String) {
         storage.userDefaults.save(key: Constants.userUniqueIdKey, value: userUniqueId)
     }
-    
+
     static func getUserFirstTouchTimestamp(storage: ClickstreamContextStorage) -> Int64 {
         Int64(storage.userDefaults.string(forKey: Constants.userFirstTouchTimestampKey) ?? "0")!
     }
@@ -110,12 +110,28 @@ enum UserDefaultsUtil {
             // switch to new user.
             let userUniqueId = UUID().uuidString
             userInfo["user_unique_id"] = userUniqueId
-            userInfo["user_first_touch_timestamp"] =  Date().millisecondsSince1970
+            userInfo["user_first_touch_timestamp"] = Date().millisecondsSince1970
             saveCurrentUserUniqueId(storage: storage, userUniqueId: userUniqueId)
             allUserInfo[userId] = userInfo
             storage.userDefaults.save(key: Constants.userInfoKey, value: allUserInfo)
         }
         return userInfo
+    }
+
+    static func getAppVersion(storage: ClickstreamContextStorage) -> String? {
+        storage.userDefaults.string(forKey: Constants.appVersionKey)
+    }
+
+    static func saveAppVersion(storage: ClickstreamContextStorage, appVersion: String) {
+        storage.userDefaults.save(key: Constants.appVersionKey, value: appVersion)
+    }
+
+    static func getOSVersion(storage: ClickstreamContextStorage) -> String? {
+        storage.userDefaults.string(forKey: Constants.osVersionKey)
+    }
+
+    static func saveOSVersion(storage: ClickstreamContextStorage, osVersion: String) {
+        storage.userDefaults.save(key: Constants.osVersionKey, value: osVersion)
     }
 }
 
@@ -128,6 +144,8 @@ extension UserDefaultsUtil {
         static let userAttributesKey = prefix + "userAttributesKey"
         static let userInfoKey = prefix + "userInfoKey"
         static let userFirstTouchTimestampKey = prefix + "userInfoKey"
+        static let appVersionKey = prefix + "appVersionKey"
+        static let osVersionKey = prefix + "osVersionKey"
     }
 }
 

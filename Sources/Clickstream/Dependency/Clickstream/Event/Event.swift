@@ -158,6 +158,14 @@ enum Event {
     enum ReservedAttribute {
         public static let USER_ID = "_user_id"
         public static let USER_FIRST_TOUCH_TIMESTAMP = "_user_first_touch_timestamp"
+        public static let PREVIOUS_APP_VERSION = "_previous_app_version"
+        public static let PREVIOUS_OS_VERSION = "_previous_os_version"
+        public static let ENGAGEMENT_TIMESTAMP = "_engagement_time_msec"
+        public static let ENTRANCES = "_entrances"
+        public static let PREVIOUS_SCREEN_ID = "_previous_screen_id"
+        public static let PREVIOUS_SCREEN_NAME = "_previous_screen_name"
+        public static let SCREEN_ID = "_screen_id"
+        public static let SCREEN_NAME = "_screen_name"
     }
 
     enum User {
@@ -195,6 +203,8 @@ enum Event {
         public static let SESSION_START = "_session_start"
         public static let SESSION_STOP = "_session_stop"
         public static let PROFILE_SET = "_profile_set"
+        public static let APP_UPDATE = "_app_update"
+        public static let OS_UPDATE = "_os_update"
     }
 
     enum ErrorType {
