@@ -40,7 +40,7 @@ public struct ClickstreamContextConfiguration {
     /// The clickstream endpoint
     var endpoint: String
     /// Time interval after which the events are automatically submitted to server
-    var sendEventsInterval: Int
+    private let sendEventsInterval: Int
     /// Whether to track app lifecycle events automatically
     var isTrackAppExceptionEvents: Bool
     /// Whether to track app exception events automatically
@@ -49,6 +49,7 @@ public struct ClickstreamContextConfiguration {
     var isCompressEvents: Bool
     /// Whether to log events json in terminal when debug
     var isLogEvents: Bool
+    var authCookie: String?
     var sessionTimeoutDuration: Int64
 
     init(appId: String,
@@ -56,7 +57,7 @@ public struct ClickstreamContextConfiguration {
          sendEventsInterval: Int,
          isTrackAppExceptionEvents: Bool = true,
          isTrackAppLifecycleEvents: Bool = true,
-         isCompressEvents: Bool,
+         isCompressEvents: Bool = true,
          isLogEvents: Bool = false,
          sessionTimeoutDuration: Int64 = 1800000)
     {
@@ -75,7 +76,7 @@ struct ClickstreamContextStorage {
     let userDefaults: UserDefaultsBehaviour
 }
 
-class ClickstreamContext {
+public class ClickstreamContext {
     var sessionClient: SessionClientBehaviour!
     var analyticsClient: AnalyticsClientBehaviour!
     var networkMonitor: NetworkMonitor!

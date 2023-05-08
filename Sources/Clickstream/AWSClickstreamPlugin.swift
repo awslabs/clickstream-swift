@@ -9,7 +9,7 @@ import Amplify
 import Foundation
 
 public final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
-    var clickstream: ClickstreamContext!
+    public var clickstream: ClickstreamContext!
 
     /// Automatically flushes the events that have been recorded on an interval
     var autoFlushEventsTimer: DispatchSourceTimer?

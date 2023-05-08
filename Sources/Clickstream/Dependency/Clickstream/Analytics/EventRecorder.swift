@@ -24,6 +24,7 @@ class EventRecorder: AnalyticsEventRecording {
     var clickstream: ClickstreamContext
     let dbUtil: ClickstreamDBProtocol
     private(set) var queue: OperationQueue
+    private(set) var bundleSequenceId: Int
 
     init(clickstream: ClickstreamContext) throws {
         self.clickstream = clickstream
@@ -33,6 +34,7 @@ class EventRecorder: AnalyticsEventRecording {
         try dbUtil.createTable()
         self.queue = OperationQueue()
         queue.maxConcurrentOperationCount = Constants.maxConcurrentOperations
+        self.bundleSequenceId = UserDefaultsUtil.getBundleSequenceId(storage: clickstream.storage)
     }
 
     /// save an clickstream event to storage
@@ -70,8 +72,12 @@ class EventRecorder: AnalyticsEventRecording {
                 if batchEvent.eventCount == 0 {
                     break
                 }
-                let result = NetRequest.uploadEventWithURLSession(eventsJson: batchEvent.eventsJson,
-                                                                  configuration: clickstream.configuration)
+                let result = NetRequest.uploadEventWithURLSession(
+                    eventsJson: batchEvent.eventsJson,
+                    configuration: clickstream.configuration,
+                    bundleSequenceId: bundleSequenceId)
+                bundleSequenceId += 1
+                UserDefaultsUtil.saveBundleSequenceId(storage: clickstream.storage, bundleSequenceId: bundleSequenceId)
                 if !result {
                     break
                 }

@@ -23,6 +23,7 @@ class EventRecorderTest: XCTestCase {
 
     override func setUp() async throws {
         do {
+            UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
             server = HttpServer()
             server["/collect"] = { _ in
                 HttpResponse.ok(.text("request success"))
@@ -66,6 +67,7 @@ class EventRecorderTest: XCTestCase {
         try eventRecorder.save(clickstreamEvent)
         let eventCount = try dbUtil.getEventCount()
         XCTAssertEqual(1, eventCount)
+        XCTAssertTrue(eventRecorder.bundleSequenceId == 1)
     }
 
     func testGetEventWithAllAttribute() throws {
@@ -309,6 +311,7 @@ class EventRecorderTest: XCTestCase {
         Thread.sleep(forTimeInterval: 0.3)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
+        XCTAssertTrue(eventRecorder.bundleSequenceId == 2)
     }
 
     func testSubmitMultiSubmissionForOneProcessSuccess() throws {
@@ -326,6 +329,7 @@ class EventRecorderTest: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
+        XCTAssertTrue(eventRecorder.bundleSequenceId == 3)
     }
 
     func testOneSubmitForNotProcessAllEvent() throws {

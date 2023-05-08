@@ -90,8 +90,8 @@ public extension AWSClickstreamPlugin {
         }
     }
 
-    func getEscapeHatch() -> ClickstreamContextConfiguration {
-        clickstream.configuration
+    func getEscapeHatch() -> ClickstreamContext {
+        clickstream
     }
 
     func enable() {

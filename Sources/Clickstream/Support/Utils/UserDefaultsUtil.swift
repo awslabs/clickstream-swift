@@ -162,6 +162,14 @@ enum UserDefaultsUtil {
     static func saveIsFirstOpen(storage: ClickstreamContextStorage, isFirstOpen: String) {
         storage.userDefaults.save(key: Constants.isFirstOpenKey, value: isFirstOpen)
     }
+
+    static func getBundleSequenceId(storage: ClickstreamContextStorage) -> Int {
+        Int(storage.userDefaults.string(forKey: Constants.bundleSequenceIdKey) ?? "1")!
+    }
+
+    static func saveBundleSequenceId(storage: ClickstreamContextStorage, bundleSequenceId: Int) {
+        storage.userDefaults.save(key: Constants.isFirstOpenKey, value: String(describing: bundleSequenceId))
+    }
 }
 
 extension UserDefaultsUtil {
@@ -177,6 +185,7 @@ extension UserDefaultsUtil {
         static let osVersionKey = prefix + "osVersionKey"
         static let sessionKey = prefix + "sessionKey"
         static let isFirstOpenKey = prefix + "isFirstOpenKey"
+        static let bundleSequenceIdKey = prefix + "isFirstOpenKey"
     }
 }
 

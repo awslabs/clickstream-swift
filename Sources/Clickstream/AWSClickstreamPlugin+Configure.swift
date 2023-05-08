@@ -8,6 +8,9 @@
 import Amplify
 import Foundation
 import Network
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 public extension AWSClickstreamPlugin {
     /// called when sdk init.
@@ -83,5 +86,6 @@ public extension AWSClickstreamPlugin {
                 label: "software.aws.solution.clickstream.AnalyticsPlugin.NetworkMonitor"
             )
         )
+        UIViewController.swizzle()
     }
 }
