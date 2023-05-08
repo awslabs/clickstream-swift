@@ -18,7 +18,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
     let uniqueId: String
     let eventType: String
     let timestamp: Date.Timestamp
-    let session: Session
+    let session: Session?
     private(set) lazy var attributes: [String: AttributeValue] = [:]
     private(set) lazy var userAttributes: [String: Any] = [:]
     let systemInfo: SystemInfo
@@ -29,7 +29,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
          appId: String,
          uniqueId: String,
          timestamp: Date.Timestamp = Date().millisecondsSince1970,
-         session: Session,
+         session: Session?,
          systemInfo: SystemInfo,
          netWorkType: String)
     {
@@ -114,9 +114,12 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
 
     private func getAttributeObject(from dictionary: AnalyticsProperties) -> JsonObject {
         var attribute = JsonObject()
-        attribute["_session_id"] = session.sessionId
-        attribute["_session_start_timestamp"] = session.startTime.millisecondsSince1970
-        attribute["_session_duration"] = session.duration
+        if session != nil {
+            attribute["_session_id"] = session!.sessionId
+            attribute["_session_start_timestamp"] = session!.startTime
+            attribute["_session_duration"] = session!.duration
+            attribute["_session_number"] = session!.sessionIndex
+        }
         if dictionary.isEmpty {
             return attribute
         }

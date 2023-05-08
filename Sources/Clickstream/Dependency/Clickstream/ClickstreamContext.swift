@@ -49,6 +49,7 @@ public struct ClickstreamContextConfiguration {
     var isCompressEvents: Bool
     /// Whether to log events json in terminal when debug
     var isLogEvents: Bool
+    var sessionTimeoutDuration: Int64
 
     init(appId: String,
          endpoint: String,
@@ -56,7 +57,8 @@ public struct ClickstreamContextConfiguration {
          isTrackAppExceptionEvents: Bool = true,
          isTrackAppLifecycleEvents: Bool = true,
          isCompressEvents: Bool,
-         isLogEvents: Bool = false)
+         isLogEvents: Bool = false,
+         sessionTimeoutDuration: Int64 = 1800000)
     {
         self.appId = appId
         self.endpoint = endpoint
@@ -65,6 +67,7 @@ public struct ClickstreamContextConfiguration {
         self.isTrackAppLifecycleEvents = isTrackAppLifecycleEvents
         self.isCompressEvents = isCompressEvents
         self.isLogEvents = isLogEvents
+        self.sessionTimeoutDuration = sessionTimeoutDuration
     }
 }
 

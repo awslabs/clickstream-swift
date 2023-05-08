@@ -46,7 +46,7 @@ class EventRecorderTest: XCTestCase {
             clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                                 appId: testAppId,
                                                 uniqueId: clickstream.userUniqueId,
-                                                session: Session(uniqueId: UUID().uuidString),
+                                                session: Session(uniqueId: UUID().uuidString, sessionIndex: 1),
                                                 systemInfo: SystemInfo(storage: clickstream.storage),
                                                 netWorkType: NetWorkType.Wifi)
             eventRecorder = try! EventRecorder(clickstream: clickstream)

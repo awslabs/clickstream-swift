@@ -105,7 +105,7 @@ actor MockAnalyticsClient: AnalyticsClientBehaviour {
             await increaseCreateEventCount()
         }
         let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)
-        return ClickstreamEvent(eventType: eventType, appId: "", uniqueId: "", session: Session(uniqueId: ""),
+        return ClickstreamEvent(eventType: eventType, appId: "", uniqueId: "", session: Session(uniqueId: "", sessionIndex: 1),
                                 systemInfo: SystemInfo(storage: storage), netWorkType: "WIFI")
     }
 

@@ -9,42 +9,49 @@ import Foundation
 
 class Session: Codable {
     let sessionId: String
-    let startTime: Date
-    private(set) var stopTime: Date?
+    let startTime: Int64
+    let sessionIndex: Int
+    private(set) var pauseTime: Int64?
 
-    init(uniqueId: String) {
+    init(uniqueId: String, sessionIndex: Int) {
         self.sessionId = Self.generateSessionId(uniqueId: uniqueId)
-        self.startTime = Date()
-        self.stopTime = nil
+        self.startTime = Date().millisecondsSince1970
+        self.pauseTime = nil
+        self.sessionIndex = sessionIndex
     }
 
-    init(sessionId: String, startTime: Date, stopTime: Date?) {
+    init(sessionId: String, startTime: Int64, pauseTime: Int64, sessionIndex: Int) {
         self.sessionId = sessionId
         self.startTime = startTime
-        self.stopTime = stopTime
+        self.pauseTime = pauseTime
+        self.sessionIndex = sessionIndex
     }
 
-    var isPaused: Bool {
-        stopTime != nil
+    static func getCurrentSession(clickstream: ClickstreamContext) -> Session {
+        let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
+        var sessionIndex = 1
+        if storedSession != nil {
+            if Date().millisecondsSince1970 - storedSession!.pauseTime!
+                < clickstream.configuration.sessionTimeoutDuration
+            {
+                return storedSession!
+            } else {
+                sessionIndex = storedSession!.sessionIndex + 1
+            }
+        }
+        return Session(uniqueId: clickstream.userUniqueId, sessionIndex: sessionIndex)
+    }
+
+    var isNewSession: Bool {
+        pauseTime == nil
     }
 
     var duration: Date.Timestamp {
-        let endTime = stopTime ?? Date()
-        return endTime.millisecondsSince1970 - startTime.millisecondsSince1970
-    }
-
-    func stop() {
-        guard stopTime == nil else { return }
-        stopTime = Date()
+        Date().millisecondsSince1970 - startTime
     }
 
     func pause() {
-        guard !isPaused else { return }
-        stopTime = Date()
-    }
-
-    func resume() {
-        stopTime = nil
+        pauseTime = Date().millisecondsSince1970
     }
 
     private static func generateSessionId(uniqueId: String) -> String {
@@ -70,21 +77,11 @@ class Session: Codable {
     }
 }
 
-// MARK: - Equatable
-
-extension Session: Equatable {
-    static func == (lhs: Session, rhs: Session) -> Bool {
-        lhs.sessionId == rhs.sessionId
-            && lhs.startTime == rhs.startTime
-            && lhs.stopTime == rhs.stopTime
-    }
-}
-
 extension Session {
     enum Constants {
         static let maxUniqueIdLength = 8
         static let paddingChar = "_"
-        static let defaultTimezone = "GMT"
+        static let defaultTimezone = "UTC"
         static let defaultLocale = "en_US"
         static let dateFormat = "yyyyMMdd"
         static let timeFormat = "HHmmssSSS"

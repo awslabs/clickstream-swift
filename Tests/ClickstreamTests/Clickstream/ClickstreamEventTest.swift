@@ -16,7 +16,7 @@ class ClickstreamEventTest: XCTestCase {
         clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                             appId: testAppId,
                                             uniqueId: UUID().uuidString,
-                                            session: Session(uniqueId: UUID().uuidString),
+                                            session: Session(uniqueId: UUID().uuidString,sessionIndex: 1),
                                             systemInfo: SystemInfo(storage: storage),
                                             netWorkType: NetWorkType.Wifi)
     }
@@ -65,7 +65,7 @@ class ClickstreamEventTest: XCTestCase {
         let event2 = ClickstreamEvent(eventType: "testEvent",
                                       appId: testAppId,
                                       uniqueId: UUID().uuidString,
-                                      session: Session(uniqueId: UUID().uuidString),
+                                      session: Session(uniqueId: UUID().uuidString,sessionIndex: 1),
                                       systemInfo: SystemInfo(storage: storage),
                                       netWorkType: NetWorkType.Wifi)
         XCTAssertFalse(event1 == event2)

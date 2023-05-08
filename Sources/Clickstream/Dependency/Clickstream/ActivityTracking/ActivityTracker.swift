@@ -17,13 +17,12 @@ enum ActivityEvent {
     case applicationDidMoveToBackground
     case applicationWillMoveToForeground
     case applicationWillTerminate
-    case backgroundTrackingDidTimeout
 }
 
 enum ApplicationState {
     case initializing
     case runningInForeground
-    case runningInBackground(isStale: Bool)
+    case runningInBackground
     case terminated
 
     enum Resolver {
@@ -37,11 +36,9 @@ enum ApplicationState {
             case .applicationWillTerminate:
                 return .terminated
             case .applicationDidMoveToBackground:
-                return .runningInBackground(isStale: false)
+                return .runningInBackground
             case .applicationWillMoveToForeground:
                 return .runningInForeground
-            case .backgroundTrackingDidTimeout:
-                return .runningInBackground(isStale: true)
             }
         }
     }
@@ -56,17 +53,6 @@ protocol ActivityTrackerBehaviour {
 }
 
 class ActivityTracker: ActivityTrackerBehaviour {
-    #if canImport(UIKit)
-        private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
-    #endif
-
-    private var backgroundTimer: Timer? {
-        willSet {
-            backgroundTimer?.invalidate()
-        }
-    }
-
-    private let backgroundTrackingTimeout: TimeInterval
     private let stateMachine: StateMachine<ApplicationState, ActivityEvent>
     private var stateMachineSubscriberToken: StateMachineSubscriberToken?
 
@@ -100,10 +86,7 @@ class ActivityTracker: ActivityTrackerBehaviour {
         applicationWillTerminate
     ]
 
-    init(backgroundTrackingTimeout: TimeInterval,
-         stateMachine: StateMachine<ApplicationState, ActivityEvent>? = nil)
-    {
-        self.backgroundTrackingTimeout = backgroundTrackingTimeout
+    init(stateMachine: StateMachine<ApplicationState, ActivityEvent>? = nil) {
         self.stateMachine = stateMachine ??
             StateMachine(initialState: .initializing,
                          resolver: ApplicationState.Resolver.resolve(currentState:event:))
@@ -128,44 +111,11 @@ class ActivityTracker: ActivityTrackerBehaviour {
         stateMachineSubscriberToken = stateMachine.subscribe(listener)
     }
 
-    private func beginBackgroundTracking() {
-        #if canImport(UIKit)
-            if backgroundTrackingTimeout > 0 {
-                backgroundTask = UIApplication.shared.beginBackgroundTask(withName:
-                    Constants.backgroundTask)
-                    { [weak self] in
-                        self?.stateMachine.process(.backgroundTrackingDidTimeout)
-                        self?.stopBackgroundTracking()
-                    }
-            }
-        #endif
-        guard backgroundTrackingTimeout != .infinity else { return }
-        backgroundTimer = Timer.scheduledTimer(withTimeInterval:
-            backgroundTrackingTimeout, repeats: false)
-            { [weak self] _ in
-                self?.stateMachine.process(.backgroundTrackingDidTimeout)
-                self?.stopBackgroundTracking()
-            }
-    }
-
-    private func stopBackgroundTracking() {
-        backgroundTimer = nil
-        #if canImport(UIKit)
-            guard backgroundTask != .invalid else {
-                return
-            }
-            UIApplication.shared.endBackgroundTask(backgroundTask)
-            backgroundTask = .invalid
-        #endif
-    }
-
     @objc private func handleApplicationStateChange(_ notification: Notification) {
         switch notification.name {
         case Self.applicationDidMoveToBackground:
-            beginBackgroundTracking()
             stateMachine.process(.applicationDidMoveToBackground)
         case Self.applicationWillMoveToForegound:
-            stopBackgroundTracking()
             stateMachine.process(.applicationWillMoveToForeground)
         case Self.applicationWillTerminate:
             stateMachine.process(.applicationWillTerminate)
@@ -174,11 +124,3 @@ class ActivityTracker: ActivityTrackerBehaviour {
         }
     }
 }
-
-#if canImport(UIKit)
-    extension ActivityTracker {
-        enum Constants {
-            static let backgroundTask = "software.aws.solution.clickstream.SessionBackgroundTask"
-        }
-    }
-#endif

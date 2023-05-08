@@ -42,8 +42,8 @@ class ActivityTrackerTests: XCTestCase {
             .initializing
         }
 
-        tracker = ActivityTracker(backgroundTrackingTimeout: timeout,
-                                  stateMachine: stateMachine)
+        tracker = ActivityTracker(
+            stateMachine: stateMachine)
     }
 
     override func tearDown() {
@@ -72,17 +72,6 @@ class ActivityTrackerTests: XCTestCase {
         XCTAssertTrue(stateMachine.processedEvents.contains(.applicationDidMoveToBackground))
         XCTAssertTrue(stateMachine.processedEvents.contains(.applicationWillMoveToForeground))
         XCTAssertTrue(stateMachine.processedEvents.contains(.applicationWillTerminate))
-    }
-
-    func testBackgroundTrackingAfterTimeoutShouldReportBackgroundTimeout() {
-        stateMachine.processExpectation = expectation(description: "Background tracking timeout")
-        stateMachine.processExpectation?.expectedFulfillmentCount = 2
-
-        NotificationCenter.default.post(Notification(name: Self.applicationDidMoveToBackgroundNotification))
-
-        waitForExpectations(timeout: 2)
-        XCTAssertTrue(stateMachine.processedEvents.contains(.applicationDidMoveToBackground))
-        XCTAssertTrue(stateMachine.processedEvents.contains(.backgroundTrackingDidTimeout))
     }
 }
 

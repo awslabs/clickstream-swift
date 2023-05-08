@@ -26,7 +26,7 @@ class AnalyticsClientTest: XCTestCase {
         clickstream = try ClickstreamContext(with: contextConfiguration)
         clickstream.networkMonitor = MockNetworkMonitor()
         eventRecorder = MockEventRecorder()
-        session = Session(uniqueId: "uniqueId")
+        session = Session(uniqueId: "uniqueId",sessionIndex: 1)
         analyticsClient = try AnalyticsClient(
             clickstream: clickstream,
             eventRecorder: eventRecorder,
@@ -239,7 +239,6 @@ class AnalyticsClientTest: XCTestCase {
         let eventType = "testEvent"
         let event = analyticsClient.createEvent(withEventType: eventType)
         XCTAssertEqual(event.eventType, eventType)
-        XCTAssertEqual(event.session, session)
     }
 
     func testRecordRecordEventWithGlobalAttribute() async {

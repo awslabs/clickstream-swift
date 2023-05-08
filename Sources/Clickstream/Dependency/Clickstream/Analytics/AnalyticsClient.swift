@@ -19,7 +19,7 @@ protocol AnalyticsClientBehaviour: Actor {
     func submitEvents() throws
 }
 
-typealias SessionProvider = () -> Session
+typealias SessionProvider = () -> Session?
 
 actor AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var eventRecorder: AnalyticsEventRecording

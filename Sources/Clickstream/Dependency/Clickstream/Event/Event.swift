@@ -201,10 +201,11 @@ enum Event {
 
     enum PresetEvent {
         public static let SESSION_START = "_session_start"
-        public static let SESSION_STOP = "_session_stop"
         public static let PROFILE_SET = "_profile_set"
         public static let APP_UPDATE = "_app_update"
         public static let OS_UPDATE = "_os_update"
+        public static let FIRST_OPEN = "_first_open"
+        public static let USER_ENGAGEMENT = "_user_engagement"
     }
 
     enum ErrorType {

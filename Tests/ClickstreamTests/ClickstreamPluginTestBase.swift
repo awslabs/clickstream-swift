@@ -26,15 +26,13 @@ class ClickstreamPluginTestBase: XCTestCase {
                                                                    isCompressEvents: false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
 
-        let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.userUniqueId,
-                                                               sessionBackgroundTimeout: TimeInterval(10)),
-                                          userDefaults: clickstream.storage.userDefaults)
+        let sessionClient = SessionClient(clickstream: clickstream)
         clickstream.sessionClient = sessionClient
-        let sessionProvider: () -> Session = { [weak sessionClient] in
+        let sessionProvider: () -> Session? = { [weak sessionClient] in
             guard let sessionClient else {
                 fatalError("SessionClient was deallocated")
             }
-            return sessionClient.currentSession
+            return sessionClient.getCurrentSession()
         }
 
         let eventRecorder = try EventRecorder(clickstream: clickstream)
@@ -43,12 +41,10 @@ class ClickstreamPluginTestBase: XCTestCase {
                                                   sessionProvider: sessionProvider)
         analyticsPlugin.analyticsClient = analyticsClient
         clickstream.analyticsClient = analyticsClient
-        sessionClient.analyticsClient = analyticsClient
         clickstream.networkMonitor = mockNetworkMonitor
 
         analyticsPlugin.configure(autoFlushEventsTimer: nil,
                                   networkMonitor: mockNetworkMonitor)
-        sessionClient.startSession()
 
         await Amplify.reset()
         let config = AmplifyConfiguration()

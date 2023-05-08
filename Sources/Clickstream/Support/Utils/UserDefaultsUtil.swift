@@ -50,7 +50,6 @@ enum UserDefaultsUtil {
         let newUserUniqueId = UUID().uuidString
         storage.userDefaults.save(key: Constants.userUniqueIdKey, value: newUserUniqueId)
         saveUserFirstTouchTimestamp(storage: storage)
-        log.info("Created new Clickstream UniqueId and saved it to userDefaults: \(newUserUniqueId)")
         return newUserUniqueId
     }
 
@@ -133,6 +132,36 @@ enum UserDefaultsUtil {
     static func saveOSVersion(storage: ClickstreamContextStorage, osVersion: String) {
         storage.userDefaults.save(key: Constants.osVersionKey, value: osVersion)
     }
+
+    static func saveSession(storage: ClickstreamContextStorage, session: Session) {
+        var sessionObject = JsonObject()
+        sessionObject["sessionId"] = session.sessionId
+        sessionObject["startTime"] = session.startTime
+        sessionObject["pauseTime"] = session.pauseTime
+        sessionObject["sessionIndex"] = session.sessionIndex
+        storage.userDefaults.save(key: Constants.sessionKey, value: sessionObject)
+    }
+
+    static func getSession(storage: ClickstreamContextStorage) -> Session? {
+        let sessionObject = storage.userDefaults.object(forKey: Constants.sessionKey) as! JsonObject?
+        if sessionObject == nil {
+            return nil
+        }
+        let session = Session(
+            sessionId: sessionObject!["sessionId"] as! String,
+            startTime: sessionObject!["startTime"] as! Int64,
+            pauseTime: sessionObject!["pauseTime"] as! Int64,
+            sessionIndex: sessionObject!["sessionIndex"] as! Int)
+        return session
+    }
+
+    static func getIsFirstOpen(storage: ClickstreamContextStorage) -> Bool {
+        storage.userDefaults.string(forKey: Constants.isFirstOpenKey) == nil
+    }
+
+    static func saveIsFirstOpen(storage: ClickstreamContextStorage, isFirstOpen: String) {
+        storage.userDefaults.save(key: Constants.isFirstOpenKey, value: isFirstOpen)
+    }
 }
 
 extension UserDefaultsUtil {
@@ -146,6 +175,8 @@ extension UserDefaultsUtil {
         static let userFirstTouchTimestampKey = prefix + "userInfoKey"
         static let appVersionKey = prefix + "appVersionKey"
         static let osVersionKey = prefix + "osVersionKey"
+        static let sessionKey = prefix + "sessionKey"
+        static let isFirstOpenKey = prefix + "isFirstOpenKey"
     }
 }
 

@@ -26,7 +26,7 @@ class ClickstreamDBUtiltest: XCTestCase {
             clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                                 appId: appId,
                                                 uniqueId: UUID().uuidString,
-                                                session: Session(uniqueId: UUID().uuidString),
+                                                session: Session(uniqueId: UUID().uuidString,sessionIndex: 1),
                                                 systemInfo: SystemInfo(storage: storage),
                                                 netWorkType: NetWorkType.Wifi)
             let eventJson = clickstreamEvent.toJson()
