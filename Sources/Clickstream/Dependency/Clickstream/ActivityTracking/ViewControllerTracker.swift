@@ -17,33 +17,46 @@ extension UIViewController {
     @objc func swizzled_viewDidAppear(_ animated: Bool) {
         // Call the original implementation of viewDidAppear
         swizzled_viewDidAppear(animated)
-        
-        // Print the view controller name and path
-        log.error("View controller did appear: \(self) at path: \(getPath())")
+
+        let name = type(of: self)
+        let path = getPath()
+        let path1 = getPath1()
+        log.error("path1: \(path1)")
+        log.error("View controller did appear: \(name) at path: \(path)")
     }
-    
-    // This function returns the view controller's path in the view hierarchy
+
     func getPath() -> String {
         var path = ""
         if let parent {
-            path += "\(parent.getPath()) > "
+            path += "\(parent.getPath())/"
         }
         path += "\(type(of: self))"
         return path
     }
-    
-    // This function swaps the implementation of the original viewDidAppear with our custom implementation
+
+    func getPath1() -> String {
+        if let navController = navigationController {
+            for (index, viewController) in navController.viewControllers.enumerated() {
+                if viewController == self {
+                    return "\(index)"
+                }
+            }
+            return ""
+        } else {
+            return ""
+        }
+    }
+
     static func swizzle() {
         guard !hasSwizzled else { return }
-        
         let originalSelector = #selector(viewDidAppear(_:))
         let swizzledSelector = #selector(swizzled_viewDidAppear(_:))
-        
+
         let originalMethod = class_getInstanceMethod(self, originalSelector)!
         let swizzledMethod = class_getInstanceMethod(self, swizzledSelector)!
-        
+
         method_exchangeImplementations(originalMethod, swizzledMethod)
-        
+
         hasSwizzled = true
     }
 }
