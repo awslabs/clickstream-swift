@@ -6,6 +6,7 @@
 //
 
 @testable import Clickstream
+import UIKit
 import XCTest
 
 class AutoRecordEventClientTest: XCTestCase {
@@ -65,5 +66,53 @@ class AutoRecordEventClientTest: XCTestCase {
 
         autoRecordEventClient.checkOSVersionUpdate(clickstream: clickstream)
         XCTAssertNotNil(eventRecorder.saveCount == 1)
+    }
+
+    func testOneScreenView() {
+        autoRecordEventClient.updateEngageTimestamp()
+        autoRecordEventClient.setIsEntrances()
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        XCTAssertTrue(viewController.viewDidAppearCalled)
+
+        XCTAssertTrue(eventRecorder.saveCount == 1)
+        XCTAssertTrue(eventRecorder.lastSavedEvent?.eventType == Event.PresetEvent.SCREEN_VIEW)
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_ID])
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_NAME])
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
+        XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_ID])
+        XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_NAME])
+        XCTAssertTrue(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENTRANCES] as! Int == 1)
+    }
+
+    func testTwoScreenView() {
+        autoRecordEventClient.updateEngageTimestamp()
+        autoRecordEventClient.setIsEntrances()
+        let viewControllerA = MockViewControllerA()
+        let viewControllerB = MockViewControllerB()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewControllerA
+        window.makeKeyAndVisible()
+        window.rootViewController = viewControllerB
+        window.makeKeyAndVisible()
+        XCTAssertTrue(viewControllerA.viewDidAppearCalled)
+        XCTAssertTrue(viewControllerB.viewDidAppearCalled)
+        XCTAssertEqual(2, eventRecorder.saveCount)
+        XCTAssertTrue(eventRecorder.lastSavedEvent!.eventType == Event.PresetEvent.SCREEN_VIEW)
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_ID])
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_NAME])
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_ID])
+        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_NAME])
+
+        XCTAssertEqual(eventRecorder.savedEvents[0].attributes[Event.ReservedAttribute.SCREEN_NAME] as! String,
+                       eventRecorder.savedEvents[1].attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_NAME] as! String)
+
+        XCTAssertEqual(eventRecorder.savedEvents[0].attributes[Event.ReservedAttribute.SCREEN_ID] as! String,
+                       eventRecorder.savedEvents[1].attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_ID] as! String)
+
+        XCTAssertTrue(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENTRANCES] as! Int == 0)
     }
 }

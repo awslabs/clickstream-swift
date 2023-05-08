@@ -10,7 +10,7 @@
 #endif
 
 private var hasSwizzled = false
-
+private var viewDidAppearFunc: ((String, String) -> Void)?
 extension UIViewController: ClickstreamLogger {}
 
 extension UIViewController {
@@ -18,11 +18,9 @@ extension UIViewController {
         // Call the original implementation of viewDidAppear
         swizzled_viewDidAppear(animated)
 
-        let name = type(of: self)
-        let path = getPath()
-        let path1 = getPath1()
-        log.error("path1: \(path1)")
-        log.error("View controller did appear: \(name) at path: \(path)")
+        let screenName = NSStringFromClass(type(of: self))
+        let screenPath = getPath()
+        viewDidAppearFunc?(screenName, screenPath)
     }
 
     func getPath() -> String {
@@ -34,21 +32,10 @@ extension UIViewController {
         return path
     }
 
-    func getPath1() -> String {
-        if let navController = navigationController {
-            for (index, viewController) in navController.viewControllers.enumerated() {
-                if viewController == self {
-                    return "\(index)"
-                }
-            }
-            return ""
-        } else {
-            return ""
-        }
-    }
-
-    static func swizzle() {
+    static func swizzle(viewDidAppear: @escaping (String, String) -> Void) {
+        viewDidAppearFunc = viewDidAppear
         guard !hasSwizzled else { return }
+
         let originalSelector = #selector(viewDidAppear(_:))
         let swizzledSelector = #selector(swizzled_viewDidAppear(_:))
 

@@ -44,7 +44,7 @@ public struct ClickstreamContextConfiguration {
     /// Whether to track app lifecycle events automatically
     var isTrackAppExceptionEvents: Bool
     /// Whether to track app exception events automatically
-    var isTrackAppLifecycleEvents: Bool
+    var isTrackScreenViewEvents: Bool
     /// Whether to compress events
     var isCompressEvents: Bool
     /// Whether to log events json in terminal when debug
@@ -65,7 +65,7 @@ public struct ClickstreamContextConfiguration {
         self.endpoint = endpoint
         self.sendEventsInterval = sendEventsInterval
         self.isTrackAppExceptionEvents = isTrackAppExceptionEvents
-        self.isTrackAppLifecycleEvents = isTrackAppLifecycleEvents
+        self.isTrackScreenViewEvents = isTrackAppLifecycleEvents
         self.isCompressEvents = isCompressEvents
         self.isLogEvents = isLogEvents
         self.sessionTimeoutDuration = sessionTimeoutDuration

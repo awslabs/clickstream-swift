@@ -5,17 +5,24 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-import Foundation
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 class AutoRecordEventClient {
     private let clickstream: ClickstreamContext
     private var isEntrances = false
     private var isFirstOpen: Bool
     private var startEngageTimestamp: Int64!
+    private var lastScreenName: String?
+    private var lastScreenPath: String?
 
     init(clickstream: ClickstreamContext) {
         self.clickstream = clickstream
         self.isFirstOpen = UserDefaultsUtil.getIsFirstOpen(storage: clickstream.storage)
+        if clickstream.configuration.isTrackScreenViewEvents {
+            UIViewController.swizzle(viewDidAppear: onViewDidAppear)
+        }
     }
 
     func checkAppVersionUpdate(clickstream: ClickstreamContext) {
@@ -79,6 +86,23 @@ class AutoRecordEventClient {
 
     func setIsEntrances() {
         isEntrances = true
+    }
+
+    func onViewDidAppear(screenName: String, screenPath: String) {
+        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
+        event.addAttribute(screenName, forKey: Event.ReservedAttribute.SCREEN_NAME)
+        event.addAttribute(screenPath, forKey: Event.ReservedAttribute.SCREEN_ID)
+        if lastScreenName != nil, lastScreenPath != nil {
+            event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_NAME)
+            event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_ID)
+        }
+        event.addAttribute(isEntrances ? 1 : 0, forKey: Event.ReservedAttribute.ENTRANCES)
+        event.addAttribute(Date().millisecondsSince1970 - startEngageTimestamp, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+        recordEvent(event)
+        
+        isEntrances = false
+        lastScreenName = screenName
+        lastScreenPath = screenPath
     }
 
     func recordEvent(_ event: ClickstreamEvent) {

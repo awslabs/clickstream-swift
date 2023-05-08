@@ -86,6 +86,5 @@ public extension AWSClickstreamPlugin {
                 label: "software.aws.solution.clickstream.AnalyticsPlugin.NetworkMonitor"
             )
         )
-        UIViewController.swizzle()
     }
 }

@@ -206,6 +206,7 @@ enum Event {
         public static let OS_UPDATE = "_os_update"
         public static let FIRST_OPEN = "_first_open"
         public static let USER_ENGAGEMENT = "_user_engagement"
+        public static let SCREEN_VIEW = "_screen_view"
     }
 
     enum ErrorType {
