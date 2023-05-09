@@ -181,12 +181,12 @@ extension UserDefaultsUtil {
         static let userUniqueIdKey = prefix + "userUniqueIdKey"
         static let userAttributesKey = prefix + "userAttributesKey"
         static let userInfoKey = prefix + "userInfoKey"
-        static let userFirstTouchTimestampKey = prefix + "userInfoKey"
+        static let userFirstTouchTimestampKey = prefix + "userFirstTouchTimestampKey"
         static let appVersionKey = prefix + "appVersionKey"
         static let osVersionKey = prefix + "osVersionKey"
         static let sessionKey = prefix + "sessionKey"
         static let isFirstOpenKey = prefix + "isFirstOpenKey"
-        static let bundleSequenceIdKey = prefix + "isFirstOpenKey"
+        static let bundleSequenceIdKey = prefix + "bundleSequenceIdKey"
     }
 }
 
