@@ -47,6 +47,15 @@ class EventRecorder: AnalyticsEventRecording {
         let eventSize = eventJson.count
         let storageEvent = StorageEvent(eventJson: eventJson, eventSize: Int64(eventSize))
         try dbUtil.saveEvent(storageEvent)
+        while try dbUtil.getTotalSize() > Constants.maxDbSize {
+            let events = try dbUtil.getEventsWith(limit: 5)
+            for event in events {
+                try dbUtil.deleteEvent(eventId: event.id!)
+                if try dbUtil.getTotalSize() < Constants.maxDbSize {
+                    break
+                }
+            }
+        }
     }
 
     /// submit an batch events, add the processEvent() as operation into queue

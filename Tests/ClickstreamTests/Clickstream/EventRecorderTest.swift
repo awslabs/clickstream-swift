@@ -70,6 +70,22 @@ class EventRecorderTest: XCTestCase {
         XCTAssertTrue(eventRecorder.bundleSequenceId == 1)
     }
 
+    func testRecordEventForReachedMaxDbSize() throws {
+        let str = "abcdeabcde"
+        var jsonString = ""
+        for _ in 0 ..< 100 {
+            jsonString.append(str)
+        }
+        for j in 0 ..< 200 {
+            clickstreamEvent.addAttribute(jsonString, forKey: "test_json_\(j)")
+        }
+        for _ in 0 ..< 260 {
+            try eventRecorder.save(clickstreamEvent)
+        }
+        XCTAssertTrue(try dbUtil.getTotalSize() < EventRecorder.Constants.maxDbSize)
+        XCTAssertEqual(256, try dbUtil.getEventCount())
+    }
+
     func testGetEventWithAllAttribute() throws {
         try eventRecorder.save(clickstreamEvent)
         let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
