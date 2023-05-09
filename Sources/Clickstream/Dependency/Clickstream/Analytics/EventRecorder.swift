@@ -78,6 +78,9 @@ class EventRecorder: AnalyticsEventRecording {
         var submissions = 0
         var totalEventSend = 0
         do {
+            if try dbUtil.getEventCount() == 0 {
+                return totalEventSend
+            }
             repeat {
                 let batchEvent = try getBatchEvent()
                 if batchEvent.eventCount == 0 {
@@ -93,16 +96,16 @@ class EventRecorder: AnalyticsEventRecording {
                     break
                 }
                 try dbUtil.deleteBatchEvents(lastEventId: batchEvent.lastEventId)
-                log.debug("success send \(batchEvent.eventCount) event")
+                log.debug("Send \(batchEvent.eventCount) events")
                 totalEventSend += batchEvent.eventCount
                 submissions += 1
             } while submissions < Constants.maxSubmissionsAllowed
             let costTime = String(describing: Date().millisecondsSince1970 - startTime)
-            log.info("time of process event cost: \(costTime)s")
+            log.info("Time of process event cost: \(costTime)ms")
         } catch {
             log.error("Failed to send event:\(error)")
         }
-        log.info("Submitte \(totalEventSend) events")
+        log.info("Total send \(totalEventSend) events successfully")
         return totalEventSend
     }
 
