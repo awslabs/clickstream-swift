@@ -97,9 +97,10 @@ class AutoRecordEventClient {
             event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_ID)
         }
         event.addAttribute(isEntrances ? 1 : 0, forKey: Event.ReservedAttribute.ENTRANCES)
-        event.addAttribute(Date().millisecondsSince1970 - startEngageTimestamp, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+        event.addAttribute(Date().millisecondsSince1970 - startEngageTimestamp,
+                           forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
         recordEvent(event)
-        
+
         isEntrances = false
         lastScreenName = screenName
         lastScreenPath = screenPath
@@ -114,6 +115,6 @@ class AutoRecordEventClient {
 
 extension AutoRecordEventClient {
     enum Constants {
-        static let minEngagementTime = 1000
+        static let minEngagementTime = 1_000
     }
 }

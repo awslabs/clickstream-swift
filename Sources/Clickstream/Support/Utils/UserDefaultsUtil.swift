@@ -9,7 +9,7 @@ import Foundation
 #if canImport(UIKit)
     import UIKit
 #endif
-
+// swiftlint:disable force_cast
 enum UserDefaultsUtil {
     static func getDeviceId(storage: ClickstreamContextStorage) -> String {
         if let deviceId = storage.userDefaults.string(forKey: Constants.deviceIdKey) {
@@ -95,7 +95,7 @@ enum UserDefaultsUtil {
     static func getNewUserInfo(storage: ClickstreamContextStorage, userId: String) -> [String: Any] {
         var userInfo = JsonObject()
         var allUserInfo = storage.userDefaults.object(forKey: Constants.userInfoKey) as? [String: Any] ?? JsonObject()
-        if allUserInfo.count == 0 {
+        if allUserInfo.isEmpty {
             // first new user login need to associate the userId and exist user uniqueId and save it to userDefault.
             userInfo["user_unique_id"] = getCurrentUserUniqueId(storage: storage)
             userInfo["user_first_touch_timestamp"] = getUserFirstTouchTimestamp(storage: storage)
@@ -171,6 +171,7 @@ enum UserDefaultsUtil {
         storage.userDefaults.save(key: Constants.isFirstOpenKey, value: String(describing: bundleSequenceId))
     }
 }
+// swiftlint:enable force_cast
 
 extension UserDefaultsUtil {
     enum Constants {

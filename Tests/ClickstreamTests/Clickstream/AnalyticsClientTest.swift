@@ -26,7 +26,7 @@ class AnalyticsClientTest: XCTestCase {
         clickstream = try ClickstreamContext(with: contextConfiguration)
         clickstream.networkMonitor = MockNetworkMonitor()
         eventRecorder = MockEventRecorder()
-        session = Session(uniqueId: "uniqueId",sessionIndex: 1)
+        session = Session(uniqueId: "uniqueId", sessionIndex: 1)
         analyticsClient = try AnalyticsClient(
             clickstream: clickstream,
             eventRecorder: eventRecorder,

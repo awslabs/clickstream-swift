@@ -21,7 +21,7 @@ class SessionClient: SessionClientBehaviour {
     private let sessionClientQueue = DispatchQueue(label: Constants.queue,
                                                    attributes: .concurrent)
     private let autoRecordClient: AutoRecordEventClient
-    
+
     init(activityTracker: ActivityTrackerBehaviour? = nil, clickstream: ClickstreamContext) {
         self.clickstream = clickstream
         self.activityTracker = activityTracker ?? ActivityTracker()

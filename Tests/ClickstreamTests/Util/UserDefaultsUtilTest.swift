@@ -22,7 +22,7 @@ class UserDefaultsUtilTest: XCTestCase {
     func testGetDeviceId() {
         let deviceId = UserDefaultsUtil.getDeviceId(storage: storage)
         XCTAssertNotNil(deviceId)
-        XCTAssertTrue(deviceId.count > 0)
+        XCTAssertTrue(!deviceId.isEmpty)
         let deviceId2 = UserDefaultsUtil.getDeviceId(storage: storage)
         XCTAssertEqual(deviceId, deviceId2)
     }
@@ -68,15 +68,15 @@ class UserDefaultsUtilTest: XCTestCase {
         let userInfo2 = UserDefaultsUtil.getNewUserInfo(storage: storage, userId: userId2)
         let userUniqueId2 = userInfo2["user_unique_id"] as! String
         let firstTouchTimestampUserId2 = userInfo2["user_first_touch_timestamp"] as! Int64
-        XCTAssertTrue(userUniqueId2.count > 0)
+        XCTAssertTrue(!userUniqueId2.isEmpty)
         XCTAssertNotEqual(userUniqueIdUnlogin, userUniqueId2)
         XCTAssertNotEqual(userUniqueId1, userUniqueId2)
         XCTAssertNotEqual(firstTouchTimestampUserId1, firstTouchTimestampUserId2)
-        
+
         let userInfo3 = UserDefaultsUtil.getNewUserInfo(storage: storage, userId: userId1)
         let userUniqueId3 = userInfo3["user_unique_id"] as! String
         let firstTouchTimestampUserId3 = userInfo3["user_first_touch_timestamp"] as! Int64
-        XCTAssertTrue(userUniqueId3.count>0)
+        XCTAssertTrue(!userUniqueId3.isEmpty)
         XCTAssertEqual(userUniqueId3, userUniqueId1)
         XCTAssertEqual(firstTouchTimestampUserId1, firstTouchTimestampUserId3)
     }

@@ -9,7 +9,11 @@ import Amplify
 import Foundation
 
 enum NetRequest {
-    static func uploadEventWithURLSession(eventsJson: String, configuration: ClickstreamContextConfiguration, bundleSequenceId: Int) -> Bool {
+    static func uploadEventWithURLSession(
+        eventsJson: String,
+        configuration: ClickstreamContextConfiguration,
+        bundleSequenceId: Int) -> Bool
+    {
         var requestData = eventsJson
         var compression = ""
         if configuration.isCompressEvents {

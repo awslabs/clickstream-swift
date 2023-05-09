@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 //
+
 import Foundation
 
 protocol AnalyticsClientBehaviour: Actor {
@@ -36,8 +37,8 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
         self.clickstream = clickstream
         self.eventRecorder = eventRecorder
         self.sessionProvider = sessionProvider
-        userId = UserDefaultsUtil.getCurrentUserId(storage: clickstream.storage)
-        userAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
+        self.userId = UserDefaultsUtil.getCurrentUserId(storage: clickstream.storage)
+        self.userAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
     }
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
@@ -76,8 +77,10 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
             if let newUserId = id, !newUserId.isEmpty {
                 userAttributes = JsonObject()
                 let userInfo = UserDefaultsUtil.getNewUserInfo(storage: clickstream.storage, userId: newUserId)
+                // swiftlint:disable force_cast
                 clickstream.userUniqueId = userInfo["user_unique_id"] as! String
                 let userFirstTouchTimestamp = userInfo["user_first_touch_timestamp"] as! Int64
+                // swiftlint:enable force_cast
                 addUserAttribute(userFirstTouchTimestamp, forKey: Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP)
             }
             if id == nil {

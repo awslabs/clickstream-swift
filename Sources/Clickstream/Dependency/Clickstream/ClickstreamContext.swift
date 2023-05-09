@@ -59,7 +59,7 @@ public struct ClickstreamContextConfiguration {
          isTrackAppLifecycleEvents: Bool = true,
          isCompressEvents: Bool = true,
          isLogEvents: Bool = false,
-         sessionTimeoutDuration: Int64 = 1800000)
+         sessionTimeoutDuration: Int64 = 1_800_000)
     {
         self.appId = appId
         self.endpoint = endpoint
