@@ -67,11 +67,4 @@ public enum ClickstreamAnalytics {
         let plugin = try Amplify.Analytics.getPlugin(for: "awsClickstreamPlugin")
         return (plugin as? AWSClickstreamPlugin)?.getEscapeHatch().configuration
     }
-
-    /// Get clickstream configuration, please config it after initialize.
-    /// - Returns: ClickstreamContextConfiguration: current userId, nil for logout
-    public static func updateConfiguration(configuration: ClickstreamContextConfiguration) throws {
-        let plugin = try Amplify.Analytics.getPlugin(for: "awsClickstreamPlugin")
-        (plugin as? AWSClickstreamPlugin)?.getEscapeHatch().configuration = configuration
-    }
 }

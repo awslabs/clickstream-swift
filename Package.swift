@@ -14,7 +14,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/aws-amplify/amplify-swift.git", exact: "2.4.0"),
+        .package(url: "https://github.com/aws-amplify/amplify-swift.git", exact: "2.10.0"),
         .package(url: "https://github.com/stephencelis/SQLite.swift.git", exact: "0.13.2"),
         .package(url: "https://github.com/1024jp/GzipSwift", exact: "5.2.0"),
         .package(url: "https://github.com/httpswift/swifter", exact: "1.5.0")

@@ -37,9 +37,7 @@ class StateMachine<State, Event> {
 
     func process(_ event: Event) {
         queue.sync {
-            log.info("Processing event \(event) for current state \(self.state)")
             let newState = self.reducer(self.state, event)
-            log.info("New state: \(newState)")
             self.state = newState
         }
     }

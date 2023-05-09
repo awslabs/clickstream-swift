@@ -57,7 +57,6 @@ public extension AWSClickstreamPlugin {
             autoFlushEventsTimer = RepeatingTimer.createRepeatingTimer(
                 timeInterval: timeInterval,
                 eventHandler: { [weak self] in
-                    self?.log.debug("AutoFlushTimer triggered, flushing events")
                     self?.flushEvents()
                 }
             )

@@ -34,7 +34,7 @@ extension UserDefaults: UserDefaultsBehaviour {
 // MARK: - ClickstreamContext
 
 /// the configuration object contains the necessary and optional param which required to use clickstream
-public struct ClickstreamContextConfiguration {
+public class ClickstreamContextConfiguration {
     // The clickstream appId
     public var appId: String
     /// The clickstream endpoint

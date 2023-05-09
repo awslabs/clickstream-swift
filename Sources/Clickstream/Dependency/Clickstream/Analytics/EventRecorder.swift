@@ -81,6 +81,7 @@ class EventRecorder: AnalyticsEventRecording {
             if try dbUtil.getEventCount() == 0 {
                 return totalEventSend
             }
+            log.debug("Start flushing events")
             repeat {
                 let batchEvent = try getBatchEvent()
                 if batchEvent.eventCount == 0 {

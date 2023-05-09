@@ -175,20 +175,18 @@ class IntegrationTest: XCTestCase {
     }
 
     func testModifyEndpoint() throws {
-        var configuration = try ClickstreamAnalytics.getClickStreamConfiguration()!
+        let configuration = try ClickstreamAnalytics.getClickStreamConfiguration()!
         configuration.endpoint = testFailEndpoint
-        try ClickstreamAnalytics.updateConfiguration(configuration: configuration)
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertNotEqual(0, eventCount)
     }
 
     func testModifyConfiguration() throws {
-        var configuration = try ClickstreamAnalytics.getClickStreamConfiguration()!
+        let configuration = try ClickstreamAnalytics.getClickStreamConfiguration()!
         configuration.isCompressEvents = true
         configuration.authCookie = "authCookie"
-        try ClickstreamAnalytics.updateConfiguration(configuration: configuration)
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
         Thread.sleep(forTimeInterval: 0.5)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
