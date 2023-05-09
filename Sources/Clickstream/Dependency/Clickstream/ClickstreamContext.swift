@@ -36,21 +36,21 @@ extension UserDefaults: UserDefaultsBehaviour {
 /// the configuration object contains the necessary and optional param which required to use clickstream
 public struct ClickstreamContextConfiguration {
     // The clickstream appId
-    var appId: String
+    public var appId: String
     /// The clickstream endpoint
-    var endpoint: String
+    public var endpoint: String
     /// Time interval after which the events are automatically submitted to server
     private let sendEventsInterval: Int
     /// Whether to track app lifecycle events automatically
-    var isTrackAppExceptionEvents: Bool
+    public var isTrackAppExceptionEvents: Bool
     /// Whether to track app exception events automatically
-    var isTrackScreenViewEvents: Bool
+    public var isTrackScreenViewEvents: Bool
     /// Whether to compress events
-    var isCompressEvents: Bool
+    public var isCompressEvents: Bool
     /// Whether to log events json in terminal when debug
-    var isLogEvents: Bool
-    var authCookie: String?
-    var sessionTimeoutDuration: Int64
+    public var isLogEvents: Bool
+    public var authCookie: String?
+    public var sessionTimeoutDuration: Int64
 
     init(appId: String,
          endpoint: String,
