@@ -106,7 +106,7 @@ class EventRecorder: AnalyticsEventRecording {
         } catch {
             log.error("Failed to send event:\(error)")
         }
-        log.info("Total send \(totalEventSend) events successfully")
+        log.info("Send \(totalEventSend) events in one submit")
         return totalEventSend
     }
 

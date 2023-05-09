@@ -127,13 +127,13 @@ class IntegrationTest: XCTestCase {
 
     func testAddUserAttribute() throws {
         ClickstreamAnalytics.setUserId(userId: "13232")
-        let userAttribute = ClickstreamUserAttribute(attribute: [
+        let userAttribute: ClickstreamAttribute = [
             "_user_age": 21,
             "isFirstOpen": true,
             "score": 85.2,
             "_user_name": "carl"
-        ])
-        ClickstreamAnalytics.addUserAttributes(userAttributes: userAttribute)
+        ]
+        ClickstreamAnalytics.addUserAttributes(attributes: userAttribute)
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()

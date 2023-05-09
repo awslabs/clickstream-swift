@@ -56,7 +56,11 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
             globalAttributes[eventError!.errorType] = eventError!.errorMessage
         } else {
             var userAttribute = JsonObject()
-            userAttribute["value"] = attribute
+            if let attributeValue = attribute as? Double {
+                userAttribute["value"] = Decimal(string: String(attributeValue))
+            } else {
+                userAttribute["value"] = attribute
+            }
             userAttribute["set_timestamp"] = Date().millisecondsSince1970
             userAttributes[key] = userAttribute
         }

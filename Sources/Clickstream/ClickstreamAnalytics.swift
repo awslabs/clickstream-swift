@@ -45,8 +45,8 @@ public enum ClickstreamAnalytics {
 
     /// Add user attributes
     /// - Parameter attributes: the user attributes to add
-    public static func addUserAttributes(userAttributes: ClickstreamUserAttribute) {
-        let userProfile = AnalyticsUserProfile(location: nil, properties: userAttributes.attribute)
+    public static func addUserAttributes(attributes: ClickstreamAttribute) {
+        let userProfile = AnalyticsUserProfile(location: nil, properties: attributes)
         Amplify.Analytics.identifyUser(userId: Event.User.USER_ID_EMPTY,
                                        userProfile: userProfile)
     }
