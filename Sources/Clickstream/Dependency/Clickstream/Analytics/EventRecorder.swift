@@ -41,12 +41,14 @@ class EventRecorder: AnalyticsEventRecording {
     /// - Parameter event: A ClickstreamEvent
     func save(_ event: ClickstreamEvent) throws {
         let eventJson: String = event.toJson()
-        if clickstream.configuration.isLogEvents {
-            log.debug(eventJson)
-        }
         let eventSize = eventJson.count
         let storageEvent = StorageEvent(eventJson: eventJson, eventSize: Int64(eventSize))
         try dbUtil.saveEvent(storageEvent)
+        if clickstream.configuration.isLogEvents {
+            setLogLevel(logLevel: LogLevel.debug)
+            log.debug("saved event: \(event.eventType)")
+            log.debug(eventJson)
+        }
         while try dbUtil.getTotalSize() > Constants.maxDbSize {
             let events = try dbUtil.getEventsWith(limit: 5)
             for event in events {
