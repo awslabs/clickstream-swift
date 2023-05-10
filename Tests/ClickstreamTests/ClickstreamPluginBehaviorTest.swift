@@ -32,7 +32,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "Identify user")
         await analyticsClient.setAddUserAttributeExpectation(expectation, count: 2)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let addCount = await analyticsClient.addUserAttributeCount
         XCTAssertEqual(2, addCount)
     }
@@ -45,7 +45,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "Identify user")
         await analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let updateCount = await analyticsClient.updateUserAttributeCount
         XCTAssertEqual(1, updateCount)
     }
@@ -54,7 +54,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "Identify user set user id not nil")
         await analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let updateCount = await analyticsClient.updateUserIdCount
         XCTAssertEqual(1, updateCount)
     }
@@ -63,7 +63,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "Identify user set user id not nil")
         await analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_NIL, userProfile: nil)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let updateCount = await analyticsClient.updateUserIdCount
         XCTAssertEqual(1, updateCount)
     }
@@ -72,7 +72,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "Identify user")
         await analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let updateCount = await analyticsClient.updateUserAttributeCount
         XCTAssertEqual(1, updateCount)
     }
@@ -82,7 +82,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         await analyticsClient.setRecordExpectation(expectation)
         let event = BaseClickstreamEvent(name: "testEvent", attribute: testAttribute)
         analyticsPlugin.record(event: event)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let recordCount = await analyticsClient.recordCount
         XCTAssertEqual(1, recordCount)
     }
@@ -99,7 +99,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "record event")
         await analyticsClient.setRecordExpectation(expectation)
         analyticsPlugin.record(eventWithName: "testEvent")
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let recordCount = await analyticsClient.recordCount
         XCTAssertEqual(1, recordCount)
     }
@@ -115,7 +115,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "add global attribute")
         await analyticsClient.setAddGlobalAttributeExpectation(expectation, count: 4)
         analyticsPlugin.registerGlobalProperties(testAttribute)
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let addGlobalAttributeCallCount = await analyticsClient.addGlobalAttributeCalls.count
         XCTAssertEqual(addGlobalAttributeCallCount, testAttribute.count)
     }
@@ -124,7 +124,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "add global attribute")
         await analyticsClient.setRemoveGlobalAttributeExpectation(expectation, count: 4)
         analyticsPlugin.unregisterGlobalProperties(Set<String>(testAttribute.keys))
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let removeGlobalAttributeCallCount = await analyticsClient.removeGlobalAttributeCalls.count
         XCTAssertEqual(removeGlobalAttributeCallCount, testAttribute.count)
     }
@@ -133,7 +133,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         let expectation = expectation(description: "flush event")
         await analyticsClient.setSubmitEventsExpectation(expectation, count: 1)
         analyticsPlugin.flushEvents()
-        await fulfillment(of: [expectation], timeout: 1)
+        await waitForExpectations(timeout: 1)
         let submitEventsCount = await analyticsClient.submitEventsCount
         XCTAssertEqual(1, submitEventsCount)
     }
