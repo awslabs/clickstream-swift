@@ -45,10 +45,9 @@ public enum ClickstreamAnalytics {
 
     /// Add user attributes
     /// - Parameter attributes: the user attributes to add
-    public static func addUserAttributes(userAttributes: ClickstreamUserAttribute) {
-        let userId: String = userAttributes.userId ?? Event.User.USER_ID_EMPTY
-        let userProfile = AnalyticsUserProfile(location: nil, properties: userAttributes.attribute)
-        Amplify.Analytics.identifyUser(userId: userId,
+    public static func addUserAttributes(attributes: ClickstreamAttribute) {
+        let userProfile = AnalyticsUserProfile(location: nil, properties: attributes)
+        Amplify.Analytics.identifyUser(userId: Event.User.USER_ID_EMPTY,
                                        userProfile: userProfile)
     }
 
@@ -66,6 +65,6 @@ public enum ClickstreamAnalytics {
     /// - Returns: ClickstreamContextConfiguration: current userId, nil for logout
     public static func getClickStreamConfiguration() throws -> ClickstreamContextConfiguration? {
         let plugin = try Amplify.Analytics.getPlugin(for: "awsClickstreamPlugin")
-        return (plugin as? AWSClickstreamPlugin)?.getEscapeHatch()
+        return (plugin as? AWSClickstreamPlugin)?.getEscapeHatch().configuration
     }
 }

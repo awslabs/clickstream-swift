@@ -9,6 +9,7 @@ import Amplify
 
 public typealias ClickstreamAttribute = AnalyticsProperties
 public typealias AttributeValue = AnalyticsPropertyValue
+extension Int64: AnalyticsPropertyValue {}
 
 public struct BaseClickstreamEvent: AnalyticsEvent {
     public var properties: AnalyticsProperties?
@@ -32,10 +33,8 @@ public struct BaseClickstreamEvent: AnalyticsEvent {
 }
 
 public struct ClickstreamUserAttribute {
-    public var userId: String?
     public var attribute: ClickstreamAttribute?
-    public init(userId: String?, attribute: ClickstreamAttribute?) {
-        self.userId = userId
+    public init(attribute: ClickstreamAttribute?) {
         self.attribute = attribute
     }
 }

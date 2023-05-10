@@ -9,105 +9,74 @@ import Amplify
 import Foundation
 
 protocol SessionClientBehaviour: AnyObject {
-    var currentSession: Session { get }
-    var analyticsClient: AnalyticsClientBehaviour? { get set }
-
-    func startSession()
-}
-
-struct SessionClientConfiguration {
-    let uniqueDeviceId: String
-    let sessionBackgroundTimeout: TimeInterval
+    func startActivityTracking()
+    func initialSession() -> Bool
+    func storeSession()
 }
 
 class SessionClient: SessionClientBehaviour {
-    private var session: Session
-    weak var analyticsClient: AnalyticsClientBehaviour?
+    private var session: Session?
+    private let clickstream: ClickstreamContext
     private let activityTracker: ActivityTrackerBehaviour
-    private let configuration: SessionClientConfiguration
     private let sessionClientQueue = DispatchQueue(label: Constants.queue,
                                                    attributes: .concurrent)
-    private let userDefaults: UserDefaultsBehaviour?
-    init(activityTracker: ActivityTrackerBehaviour? = nil,
-         configuration: SessionClientConfiguration,
-         userDefaults: UserDefaultsBehaviour? = nil)
-    {
-        self.activityTracker = activityTracker ??
-            ActivityTracker(backgroundTrackingTimeout: configuration.sessionBackgroundTimeout)
-        self.configuration = configuration
-        self.userDefaults = userDefaults
-        self.session = Session.invalid
+    private let autoRecordClient: AutoRecordEventClient
+
+    init(activityTracker: ActivityTrackerBehaviour? = nil, clickstream: ClickstreamContext) {
+        self.clickstream = clickstream
+        self.activityTracker = activityTracker ?? ActivityTracker()
+        self.autoRecordClient = AutoRecordEventClient(clickstream: clickstream)
+        startActivityTracking()
     }
 
-    var currentSession: Session {
-        if session == Session.invalid {
-            startNewSession()
-        }
-        return session
-    }
-
-    func startSession() {
-        guard analyticsClient != nil else {
-            log.error("Clickstream Analytics is disabled.")
-            return
-        }
-
+    func startActivityTracking() {
         activityTracker.beginActivityTracking { [weak self] newState in
             guard let self else { return }
-            self.log.info("New state received: \(newState)")
             self.sessionClientQueue.sync(flags: .barrier) {
                 self.respond(to: newState)
             }
         }
+    }
 
-        sessionClientQueue.sync(flags: .barrier) {
-            startNewSession()
+    func initialSession() -> Bool {
+        session = Session.getCurrentSession(clickstream: clickstream)
+        if session!.isNewSession {
+            autoRecordClient.recordSessionStartEvent()
+        }
+        return session!.isNewSession
+    }
+
+    func storeSession() {
+        session?.pause()
+        UserDefaultsUtil.saveSession(storage: clickstream.storage, session: session!)
+    }
+
+    func getCurrentSession() -> Session? {
+        session
+    }
+
+    private func handleAppEnterForeground() {
+        log.debug("Application entered the foreground.")
+        autoRecordClient.updateEngageTimestamp()
+        autoRecordClient.handleFirstOpen()
+        let isNewSession = initialSession()
+        if isNewSession {
+            autoRecordClient.setIsEntrances()
         }
     }
 
-    private func startNewSession() {
-        session = Session(uniqueId: configuration.uniqueDeviceId)
-        log.info("Session Started.")
-
-        // Update Endpoint and record Session Start event
-        Task {
-            log.info("Firing Session Event: Start")
-            record(eventType: Event.PresetEvent.SESSION_START)
-        }
-    }
-
-    private func endSession() {
-        session.stop()
-        log.info("Session Stopped.")
-
-        Task {
-            log.info("Firing Session Event: Stop")
-            record(eventType: Event.PresetEvent.SESSION_STOP)
-        }
-    }
-
-    private func record(eventType: String) {
-        guard let analyticsClient else {
-            log.error("Clickstream Analytics is disabled.")
-            return
-        }
-
-        let event = analyticsClient.createEvent(withEventType: eventType)
-        Task {
-            try? await analyticsClient.record(event)
-        }
+    private func handleAppEnterBackground() {
+        log.debug("Application entered the background.")
+        storeSession()
+        autoRecordClient.recordUserEngagement()
     }
 
     private func respond(to newState: ApplicationState) {
         switch newState {
-        case .terminated:
-            endSession()
-        #if !os(macOS)
-            case let .runningInBackground(isStale):
-                if isStale {
-                    endSession()
-                }
-        #endif
+        case .runningInForeground:
+            handleAppEnterForeground()
+        case .runningInBackground:
+            handleAppEnterBackground()
         default:
             break
         }
@@ -119,10 +88,6 @@ class SessionClient: SessionClientBehaviour {
 extension SessionClient: ClickstreamLogger {}
 extension SessionClient {
     enum Constants {
-        static let queue = "com.amazonaws.solution.Clickstream.SessionClientQueue"
+        static let queue = "software.aws.solution.Clickstream.SessionClientQueue"
     }
-}
-
-extension Session {
-    static var invalid = Session(sessionId: "InvalidSessionId", startTime: Date(), stopTime: nil)
 }

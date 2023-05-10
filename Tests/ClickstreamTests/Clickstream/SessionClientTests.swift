@@ -9,127 +9,136 @@
 import XCTest
 
 class SessionClientTests: XCTestCase {
-    private var client: SessionClient!
-
+    private var sessionClient: SessionClient!
+    private var eventRecorder: MockEventRecorder!
     private var activityTracker: MockActivityTracker!
-    private var analyticsClient: MockAnalyticsClient!
-    private var sessionTimeout: TimeInterval = 5
+    var mockNetworkMonitor: MockNetworkMonitor!
+    private var analyticsClient: AnalyticsClient!
+    private var clickstream: ClickstreamContext!
+    let testAppId = "testAppId"
+    let testEndpoint = "https://example.com/collect"
 
-    override func setUp() {
+    override func setUp() async throws {
+        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         activityTracker = MockActivityTracker()
-        analyticsClient = MockAnalyticsClient()
-        createNewSessionClient()
+        mockNetworkMonitor = MockNetworkMonitor()
+        let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
+                                                                   endpoint: testEndpoint,
+                                                                   sendEventsInterval: 10_000,
+                                                                   isTrackAppExceptionEvents: false,
+                                                                   isCompressEvents: false)
+        clickstream = try ClickstreamContext(with: contextConfiguration)
+        clickstream.networkMonitor = mockNetworkMonitor
+        sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)
+        clickstream.sessionClient = sessionClient
+
+        eventRecorder = MockEventRecorder()
+
+        let sessionProvider: () -> Session? = { [weak sessionClient] in
+            guard let sessionClient else {
+                fatalError("SessionClient was deallocated")
+            }
+            return sessionClient.getCurrentSession()
+        }
+
+        analyticsClient = try AnalyticsClient(
+            clickstream: clickstream,
+            eventRecorder: eventRecorder,
+            sessionProvider: sessionProvider
+        )
+        clickstream.analyticsClient = analyticsClient
     }
 
     override func tearDown() {
         activityTracker = nil
-        analyticsClient = nil
-        client = nil
+        sessionClient = nil
+        eventRecorder = nil
+        activityTracker?.resetCounters()
     }
 
-    func createNewSessionClient() {
-        client = SessionClient(activityTracker: activityTracker,
-                               configuration: SessionClientConfiguration(
-                                   uniqueDeviceId: "deviceId",
-                                   sessionBackgroundTimeout: sessionTimeout))
-        client.analyticsClient = analyticsClient
+    func testGetCurrentSession() {
+        let session = Session.getCurrentSession(clickstream: clickstream)
+        XCTAssertTrue(session.isNewSession)
+        XCTAssertTrue(session.sessionIndex == 1)
+        XCTAssertNotNil(session.sessionId)
+        XCTAssertNotNil(session.startTime)
     }
 
-    func resetCounters() async {
-        await analyticsClient.resetCounters()
-        activityTracker.resetCounters()
+    func testRunningInForeground() {
+        XCTAssertTrue(sessionClient.getCurrentSession() == nil)
+        activityTracker.callback?(.runningInForeground)
+        let session = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session.isNewSession)
+        XCTAssertTrue(session.sessionIndex == 1)
+        XCTAssertNotNil(session.sessionId)
+        XCTAssertNotNil(session.startTime)
+
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(2, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
     }
 
-    func testCurrentSession_withoutStoredSession_shouldStartNewSession() async {
-        let currentSession = client.currentSession
-        XCTAssertFalse(currentSession.isPaused)
-        XCTAssertNil(currentSession.stopTime)
-        XCTAssertEqual(activityTracker.beginActivityTrackingCount, 0)
-        await analyticsClient.setRecordExpectation(expectation(description: "Start event for new session"))
-        await waitForExpectations(timeout: 1)
-        let createEventCount = await analyticsClient.createEventCount
-        XCTAssertEqual(createEventCount, 1)
-        let recordCount = await analyticsClient.recordCount
-        XCTAssertEqual(recordCount, 1)
+    func testGoBackground() {
+        XCTAssertTrue(sessionClient.getCurrentSession() == nil)
+        activityTracker.callback?(.runningInForeground)
+        activityTracker.callback?(.runningInBackground)
+        let session = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session.pauseTime != nil)
+        let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
+        XCTAssertTrue(storedSession != nil)
+
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(2, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
     }
 
-    func teststartSession_shouldRecordStartEvent() async {
-        await resetCounters()
+    func testGoBackgroundWithUserEngagement() {
+        activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 1)
+        activityTracker.callback?(.runningInBackground)
+        let session = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session.pauseTime != nil)
+        let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
+        XCTAssertTrue(storedSession != nil)
 
-        await analyticsClient.setRecordExpectation(expectation(description: "Start event for new session"))
-        client.startSession()
-        await waitForExpectations(timeout: 1)
-        let createCount = await analyticsClient.createEventCount
-        XCTAssertEqual(createCount, 1)
-        let recordCount = await analyticsClient.recordCount
-        XCTAssertEqual(recordCount, 1)
-        guard let event = await analyticsClient.lastRecordedEvent else {
-            XCTFail("Expected recorded event")
-            return
-        }
-        XCTAssertEqual(event.eventType, Event.PresetEvent.SESSION_START)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[2].eventType)
     }
 
-    #if !os(macOS)
+    func testReturnToForeground() {
+        activityTracker.callback?(.runningInForeground)
+        let session1 = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session1.isNewSession)
+        activityTracker.callback?(.runningInBackground)
+        activityTracker.callback?(.runningInForeground)
+        let session2 = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session1.sessionId == session2.sessionId)
+        XCTAssertFalse(session2.isNewSession)
+    }
 
-        func testApplicationMovedToBackground_stale_shouldRecordStopEvent_andSubmit() async {
-            client.startSession()
-            await analyticsClient.setRecordExpectation(expectation(description: "Start event for new session"))
-            await waitForExpectations(timeout: 1)
+    func testReturnToForegroundWithSessionTimeout() {
+        clickstream.configuration.sessionTimeoutDuration = 0
+        activityTracker.callback?(.runningInForeground)
+        let session1 = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session1.isNewSession)
+        activityTracker.callback?(.runningInBackground)
+        activityTracker.callback?(.runningInForeground)
+        let session2 = sessionClient.getCurrentSession()!
+        XCTAssertTrue(session1.sessionIndex != session2.sessionIndex)
+        XCTAssertTrue(session2.isNewSession)
+        XCTAssertTrue(session2.sessionIndex == 2)
 
-            await resetCounters()
-
-            activityTracker.callback?(.runningInBackground(isStale: true))
-            await analyticsClient.setRecordExpectation(expectation(description: "Stop event for current session"))
-            await waitForExpectations(timeout: 1)
-
-            let createCount = await analyticsClient.createEventCount
-            XCTAssertEqual(createCount, 1)
-            let recordCount = await analyticsClient.recordCount
-            XCTAssertEqual(recordCount, 1)
-
-            guard let event = await analyticsClient.lastRecordedEvent else {
-                XCTFail("Expected recorded event")
-                return
-            }
-            XCTAssertEqual(event.eventType, Event.PresetEvent.SESSION_STOP)
-        }
-
-        func testApplicationMovedToForeground_withNonPausedSession_shouldDoNothing() async {
-            client.startSession()
-            await analyticsClient.setRecordExpectation(expectation(description: "Start event for new session"))
-            await waitForExpectations(timeout: 1)
-
-            await resetCounters()
-            activityTracker.callback?(.runningInForeground)
-            let createCount = await analyticsClient.createEventCount
-            XCTAssertEqual(createCount, 0)
-            let recordCount = await analyticsClient.recordCount
-            XCTAssertEqual(recordCount, 0)
-            let event = await analyticsClient.lastRecordedEvent
-            XCTAssertNil(event)
-        }
-    #endif
-    func testApplicationTerminated_shouldRecordStopEvent() async {
-        client.startSession()
-        await analyticsClient.setRecordExpectation(expectation(description: "Start event for new session"))
-        await waitForExpectations(timeout: 1)
-
-        await resetCounters()
-        await analyticsClient.setRecordExpectation(expectation(description: "Stop event for current session"))
-        activityTracker.callback?(.terminated)
-        await waitForExpectations(timeout: 1)
-
-        let createCount = await analyticsClient.createEventCount
-        XCTAssertEqual(createCount, 1)
-        let recordCount = await analyticsClient.recordCount
-        XCTAssertEqual(recordCount, 1)
-        guard let event = await analyticsClient.lastRecordedEvent else {
-            XCTFail("Expected recorded event")
-            return
-        }
-        XCTAssertEqual(event.eventType, Event.PresetEvent.SESSION_STOP)
-        let submitCount = await analyticsClient.submitEventsCount
-        XCTAssertEqual(submitCount, 0)
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
     }
 }

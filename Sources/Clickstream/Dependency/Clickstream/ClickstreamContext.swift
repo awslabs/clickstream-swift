@@ -6,9 +6,9 @@
 //
 
 import Amplify
+import AWSPluginsCore
 import Foundation
 import Network
-@_spi(KeychainStore) import AWSPluginsCore
 
 // MARK: - UserDefaultsBehaviour
 
@@ -34,82 +34,63 @@ extension UserDefaults: UserDefaultsBehaviour {
 // MARK: - ClickstreamContext
 
 /// the configuration object contains the necessary and optional param which required to use clickstream
-public struct ClickstreamContextConfiguration {
+public class ClickstreamContextConfiguration {
     // The clickstream appId
-    var appId: String
+    public var appId: String
     /// The clickstream endpoint
-    var endpoint: String
+    public var endpoint: String
     /// Time interval after which the events are automatically submitted to server
-    var sendEventsInterval: Int
+    private let sendEventsInterval: Int
     /// Whether to track app lifecycle events automatically
-    var isTrackAppExceptionEvents: Bool
+    public var isTrackAppExceptionEvents: Bool
     /// Whether to track app exception events automatically
-    var isTrackAppLifecycleEvents: Bool
+    public var isTrackScreenViewEvents: Bool
     /// Whether to compress events
-    var isCompressEvents: Bool
+    public var isCompressEvents: Bool
     /// Whether to log events json in terminal when debug
-    var isLogEvents: Bool
+    public var isLogEvents: Bool
+    public var authCookie: String?
+    public var sessionTimeoutDuration: Int64
 
     init(appId: String,
          endpoint: String,
          sendEventsInterval: Int,
          isTrackAppExceptionEvents: Bool = true,
          isTrackAppLifecycleEvents: Bool = true,
-         isCompressEvents: Bool,
-         isLogEvents: Bool = false)
+         isCompressEvents: Bool = true,
+         isLogEvents: Bool = false,
+         sessionTimeoutDuration: Int64 = 1_800_000)
     {
         self.appId = appId
         self.endpoint = endpoint
         self.sendEventsInterval = sendEventsInterval
         self.isTrackAppExceptionEvents = isTrackAppExceptionEvents
-        self.isTrackAppLifecycleEvents = isTrackAppLifecycleEvents
+        self.isTrackScreenViewEvents = isTrackAppLifecycleEvents
         self.isCompressEvents = isCompressEvents
         self.isLogEvents = isLogEvents
+        self.sessionTimeoutDuration = sessionTimeoutDuration
     }
 }
 
 struct ClickstreamContextStorage {
     let userDefaults: UserDefaultsBehaviour
-    let keychainStore: KeychainStoreBehavior
 }
 
-class ClickstreamContext {
+public class ClickstreamContext {
     var sessionClient: SessionClientBehaviour!
     var analyticsClient: AnalyticsClientBehaviour!
     var networkMonitor: NetworkMonitor!
     let systemInfo: SystemInfo
     var configuration: ClickstreamContextConfiguration
-    let uniqueId: String
+    var userUniqueId: String
     let storage: ClickstreamContextStorage
 
     init(with configuration: ClickstreamContextConfiguration,
-         userDefaults: UserDefaultsBehaviour = UserDefaults.standard,
-         keychainStore: KeychainStoreBehavior = KeychainStore(service: ClickstreamContext.Constants.keychain)) throws
+         userDefaults: UserDefaultsBehaviour = UserDefaults.standard) throws
     {
-        self.storage = ClickstreamContextStorage(userDefaults: userDefaults, keychainStore: keychainStore)
-        self.uniqueId = Self.getUniqueId(storage: storage)
-        self.systemInfo = SystemInfo()
+        self.storage = ClickstreamContextStorage(userDefaults: userDefaults)
+        self.userUniqueId = UserDefaultsUtil.getCurrentUserUniqueId(storage: storage)
+        self.systemInfo = SystemInfo(storage: storage)
         self.configuration = configuration
-    }
-
-    private static func getUniqueId(storage: ClickstreamContextStorage) -> String {
-        if let deviceUniqueId = storage.userDefaults.string(forKey: Constants.uniqueIdKey) {
-            return deviceUniqueId
-        }
-        let newUniqueId = UUID().uuidString
-        storage.userDefaults.save(key: Constants.uniqueIdKey, value: newUniqueId)
-        log.info("Created new Clickstream UniqueId and saved it to Keychain: \(newUniqueId)")
-        return newUniqueId
-    }
-}
-
-// MARK: - extensions
-
-extension ClickstreamContext: ClickstreamLogger {}
-
-extension ClickstreamContext {
-    enum Constants {
-        static let keychain = "com.amazonaws.solution.clickstream.Keychain"
-        static let uniqueIdKey = "com.amazonaws.solution.clickstream.UniqueIdKey"
     }
 }

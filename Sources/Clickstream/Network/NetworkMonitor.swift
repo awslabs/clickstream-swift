@@ -15,25 +15,24 @@ protocol NetworkMonitor: AnyObject {
     func stopMonitoring()
 }
 
+var currentNetWorkType: String = NetWorkType.UnKnow
+
 extension NWPathMonitor: NetworkMonitor {
     var isOnline: Bool {
         currentPath.status == .satisfied
     }
 
-    var netWorkType: String {
-        var type = NetWorkType.UnKnow
-        pathUpdateHandler = { path in
-            if path.usesInterfaceType(.wifi) {
-                type = NetWorkType.Wifi
-            } else if path.usesInterfaceType(.cellular) {
-                type = NetWorkType.Mobile
-            }
-        }
-        return type
-    }
+    var netWorkType: String { currentNetWorkType }
 
     func startMonitoring(using queue: DispatchQueue) {
         start(queue: queue)
+        pathUpdateHandler = { path in
+            if path.usesInterfaceType(.wifi) {
+                currentNetWorkType = NetWorkType.Wifi
+            } else if path.usesInterfaceType(.cellular) {
+                currentNetWorkType = NetWorkType.Mobile
+            }
+        }
     }
 
     func stopMonitoring() {

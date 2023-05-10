@@ -9,7 +9,11 @@ import Amplify
 import Foundation
 
 enum NetRequest {
-    static func uploadEventWithURLSession(eventsJson: String, configuration: ClickstreamContextConfiguration) -> Bool {
+    static func uploadEventWithURLSession(
+        eventsJson: String,
+        configuration: ClickstreamContextConfiguration,
+        bundleSequenceId: Int) -> Bool
+    {
         var requestData = eventsJson
         var compression = ""
         if configuration.isCompressEvents {
@@ -27,12 +31,16 @@ enum NetRequest {
         urlComponts.queryItems = [
             URLQueryItem(name: "platform", value: "iOS"),
             URLQueryItem(name: "appId", value: configuration.appId),
-            URLQueryItem(name: "compression", value: compression)
+            URLQueryItem(name: "compression", value: compression),
+            URLQueryItem(name: "event_bundle_sequence_id", value: String(describing: bundleSequenceId))
         ]
 
         var request = URLRequest(url: urlComponts.url!, timeoutInterval: 15.0)
         request.httpMethod = "POST"
         request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        if configuration.authCookie != nil {
+            request.addValue(configuration.authCookie!, forHTTPHeaderField: "cookie")
+        }
         request.httpBody = requestData.data(using: .utf8)
         let semaphore = DispatchSemaphore(value: 0)
 

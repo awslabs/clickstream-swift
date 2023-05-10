@@ -8,6 +8,9 @@
 import Amplify
 import Foundation
 import Network
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 public extension AWSClickstreamPlugin {
     /// called when sdk init.
@@ -32,22 +35,19 @@ public extension AWSClickstreamPlugin {
                                                                    isCompressEvents: configuration.isCompressEvents)
         clickstream = try ClickstreamContext(with: contextConfiguration)
 
-        let sessionClient = SessionClient(configuration: .init(uniqueDeviceId: clickstream.uniqueId,
-                                                               sessionBackgroundTimeout: TimeInterval(10)),
-                                          userDefaults: clickstream.storage.userDefaults)
+        let sessionClient = SessionClient(clickstream: clickstream)
         clickstream.sessionClient = sessionClient
-        let sessionProvider: () -> Session = { [weak sessionClient] in
+        let sessionProvider: () -> Session? = { [weak sessionClient] in
             guard let sessionClient else {
                 fatalError("SessionClient was deallocated")
             }
-            return sessionClient.currentSession
+            return sessionClient.getCurrentSession()
         }
         let eventRecorder = try EventRecorder(clickstream: clickstream)
         analyticsClient = try AnalyticsClient(clickstream: clickstream,
                                               eventRecorder: eventRecorder,
                                               sessionProvider: sessionProvider)
         clickstream.analyticsClient = analyticsClient
-        sessionClient.analyticsClient = analyticsClient
         let networkMonitor = NWPathMonitor()
         clickstream.networkMonitor = networkMonitor
 
@@ -57,7 +57,6 @@ public extension AWSClickstreamPlugin {
             autoFlushEventsTimer = RepeatingTimer.createRepeatingTimer(
                 timeInterval: timeInterval,
                 eventHandler: { [weak self] in
-                    self?.log.debug("AutoFlushTimer triggered, flushing events")
                     self?.flushEvents()
                 }
             )
@@ -67,7 +66,6 @@ public extension AWSClickstreamPlugin {
             autoFlushEventsTimer: autoFlushEventsTimer,
             networkMonitor: networkMonitor
         )
-        sessionClient.startSession()
         log.debug("init the sdk success")
     }
 
@@ -84,7 +82,7 @@ public extension AWSClickstreamPlugin {
         self.networkMonitor = networkMonitor
         self.networkMonitor.startMonitoring(
             using: DispatchQueue(
-                label: "com.amazonaws.solution.clickstream.AnalyticsPlugin.NetworkMonitor"
+                label: "software.aws.solution.clickstream.AnalyticsPlugin.NetworkMonitor"
             )
         )
     }

@@ -14,7 +14,11 @@ public protocol ClickstreamLogger {
 
 public extension ClickstreamLogger {
     static var log: Logger {
-        Amplify.Logging.logger(forCategory: String(describing: self), logLevel: LogLevel.warn)
+        Amplify.Logging.logger(forCategory: String(describing: self), logLevel: LogLevel.debug)
+    }
+
+    func setLogLevel(logLevel: LogLevel) {
+        _ = Amplify.Logging.logger(forCategory: String(describing: self), logLevel: logLevel)
     }
 
     var log: Logger {

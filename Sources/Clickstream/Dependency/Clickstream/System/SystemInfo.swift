@@ -13,7 +13,7 @@ import AdSupport
 import CoreTelephony
 
 class SystemInfo {
-    var idfv: String! = ""
+    var deviceId: String! = ""
     var idfa: String! = ""
     let platform: String
     var osVersion: String! = ""
@@ -26,12 +26,14 @@ class SystemInfo {
     var appVersion: String! = ""
     var appPackgeName: String! = ""
     var appTitle: String! = ""
-    init() {
+    init(storage: ClickstreamContextStorage) {
         #if canImport(UIKit)
-            self.idfv = UIDevice.current.identifierForVendor?.uuidString ?? ""
+            self.deviceId = UserDefaultsUtil.getDeviceId(storage: storage)
             self.idfa = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+            if idfa == "00000000-0000-0000-0000-000000000000" {
+                self.idfa = ""
+            }
             self.model = UIDevice.current.name
-
             self.osVersion = UIDevice.current.systemVersion
             self.screenWidth = Int(UIScreen.main.bounds.size.width * UIScreen.main.scale)
             self.screenHeight = Int(UIScreen.main.bounds.size.height * UIScreen.main.scale)

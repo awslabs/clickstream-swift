@@ -8,5 +8,5 @@
 public enum PackageInfo {
     /// the clickstream analytics iOS sdk version
     /// note: update and align the version with new tag version before committing new tag
-    public static let version = "0.2.0"
+    public static let version = "0.4.0"
 }

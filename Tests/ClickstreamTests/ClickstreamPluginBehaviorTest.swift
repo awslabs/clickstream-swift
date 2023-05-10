@@ -29,23 +29,57 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
             "user_age": 22,
             "user_name": "carl",
         ])
-        await analyticsClient.setAddUserAttributeExpectation(expectation(description: "Identify user"), count: 3)
-        analyticsPlugin.identifyUser(userId: "testUserId", userProfile: userProfile)
+        let expectation = expectation(description: "Identify user")
+        await analyticsClient.setAddUserAttributeExpectation(expectation, count: 2)
+        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
         await waitForExpectations(timeout: 1)
         let addCount = await analyticsClient.addUserAttributeCount
-        XCTAssertEqual(3, addCount)
+        XCTAssertEqual(2, addCount)
+    }
+
+    func testUpdateUserAttributes() async {
+        let userProfile = AnalyticsUserProfile(location: nil, properties: [
+            "user_age": 22,
+            "user_name": "carl",
+        ])
+        let expectation = expectation(description: "Identify user")
+        await analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
+        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
+        await waitForExpectations(timeout: 1)
+        let updateCount = await analyticsClient.updateUserAttributeCount
+        XCTAssertEqual(1, updateCount)
+    }
+
+    func testIdentifyUserForSetUserId() async {
+        let expectation = expectation(description: "Identify user set user id not nil")
+        await analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
+        analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
+        await waitForExpectations(timeout: 1)
+        let updateCount = await analyticsClient.updateUserIdCount
+        XCTAssertEqual(1, updateCount)
     }
 
     func testIdentifyUserForNilUserId() async {
-        await analyticsClient.setRemoveUserAttributeExpectation(expectation(description: "Identify user set user id nil"), count: 1)
+        let expectation = expectation(description: "Identify user set user id not nil")
+        await analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_NIL, userProfile: nil)
         await waitForExpectations(timeout: 1)
-        let addCount = await analyticsClient.removeUserAttributeCount
-        XCTAssertEqual(1, addCount)
+        let updateCount = await analyticsClient.updateUserIdCount
+        XCTAssertEqual(1, updateCount)
+    }
+
+    func testUpdateUserAttributesForUserIdUpdate() async {
+        let expectation = expectation(description: "Identify user")
+        await analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
+        analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
+        await waitForExpectations(timeout: 1)
+        let updateCount = await analyticsClient.updateUserAttributeCount
+        XCTAssertEqual(1, updateCount)
     }
 
     func testRecordEvent() async {
-        await analyticsClient.setRecordExpectation(expectation(description: "record event"))
+        let expectation = expectation(description: "record event")
+        await analyticsClient.setRecordExpectation(expectation)
         let event = BaseClickstreamEvent(name: "testEvent", attribute: testAttribute)
         analyticsPlugin.record(event: event)
         await waitForExpectations(timeout: 1)
@@ -62,7 +96,8 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     }
 
     func testRecordEventWithName() async {
-        await analyticsClient.setRecordExpectation(expectation(description: "record event"))
+        let expectation = expectation(description: "record event")
+        await analyticsClient.setRecordExpectation(expectation)
         analyticsPlugin.record(eventWithName: "testEvent")
         await waitForExpectations(timeout: 1)
         let recordCount = await analyticsClient.recordCount
@@ -77,7 +112,8 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     }
 
     func testRegisterGlobalAttribute() async {
-        await analyticsClient.setAddGlobalAttributeExpectation(expectation(description: "add global attribute"), count: 4)
+        let expectation = expectation(description: "add global attribute")
+        await analyticsClient.setAddGlobalAttributeExpectation(expectation, count: 4)
         analyticsPlugin.registerGlobalProperties(testAttribute)
         await waitForExpectations(timeout: 1)
         let addGlobalAttributeCallCount = await analyticsClient.addGlobalAttributeCalls.count
@@ -85,7 +121,8 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     }
 
     func testUnregisterGlobalAttribute() async {
-        await analyticsClient.setRemoveGlobalAttributeExpectation(expectation(description: "add global attribute"), count: 4)
+        let expectation = expectation(description: "add global attribute")
+        await analyticsClient.setRemoveGlobalAttributeExpectation(expectation, count: 4)
         analyticsPlugin.unregisterGlobalProperties(Set<String>(testAttribute.keys))
         await waitForExpectations(timeout: 1)
         let removeGlobalAttributeCallCount = await analyticsClient.removeGlobalAttributeCalls.count
@@ -93,7 +130,8 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     }
 
     func testFlushEvent() async {
-        await analyticsClient.setSubmitEventsExpectation(expectation(description: "flush event"), count: 1)
+        let expectation = expectation(description: "flush event")
+        await analyticsClient.setSubmitEventsExpectation(expectation, count: 1)
         analyticsPlugin.flushEvents()
         await waitForExpectations(timeout: 1)
         let submitEventsCount = await analyticsClient.submitEventsCount

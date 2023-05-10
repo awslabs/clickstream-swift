@@ -24,6 +24,7 @@ class EventRecorder: AnalyticsEventRecording {
     var clickstream: ClickstreamContext
     let dbUtil: ClickstreamDBProtocol
     private(set) var queue: OperationQueue
+    private(set) var bundleSequenceId: Int
 
     init(clickstream: ClickstreamContext) throws {
         self.clickstream = clickstream
@@ -33,18 +34,30 @@ class EventRecorder: AnalyticsEventRecording {
         try dbUtil.createTable()
         self.queue = OperationQueue()
         queue.maxConcurrentOperationCount = Constants.maxConcurrentOperations
+        self.bundleSequenceId = UserDefaultsUtil.getBundleSequenceId(storage: clickstream.storage)
     }
 
     /// save an clickstream event to storage
     /// - Parameter event: A ClickstreamEvent
     func save(_ event: ClickstreamEvent) throws {
         let eventJson: String = event.toJson()
-        if clickstream.configuration.isLogEvents {
-            log.debug(eventJson)
-        }
         let eventSize = eventJson.count
         let storageEvent = StorageEvent(eventJson: eventJson, eventSize: Int64(eventSize))
         try dbUtil.saveEvent(storageEvent)
+        if clickstream.configuration.isLogEvents {
+            setLogLevel(logLevel: LogLevel.debug)
+            log.debug("saved event: \(event.eventType)")
+            log.debug(eventJson)
+        }
+        while try dbUtil.getTotalSize() > Constants.maxDbSize {
+            let events = try dbUtil.getEventsWith(limit: 5)
+            for event in events {
+                try dbUtil.deleteEvent(eventId: event.id!)
+                if try dbUtil.getTotalSize() < Constants.maxDbSize {
+                    break
+                }
+            }
+        }
     }
 
     /// submit an batch events, add the processEvent() as operation into queue
@@ -61,31 +74,39 @@ class EventRecorder: AnalyticsEventRecording {
 
     /// process an batch event and send the events to server
     func processEvent() -> Int {
-        let startTime = Date().timeIntervalSince1970
+        let startTime = Date().millisecondsSince1970
         var submissions = 0
         var totalEventSend = 0
         do {
+            if try dbUtil.getEventCount() == 0 {
+                return totalEventSend
+            }
+            log.debug("Start flushing events")
             repeat {
                 let batchEvent = try getBatchEvent()
                 if batchEvent.eventCount == 0 {
                     break
                 }
-                let result = NetRequest.uploadEventWithURLSession(eventsJson: batchEvent.eventsJson,
-                                                                  configuration: clickstream.configuration)
+                let result = NetRequest.uploadEventWithURLSession(
+                    eventsJson: batchEvent.eventsJson,
+                    configuration: clickstream.configuration,
+                    bundleSequenceId: bundleSequenceId)
+                bundleSequenceId += 1
+                UserDefaultsUtil.saveBundleSequenceId(storage: clickstream.storage, bundleSequenceId: bundleSequenceId)
                 if !result {
                     break
                 }
                 try dbUtil.deleteBatchEvents(lastEventId: batchEvent.lastEventId)
-                log.debug("success send \(batchEvent.eventCount) event")
+                log.debug("Send \(batchEvent.eventCount) events")
                 totalEventSend += batchEvent.eventCount
                 submissions += 1
             } while submissions < Constants.maxSubmissionsAllowed
-            let costTime = String(describing: Date().timeIntervalSince1970 - startTime)
-            log.info("time of process event cost: \(costTime)s")
+            let costTime = String(describing: Date().millisecondsSince1970 - startTime)
+            log.info("Time of process event cost: \(costTime)ms")
         } catch {
             log.error("Failed to send event:\(error)")
         }
-        log.info("Submitte \(totalEventSend) events")
+        log.info("Send \(totalEventSend) events in one submit")
         return totalEventSend
     }
 
@@ -96,9 +117,7 @@ class EventRecorder: AnalyticsEventRecording {
 
         let events = try dbUtil.getEventsWith(limit: Constants.maxEventNumberOfBatch)
         for event in events {
-            let sequenceIdString = "\"event_sequence_id\": \(String(describing: event.id ?? 0)),"
-            var eventJson = event.eventJson
-            eventJson.insert(contentsOf: sequenceIdString, at: eventJson.index(after: eventJson.startIndex))
+            let eventJson = event.eventJson
             if eventsJson.count + eventJson.count > Constants.maxSubmissionSize {
                 eventsJson.append("]")
                 break
