@@ -21,4 +21,16 @@ class ClickstreamAnalyticsTest: XCTestCase {
             }
         }
     }
+    
+    func testThrowMissingConfigureFileWhenInitSDKForObjc() throws {
+        do {
+            try ClickstreamObjc.initSDK()
+            XCTFail("Should have thrown a invalidAmplifyConfigurationFile error, if no configuration file is specified")
+        } catch {
+            guard case ConfigurationError.invalidAmplifyConfigurationFile = error else {
+                XCTFail("Should have thrown a invalidAmplifyConfigurationFile error")
+                return
+            }
+        }
+    }
 }

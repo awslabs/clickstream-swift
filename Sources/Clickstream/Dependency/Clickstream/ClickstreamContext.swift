@@ -33,23 +33,25 @@ extension UserDefaults: UserDefaultsBehaviour {
 
 // MARK: - ClickstreamContext
 
-/// the configuration object contains the necessary and optional param which required to use clickstream
-public class ClickstreamContextConfiguration {
-    // The clickstream appId
+/// The configuration object for clickstream, modify the params after sdk initialize
+@objcMembers public class ClickstreamContextConfiguration: NSObject {
+    /// The clickstream appId
     public var appId: String
     /// The clickstream endpoint
     public var endpoint: String
     /// Time interval after which the events are automatically submitted to server
     private let sendEventsInterval: Int
-    /// Whether to track app lifecycle events automatically
-    public var isTrackAppExceptionEvents: Bool
     /// Whether to track app exception events automatically
+    public var isTrackAppExceptionEvents: Bool
+    /// Whether to track app scren view events automatically
     public var isTrackScreenViewEvents: Bool
-    /// Whether to compress events
+    /// Whether to compress events when send to server
     public var isCompressEvents: Bool
-    /// Whether to log events json in terminal when debug
+    /// Whether to log events json in console when debug
     public var isLogEvents: Bool
+    /// The auth cookie for request
     public var authCookie: String?
+    /// The session timeout calculated the duration from last app in background, defalut is 1800000ms
     public var sessionTimeoutDuration: Int64
 
     init(appId: String,
@@ -76,7 +78,7 @@ struct ClickstreamContextStorage {
     let userDefaults: UserDefaultsBehaviour
 }
 
-public class ClickstreamContext {
+class ClickstreamContext {
     var sessionClient: SessionClientBehaviour!
     var analyticsClient: AnalyticsClientBehaviour!
     var networkMonitor: NetworkMonitor!

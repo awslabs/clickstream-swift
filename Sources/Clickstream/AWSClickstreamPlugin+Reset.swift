@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-public extension AWSClickstreamPlugin {
+extension AWSClickstreamPlugin {
     func reset() {
         if clickstream != nil {
             clickstream = nil

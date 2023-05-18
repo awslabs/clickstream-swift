@@ -7,7 +7,7 @@
 
 import Amplify
 
-public struct AWSClickstreamConfiguration {
+struct AWSClickstreamConfiguration {
     static let appIdKey = "appId"
     static let endpointKey = "endpoint"
     static let sendEventsIntervalKey = "autoFlushEventsInterval"

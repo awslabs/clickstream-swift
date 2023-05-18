@@ -15,7 +15,7 @@ enum Event {
     ///   - key: attribute key
     ///   - value: attribute value
     /// - Returns: the ErrorType
-    public static func checkAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
+    static func checkAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
         if currentNumber >= Limit.MAX_NUM_OF_ATTRIBUTES {
             let errorMsg = """
             reached the max number of attributes limit (\(Limit.MAX_NUM_OF_ATTRIBUTES)).\
@@ -70,7 +70,7 @@ enum Event {
     ///   - key: attribute key
     ///   - value: attribute value
     /// - Returns: the ErrorType
-    public static func checkUserAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
+    static func checkUserAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
         if currentNumber >= Limit.MAX_NUM_OF_USER_ATTRIBUTES {
             let errorMsg = """
             reached the max number of user attributes limit (\(Limit.MAX_NUM_OF_USER_ATTRIBUTES)).\
@@ -123,7 +123,7 @@ enum Event {
     /// Check the event name whether valide
     /// - Parameter eventType: the event name
     /// - Returns: the eventType is valide and the error type
-    public static func isValidEventType(eventType: String) -> (Bool, String) {
+    static func isValidEventType(eventType: String) -> (Bool, String) {
         if eventType.utf8.count > Event.Limit.MAX_EVENT_TYPE_LENGTH {
             let errorMsg = """
             Event name is too long, the max event type length is \
@@ -144,7 +144,7 @@ enum Event {
     /// underscores, and is not start with a number
     /// - Parameter name: the name to verify
     /// - Returns: the name is valid.
-    public static func isValidName(name: String) -> Bool {
+    static func isValidName(name: String) -> Bool {
         let regex = try? NSRegularExpression(pattern: "^(?![0-9])[0-9a-zA-Z_]+$")
         let range = NSRange(location: 0, length: name.utf8.count)
         let matches = regex?.matches(in: name, range: range)
@@ -156,64 +156,64 @@ enum Event {
     }
 
     enum ReservedAttribute {
-        public static let USER_ID = "_user_id"
-        public static let USER_FIRST_TOUCH_TIMESTAMP = "_user_first_touch_timestamp"
-        public static let PREVIOUS_APP_VERSION = "_previous_app_version"
-        public static let PREVIOUS_OS_VERSION = "_previous_os_version"
-        public static let ENGAGEMENT_TIMESTAMP = "_engagement_time_msec"
-        public static let ENTRANCES = "_entrances"
-        public static let PREVIOUS_SCREEN_ID = "_previous_screen_id"
-        public static let PREVIOUS_SCREEN_NAME = "_previous_screen_name"
-        public static let SCREEN_ID = "_screen_id"
-        public static let SCREEN_NAME = "_screen_name"
+        static let USER_ID = "_user_id"
+        static let USER_FIRST_TOUCH_TIMESTAMP = "_user_first_touch_timestamp"
+        static let PREVIOUS_APP_VERSION = "_previous_app_version"
+        static let PREVIOUS_OS_VERSION = "_previous_os_version"
+        static let ENGAGEMENT_TIMESTAMP = "_engagement_time_msec"
+        static let ENTRANCES = "_entrances"
+        static let PREVIOUS_SCREEN_ID = "_previous_screen_id"
+        static let PREVIOUS_SCREEN_NAME = "_previous_screen_name"
+        static let SCREEN_ID = "_screen_id"
+        static let SCREEN_NAME = "_screen_name"
     }
 
     enum User {
-        public static let USER_ID_NIL = "_clickstream_user_id_nil"
-        public static let USER_ID_EMPTY = "_clickstream_user_id_empty"
+        static let USER_ID_NIL = "_clickstream_user_id_nil"
+        static let USER_ID_EMPTY = "_clickstream_user_id_empty"
     }
 
     enum Limit {
         /// max event type length
-        public static let MAX_EVENT_TYPE_LENGTH = 50
+        static let MAX_EVENT_TYPE_LENGTH = 50
 
         /// max limit of single event attribute number.
-        public static let MAX_NUM_OF_ATTRIBUTES = 500
+        static let MAX_NUM_OF_ATTRIBUTES = 500
 
         /// max limit of single event user attribute number.
-        public static let MAX_NUM_OF_USER_ATTRIBUTES = 100
+        static let MAX_NUM_OF_USER_ATTRIBUTES = 100
 
         /// max limit of attribute name character length.
-        public static let MAX_LENGTH_OF_NAME = 50
+        static let MAX_LENGTH_OF_NAME = 50
 
         /// max limit of attribute value character length.
-        public static let MAX_LENGTH_OF_VALUE = 1_024
+        static let MAX_LENGTH_OF_VALUE = 1_024
 
         /// max limit of user attribute value character length.
-        public static let MAX_LENGTH_OF_USER_VALUE = 256
+        static let MAX_LENGTH_OF_USER_VALUE = 256
 
         /// max limit of one batch event number.
-        public static let MAX_EVENT_NUMBER_OF_BATCH = 100
+        static let MAX_EVENT_NUMBER_OF_BATCH = 100
 
         /// max limit of error attribute value length.
-        public static let MAX_LENGTH_OF_ERROR_VALUE = 256
+        static let MAX_LENGTH_OF_ERROR_VALUE = 256
     }
 
     enum PresetEvent {
-        public static let SESSION_START = "_session_start"
-        public static let PROFILE_SET = "_profile_set"
-        public static let APP_UPDATE = "_app_update"
-        public static let OS_UPDATE = "_os_update"
-        public static let FIRST_OPEN = "_first_open"
-        public static let USER_ENGAGEMENT = "_user_engagement"
-        public static let SCREEN_VIEW = "_screen_view"
+        static let SESSION_START = "_session_start"
+        static let PROFILE_SET = "_profile_set"
+        static let APP_UPDATE = "_app_update"
+        static let OS_UPDATE = "_os_update"
+        static let FIRST_OPEN = "_first_open"
+        static let USER_ENGAGEMENT = "_user_engagement"
+        static let SCREEN_VIEW = "_screen_view"
     }
 
     enum ErrorType {
-        public static let ATTRIBUTE_NAME_INVALID = "_error_name_invalid"
-        public static let ATTRIBUTE_NAME_LENGTH_EXCEED = "_error_name_length_exceed"
-        public static let ATTRIBUTE_VALUE_LENGTH_EXCEED = "_error_value_length_exceed"
-        public static let ATTRIBUTE_SIZE_EXCEED = "_error_attribute_size_exceed"
+        static let ATTRIBUTE_NAME_INVALID = "_error_name_invalid"
+        static let ATTRIBUTE_NAME_LENGTH_EXCEED = "_error_name_length_exceed"
+        static let ATTRIBUTE_VALUE_LENGTH_EXCEED = "_error_value_length_exceed"
+        static let ATTRIBUTE_SIZE_EXCEED = "_error_attribute_size_exceed"
     }
 
     class EventError {

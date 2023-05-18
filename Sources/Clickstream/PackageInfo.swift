@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-public enum PackageInfo {
+enum PackageInfo {
     /// the clickstream analytics iOS sdk version
     /// note: update and align the version with new tag version before committing new tag
-    public static let version = "0.4.0"
+    static let version = "0.4.1"
 }

@@ -8,7 +8,7 @@
 import Amplify
 import Foundation
 
-public extension AWSClickstreamPlugin {
+ extension AWSClickstreamPlugin {
     func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {
         if userId == Event.User.USER_ID_EMPTY {
             userProfile?.properties?.forEach { key, value in
