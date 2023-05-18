@@ -21,7 +21,7 @@ class ClickstreamAnalyticsTest: XCTestCase {
             }
         }
     }
-    
+
     func testThrowMissingConfigureFileWhenInitSDKForObjc() throws {
         do {
             try ClickstreamObjc.initSDK()

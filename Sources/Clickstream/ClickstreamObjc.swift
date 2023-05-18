@@ -67,17 +67,17 @@ import Foundation
 
     private static func getAttributes(_ attributes: NSDictionary) -> ClickstreamAttribute {
         var result: ClickstreamAttribute = [:]
-        for (key, value) in attributes {
-            if key is NSString {
-                if value is String {
-                    result[key as! String] = value as? String
-                } else if value is Bool {
-                    result[key as! String] = (value as! Bool) ? true : false
-                } else if value is Int {
-                    result[key as! String] = value as? Int
-                } else if value is Double {
-                    result[key as! String] = value as? Double
+        for case let (key as String, value) in attributes {
+            if value is String {
+                result[key] = value as? String
+            } else if value is Bool {
+                if let boolValue = value as? Bool {
+                    result[key] = boolValue ? true : false
                 }
+            } else if value is Int {
+                result[key] = value as? Int
+            } else if value is Double {
+                result[key] = value as? Double
             }
         }
         return result

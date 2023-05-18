@@ -69,6 +69,8 @@ public enum ClickstreamAnalytics {
     /// - Returns: ClickstreamContextConfiguration to modify the configuration of clickstream sdk
     public static func getClickstreamConfiguration() throws -> ClickstreamContextConfiguration {
         let plugin = try Amplify.Analytics.getPlugin(for: "awsClickstreamPlugin")
+        // swiftlint:disable force_cast
         return (plugin as! AWSClickstreamPlugin).getEscapeHatch().configuration
+        // swiftlint:enable force_cast
     }
 }

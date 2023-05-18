@@ -22,7 +22,7 @@ closing_brace: error
 colon:
   severity: error
 comma: error
-empty_count: warning
+# empty_count: warning
 empty_enum_arguments: error
 function_body_length:
   warning: 100
