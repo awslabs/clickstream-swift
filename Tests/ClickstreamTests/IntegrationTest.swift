@@ -188,6 +188,7 @@ class IntegrationTest: XCTestCase {
     func testModifyConfiguration() throws {
         let configuration = try ClickstreamAnalytics.getClickstreamConfiguration()
         configuration.isCompressEvents = true
+        configuration.isLogEvents = true
         configuration.authCookie = "authCookie"
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
         ClickstreamAnalytics.flushEvents()
