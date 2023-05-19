@@ -377,7 +377,7 @@ class EventRecorderTest: XCTestCase {
         eventRecorder.submitEvents()
         XCTAssertEqual(2, eventRecorder.queue.operationCount)
         if clickstream.systemInfo.model == "iPhone 14 Pro" {
-            Thread.sleep(forTimeInterval: 10)
+            Thread.sleep(forTimeInterval: 15)
         } else {
             Thread.sleep(forTimeInterval: 0.5)
         }
