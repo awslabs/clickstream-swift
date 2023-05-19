@@ -66,16 +66,17 @@ class IntegrationTest: XCTestCase {
             "Successful": true,
             "Score": 90
         ]
-        let event = BaseClickstreamEvent(name: "userId", attribute: attribute)
-        ClickstreamAnalytics.recordEvent(event: event)
-        Thread.sleep(forTimeInterval: 0.5)
+        ClickstreamAnalytics.recordEvent(eventName: "userId", attributes: attribute)
+        ClickstreamAnalytics.flushEvents()
+        Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }
 
     func testRecordOneEventWithNameSuccess() throws {
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
-        Thread.sleep(forTimeInterval: 0.5)
+        ClickstreamAnalytics.flushEvents()
+        Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }
@@ -175,20 +176,90 @@ class IntegrationTest: XCTestCase {
     }
 
     func testModifyEndpoint() throws {
-        let configuration = try ClickstreamAnalytics.getClickStreamConfiguration()!
+        let configuration = try ClickstreamAnalytics.getClickstreamConfiguration()
         configuration.endpoint = testFailEndpoint
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
-        Thread.sleep(forTimeInterval: 2)
+        ClickstreamAnalytics.flushEvents()
+        Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertNotEqual(0, eventCount)
     }
 
     func testModifyConfiguration() throws {
-        let configuration = try ClickstreamAnalytics.getClickStreamConfiguration()!
+        let configuration = try ClickstreamAnalytics.getClickstreamConfiguration()
+        configuration.isCompressEvents = true
+        configuration.isLogEvents = true
+        configuration.authCookie = "authCookie"
+        ClickstreamAnalytics.recordEvent(eventName: "testEvent")
+        ClickstreamAnalytics.flushEvents()
+        Thread.sleep(forTimeInterval: 0.2)
+        let eventCount = try eventRecorder.dbUtil.getEventCount()
+        XCTAssertEqual(0, eventCount)
+    }
+
+    // MARK: - Objc test
+
+    func testRecordEventForObjc() throws {
+        let attribute: NSDictionary = [
+            "Channel": "SMS",
+            "Successful": true,
+            "Score": 90.1,
+            "level": 5
+        ]
+        ClickstreamObjc.recordEvent("userId")
+        ClickstreamObjc.recordEvent("testEvent", attribute)
+        ClickstreamObjc.flushEvents()
+        Thread.sleep(forTimeInterval: 0.2)
+        let eventCount = try eventRecorder.dbUtil.getEventCount()
+        XCTAssertEqual(0, eventCount)
+    }
+
+    func testGlobalAttributeForObjc() throws {
+        let attribute: NSDictionary = [
+            "Channel": "SMS",
+            "Successful": true,
+            "Score": 90.1,
+            "level": 5
+        ]
+        ClickstreamObjc.addGlobalAttributes(attribute)
+        ClickstreamObjc.deleteGlobalAttributes(["Channel"])
+        ClickstreamObjc.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
+        let testEvent = try getTestEvent()
+        let eventAttribute = testEvent["attributes"] as! [String: Any]
+        XCTAssertNil(eventAttribute["Channel"])
+        XCTAssertEqual(5, eventAttribute["level"] as! Int)
+        XCTAssertEqual(90.1, eventAttribute["Score"] as! Double)
+        XCTAssertEqual(true, eventAttribute["Successful"] as! Bool)
+    }
+
+    func testUserAttributeForObjc() throws {
+        ClickstreamObjc.setUserId("3231")
+        let userAttribute: NSDictionary = [
+            "_user_age": 21,
+            "isFirstOpen": true,
+            "score": 85.2,
+            "_user_name": "carl"
+        ]
+        ClickstreamObjc.addUserAttributes(userAttribute)
+        ClickstreamObjc.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
+        let testEvent = try getTestEvent()
+        let userInfo = testEvent["user"] as! [String: Any]
+        XCTAssertEqual(21, (userInfo["_user_age"] as! JsonObject)["value"] as! Int)
+        XCTAssertEqual(true, (userInfo["isFirstOpen"] as! JsonObject)["value"] as! Bool)
+        XCTAssertEqual(85.2, (userInfo["score"] as! JsonObject)["value"] as! Double)
+        XCTAssertEqual("carl", (userInfo["_user_name"] as! JsonObject)["value"] as! String)
+        XCTAssertEqual("3231", (userInfo[Event.ReservedAttribute.USER_ID] as! JsonObject)["value"] as! String)
+    }
+
+    func testModifyConfigurationForObjc() throws {
+        let configuration = try ClickstreamObjc.getClickstreamConfiguration()
         configuration.isCompressEvents = true
         configuration.authCookie = "authCookie"
         ClickstreamAnalytics.recordEvent(eventName: "testEvent")
-        Thread.sleep(forTimeInterval: 0.5)
+        ClickstreamAnalytics.flushEvents()
+        Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }

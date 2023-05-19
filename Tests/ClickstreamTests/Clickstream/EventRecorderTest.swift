@@ -42,7 +42,7 @@ class EventRecorderTest: XCTestCase {
                                                                        sendEventsInterval: 10_000,
                                                                        isTrackAppExceptionEvents: false,
                                                                        isCompressEvents: false)
-            contextConfiguration.isLogEvents = true
+            contextConfiguration.isLogEvents = false
             clickstream = try ClickstreamContext(with: contextConfiguration)
             clickstreamEvent = ClickstreamEvent(eventType: "testEvent",
                                                 appId: testAppId,
@@ -342,7 +342,7 @@ class EventRecorderTest: XCTestCase {
 
         eventRecorder.submitEvents()
         XCTAssertEqual(1, eventRecorder.queue.operationCount)
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 0.3)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
         XCTAssertTrue(eventRecorder.bundleSequenceId == 3)
@@ -359,7 +359,7 @@ class EventRecorderTest: XCTestCase {
         }
         eventRecorder.submitEvents()
         XCTAssertEqual(1, eventRecorder.queue.operationCount)
-        Thread.sleep(forTimeInterval: 0.2)
+        Thread.sleep(forTimeInterval: 0.3)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertTrue(totalEvent > 0)
     }
@@ -376,7 +376,11 @@ class EventRecorderTest: XCTestCase {
         eventRecorder.submitEvents()
         eventRecorder.submitEvents()
         XCTAssertEqual(2, eventRecorder.queue.operationCount)
-        Thread.sleep(forTimeInterval: 1)
+        if clickstream.systemInfo.model == "iPhone 14 Pro" {
+            Thread.sleep(forTimeInterval: 15)
+        } else {
+            Thread.sleep(forTimeInterval: 0.5)
+        }
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
     }

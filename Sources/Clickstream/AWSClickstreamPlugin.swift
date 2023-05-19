@@ -8,8 +8,8 @@
 import Amplify
 import Foundation
 
-public final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
-    public var clickstream: ClickstreamContext!
+final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
+    var clickstream: ClickstreamContext!
 
     /// Automatically flushes the events that have been recorded on an interval
     var autoFlushEventsTimer: DispatchSourceTimer?
@@ -24,10 +24,10 @@ public final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
     var analyticsClient: AnalyticsClientBehaviour!
 
     /// The configuration file plugin key of clickstream plugin
-    public var key: PluginKey {
+    var key: PluginKey {
         "awsClickstreamPlugin"
     }
 
     /// Instantiates an instance of the AWSClickstreamPlugin
-    public init() {}
+    init() {}
 }

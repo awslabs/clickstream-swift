@@ -12,7 +12,7 @@ import Network
     import UIKit
 #endif
 
-public extension AWSClickstreamPlugin {
+extension AWSClickstreamPlugin {
     /// called when sdk init.
     func configure(using configuration: Any?) throws {
         guard let config = configuration as? JSONValue else {
@@ -72,7 +72,7 @@ public extension AWSClickstreamPlugin {
     // MARK: Internal
 
     /// Internal configure method to set the properties of the plugin
-    internal func configure(
+    func configure(
         autoFlushEventsTimer: DispatchSourceTimer?,
         networkMonitor: NetworkMonitor
     ) {

@@ -7,12 +7,12 @@
 
 import Amplify
 
-public protocol ClickstreamLogger {
+protocol ClickstreamLogger {
     static var log: Logger { get }
     var log: Logger { get }
 }
 
-public extension ClickstreamLogger {
+extension ClickstreamLogger {
     static var log: Logger {
         Amplify.Logging.logger(forCategory: String(describing: self), logLevel: LogLevel.debug)
     }

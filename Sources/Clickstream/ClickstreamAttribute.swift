@@ -7,34 +7,29 @@
 
 import Amplify
 
+/// the attribute for Clickstream which support String, Int, Int64, Double and Bool
 public typealias ClickstreamAttribute = AnalyticsProperties
-public typealias AttributeValue = AnalyticsPropertyValue
+
+typealias AttributeValue = AnalyticsPropertyValue
 extension Int64: AnalyticsPropertyValue {}
 
-public struct BaseClickstreamEvent: AnalyticsEvent {
-    public var properties: AnalyticsProperties?
+struct BaseClickstreamEvent: AnalyticsEvent {
+    var properties: AnalyticsProperties?
 
     /// The name of the event
-    public var name: String
+    var name: String
 
     /// Properties of the event
-    public var attribute: ClickstreamAttribute?
+    var attribute: ClickstreamAttribute?
 
     /// Initializer
     /// - Parameters:
     ///   - name: The name of the event
     ///   - attribute: Attribute of the event
-    public init(name: String,
-                attribute: ClickstreamAttribute? = nil)
+    init(name: String,
+         attribute: ClickstreamAttribute? = nil)
     {
         self.name = name
-        self.attribute = attribute
-    }
-}
-
-public struct ClickstreamUserAttribute {
-    public var attribute: ClickstreamAttribute?
-    public init(attribute: ClickstreamAttribute?) {
         self.attribute = attribute
     }
 }

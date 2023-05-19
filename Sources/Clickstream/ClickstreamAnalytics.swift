@@ -7,6 +7,7 @@
 
 import Amplify
 
+/// ClickstreamAnalytics api for swift
 public enum ClickstreamAnalytics {
     /// Init ClickstreamAnalytics
     public static func initSDK() throws {
@@ -14,19 +15,22 @@ public enum ClickstreamAnalytics {
         try Amplify.configure()
     }
 
-    /// Use this method to record Event.
-    /// - Parameter event: ClickstreamEvent to record
-    public static func recordEvent(event: AnalyticsEvent) {
-        Amplify.Analytics.record(event: event)
-    }
-
-    /// Use this method to record Event.
+    /// Use this method to record event
     /// - Parameter eventName: the event name
     public static func recordEvent(eventName: String) {
         Amplify.Analytics.record(eventWithName: eventName)
     }
 
-    /// Use this method to send events immediately.
+    /// The method to record event with ClickstreamAttribute
+    /// - Parameters:
+    ///   - eventName: the event name
+    ///   - attributes: the event attributes
+    public static func recordEvent(eventName: String, attributes: ClickstreamAttribute) {
+        let event = BaseClickstreamEvent(name: eventName, attribute: attributes)
+        Amplify.Analytics.record(event: event)
+    }
+
+    /// Use this method to send events immediately
     public static func flushEvents() {
         Amplify.Analytics.flushEvents()
     }
@@ -38,7 +42,7 @@ public enum ClickstreamAnalytics {
     }
 
     /// Delete global attributes
-    /// - Parameter attributes: the global attributes to delete
+    /// - Parameter attributes: the global attributes names to delete
     public static func deleteGlobalAttributes(attributes: String...) {
         Amplify.Analytics.unregisterGlobalProperties(attributes)
     }
@@ -61,10 +65,12 @@ public enum ClickstreamAnalytics {
         }
     }
 
-    /// Get clickstream configuration, please config it after initialize.
-    /// - Returns: ClickstreamContextConfiguration: current userId, nil for logout
-    public static func getClickStreamConfiguration() throws -> ClickstreamContextConfiguration? {
+    /// Get Clickstream configuration, please config it after initialize sdk
+    /// - Returns: ClickstreamContextConfiguration to modify the configuration of clickstream sdk
+    public static func getClickstreamConfiguration() throws -> ClickstreamContextConfiguration {
         let plugin = try Amplify.Analytics.getPlugin(for: "awsClickstreamPlugin")
-        return (plugin as? AWSClickstreamPlugin)?.getEscapeHatch().configuration
+        // swiftlint:disable force_cast
+        return (plugin as! AWSClickstreamPlugin).getEscapeHatch().configuration
+        // swiftlint:enable force_cast
     }
 }

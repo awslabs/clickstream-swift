@@ -83,6 +83,7 @@ class SessionClientTests: XCTestCase {
     func testGoBackground() {
         XCTAssertTrue(sessionClient.getCurrentSession() == nil)
         activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 0.1)
         activityTracker.callback?(.runningInBackground)
         let session = sessionClient.getCurrentSession()!
         XCTAssertTrue(session.pauseTime != nil)
