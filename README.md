@@ -10,7 +10,7 @@ The SDK relies on the Amplify for Swift Core Library and is developed according 
 
 The Clickstream SDK supports iOS 13+.
 
-[**API Documentation**](https://awslabs.github.io/clickstream-swift/docs/)
+[**API Documentation**](https://awslabs.github.io/clickstream-swift/)
 
 ## Integrate SDK
 
