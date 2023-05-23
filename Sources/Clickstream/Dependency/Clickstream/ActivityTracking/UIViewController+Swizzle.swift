@@ -6,8 +6,7 @@
 //
 
 #if canImport(UIKit)
-    import UIKit
-#endif
+import UIKit
 
 private var hasSwizzled = false
 private var viewDidAppearFunc: ((String, String) -> Void)?
@@ -47,3 +46,4 @@ extension UIViewController {
         hasSwizzled = true
     }
 }
+#endif

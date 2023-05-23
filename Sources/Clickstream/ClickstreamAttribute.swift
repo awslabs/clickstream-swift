@@ -11,6 +11,7 @@ import Amplify
 public typealias ClickstreamAttribute = AnalyticsProperties
 
 typealias AttributeValue = AnalyticsPropertyValue
+/// for support Int64 attribute value
 extension Int64: AnalyticsPropertyValue {}
 
 struct BaseClickstreamEvent: AnalyticsEvent {
