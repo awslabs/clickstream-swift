@@ -12,5 +12,4 @@ theme: apple
 build_tool_arguments:
   - -Xswiftc
   - -swift-version
-  - -Xswiftc
   - "5"
