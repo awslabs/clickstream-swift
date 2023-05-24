@@ -16,7 +16,10 @@ enum UserDefaultsUtil {
             return deviceId
         }
         var newDeviceId = ""
-        let idfv = UIDevice.current.identifierForVendor?.uuidString ?? ""
+        var idfv = ""
+        #if canImport(UIKit)
+            idfv = UIDevice.current.identifierForVendor?.uuidString ?? ""
+        #endif
         if idfv != "" {
             newDeviceId = idfv
         } else {

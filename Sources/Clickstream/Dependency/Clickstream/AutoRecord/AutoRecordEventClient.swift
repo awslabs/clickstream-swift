@@ -8,6 +8,7 @@
 #if canImport(UIKit)
     import UIKit
 #endif
+import Foundation
 
 class AutoRecordEventClient {
     private let clickstream: ClickstreamContext
@@ -21,7 +22,9 @@ class AutoRecordEventClient {
         self.clickstream = clickstream
         self.isFirstOpen = UserDefaultsUtil.getIsFirstOpen(storage: clickstream.storage)
         if clickstream.configuration.isTrackScreenViewEvents {
-            UIViewController.swizzle(viewDidAppear: onViewDidAppear)
+            #if canImport(UIKit)
+                UIViewController.swizzle(viewDidAppear: onViewDidAppear)
+            #endif
         }
     }
 
