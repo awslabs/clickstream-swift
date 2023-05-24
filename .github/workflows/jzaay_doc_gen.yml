@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 env:
   GIT_USER_NAME: clickstream-android-dev+ghops
-  GIT_USER_EMAIL: clickstream-android-dev+ghops@amazon.com
+  GIT_USER_EMAIL: no-reply@amazon.com
 jobs:
   deploy:
     runs-on: macos-12
