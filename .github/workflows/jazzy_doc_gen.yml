@@ -20,3 +20,5 @@ jobs:
           git add docs
           git commit -m "chore: update API docs"
           git push origin HEAD:gh-pages -f
+        env:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
