@@ -12,6 +12,8 @@ The Clickstream SDK supports iOS 13+.
 
 [**API Documentation**](https://awslabs.github.io/clickstream-swift/)
 
+- [Objective-C API Reference](https://awslabs.github.io/clickstream-swift/Classes/ClickstreamObjc.html)
+
 ## Integrate SDK
 
 Clickstream requires Xcode 13.4 or higher to build.
