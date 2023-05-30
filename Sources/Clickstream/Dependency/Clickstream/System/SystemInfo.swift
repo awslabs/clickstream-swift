@@ -72,6 +72,7 @@ class SystemInfo {
         return identifier
     }()
 
+    // swiftlint:disable cyclomatic_complexity
     static func getModel(identifier: String) -> String {
         switch identifier {
         case "iPod9,1": return "iPod touch (7th generation)"
@@ -135,4 +136,5 @@ class SystemInfo {
             return identifier
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 }
