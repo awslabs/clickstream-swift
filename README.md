@@ -111,8 +111,8 @@ Add the following code where you need to complete the event report.
 import Clickstream
 
 let attributes: ClickstreamAttribute = [
-    "channel": "apple",
-    "uccessful": true,
+    "Channel": "apple",
+    "Successful": true,
     "ProcessDuration": 12.33,
     "UserAge": 20,
 ]
