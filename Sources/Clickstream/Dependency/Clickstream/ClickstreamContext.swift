@@ -58,7 +58,7 @@ extension UserDefaults: UserDefaultsBehaviour {
          endpoint: String,
          sendEventsInterval: Int,
          isTrackAppExceptionEvents: Bool = true,
-         isTrackAppLifecycleEvents: Bool = true,
+         isTrackScreenViewEvents: Bool = true,
          isCompressEvents: Bool = true,
          isLogEvents: Bool = false,
          sessionTimeoutDuration: Int64 = 1_800_000)
@@ -67,7 +67,7 @@ extension UserDefaults: UserDefaultsBehaviour {
         self.endpoint = endpoint
         self.sendEventsInterval = sendEventsInterval
         self.isTrackAppExceptionEvents = isTrackAppExceptionEvents
-        self.isTrackScreenViewEvents = isTrackAppLifecycleEvents
+        self.isTrackScreenViewEvents = isTrackScreenViewEvents
         self.isCompressEvents = isCompressEvents
         self.isLogEvents = isLogEvents
         self.sessionTimeoutDuration = sessionTimeoutDuration

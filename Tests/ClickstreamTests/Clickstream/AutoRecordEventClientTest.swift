@@ -115,4 +115,16 @@ class AutoRecordEventClientTest: XCTestCase {
 
         XCTAssertTrue(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENTRANCES] as! Int == 0)
     }
+
+    func testCloseRecordScreenView() {
+        clickstream.configuration.isTrackScreenViewEvents = false
+        autoRecordEventClient.updateEngageTimestamp()
+        autoRecordEventClient.setIsEntrances()
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        XCTAssertTrue(viewController.viewDidAppearCalled)
+        XCTAssertTrue(eventRecorder.saveCount == 0)
+    }
 }

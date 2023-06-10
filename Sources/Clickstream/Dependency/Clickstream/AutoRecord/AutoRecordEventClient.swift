@@ -92,6 +92,9 @@ class AutoRecordEventClient {
     }
 
     func onViewDidAppear(screenName: String, screenPath: String) {
+        if !clickstream.configuration.isTrackScreenViewEvents {
+            return
+        }
         let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
         event.addAttribute(screenName, forKey: Event.ReservedAttribute.SCREEN_NAME)
         event.addAttribute(screenPath, forKey: Event.ReservedAttribute.SCREEN_ID)

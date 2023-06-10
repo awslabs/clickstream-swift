@@ -62,7 +62,7 @@ Your `appId` and `endpoint` are already set up in it, here's an explanation of e
 
 **3.Initialize the SDK**
 
-Once you have configured the parameters, you need to initialize it in AppDelegate's `didFinishLaunchingWithOptions` lifecycle method to use the SDK.
+Once you have configured the parameters, you need to initialize it in your app delegate's `application(_:didFinishLaunchingWithOptions:)` lifecycle method:
 
 ```swift
 import Clickstream
@@ -78,7 +78,23 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-**4.Config the SDK**
+If your project is developed with SwiftUI, you need to create an application delegate and attach it to your `App` through `UIApplicationDelegateAdaptor`. 
+
+```swift
+@main
+struct YourApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    var body: some Scene {
+        WindowGroup {
+            YourView()
+        }
+    }
+}
+```
+
+You also need to disable swzzling by setting `configuration.isTrackScreenViewEvents = false`, see the next configuration steps.
+
+**4.Configure the SDK**
 
 ```swift
 import Clickstream
@@ -90,7 +106,7 @@ do {
     configuration.endpoint = "https://example.com/collect"
     configuration.authCookie = "your authentication cookie"
     configuration.sessionTimeoutDuration = 1800000
-    configuration.isTrackAppExceptionEvents = false
+    configuration.isTrackScreenViewEvents = true
     configuration.isLogEvents = true
     configuration.isCompressEvents = true    
     configuration.isLogEvents = true
