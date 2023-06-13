@@ -10,25 +10,23 @@ import Foundation
 
 extension AWSClickstreamPlugin {
     func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {
-        if userId == Event.User.USER_ID_EMPTY {
-            userProfile?.properties?.forEach { key, value in
-                Task {
-                    await analyticsClient.addUserAttribute(value, forKey: key)
+        Task {
+            if userId == Event.User.USER_ID_EMPTY {
+                if let attributes = userProfile?.properties {
+                    for attribute in attributes {
+                        await analyticsClient.addUserAttribute(attribute.value, forKey: attribute.key)
+                    }
                 }
-            }
-        } else {
-            Task {
+            } else {
                 if userId == Event.User.USER_ID_NIL {
                     await analyticsClient.updateUserId(nil)
                 } else {
                     await analyticsClient.updateUserId(userId)
                 }
             }
-        }
-        Task {
             await analyticsClient.updateUserAttributes()
+            record(eventWithName: Event.PresetEvent.PROFILE_SET)
         }
-        record(eventWithName: Event.PresetEvent.PROFILE_SET)
     }
 
     func record(event: AnalyticsEvent) {
