@@ -37,7 +37,7 @@ class IntegrationTest: XCTestCase {
                 "appId": appId,
                 "endpoint": "http://localhost:8080/collect",
                 "isCompressEvents": false,
-                "autoFlushEventsInterval": 10000,
+                "autoFlushEventsInterval": 10_000,
                 "isTrackAppExceptionEvents": false
             ]
         ]
