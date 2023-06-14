@@ -132,10 +132,10 @@ let attributes: ClickstreamAttribute = [
     "ProcessDuration": 12.33,
     "UserAge": 20,
 ]
-ClickstreamAnalytics.recordEvent(eventName: "testEvent", attributes: attributes)
+ClickstreamAnalytics.recordEvent("testEvent", attributes)
 
 // for record an event directly
-ClickstreamAnalytics.recordEvent(eventName: "button_click")
+ClickstreamAnalytics.recordEvent("button_click")
 ```
 
 #### Add global attribute
@@ -149,10 +149,10 @@ let globalAttribute: ClickstreamAttribute = [
     "level": 5.1,
     "isOpenNotification": true,
 ]
-ClickstreamAnalytics.addGlobalAttributes(attributes: globalAttribute)
+ClickstreamAnalytics.addGlobalAttributes(globalAttribute)
 
 // for delete an global attribute
-ClickstreamAnalytics.deleteGlobalAttributes(attributes: "level")
+ClickstreamAnalytics.deleteGlobalAttributes("level")
 ```
 
 #### Login and logout
@@ -161,10 +161,10 @@ ClickstreamAnalytics.deleteGlobalAttributes(attributes: "level")
 import Clickstream
 
 // when user login usccess.
-ClickstreamAnalytics.setUserId(userId: "userId")
+ClickstreamAnalytics.setUserId("userId")
 
 // when user logout
-ClickstreamAnalytics.setUserId(userId: nil)
+ClickstreamAnalytics.setUserId(nil)
 ```
 
 When we log into another user, we will clear the before user's user attributes, after `setUserId()` you need to add new user's attribute.
@@ -178,7 +178,7 @@ let userAttributes : ClickstreamAttribute=[
     "_user_age": 21,
     "_user_name": "carl"
 ]
-ClickstreamAnalytics.addUserAttributes(attributes: userAttributes)
+ClickstreamAnalytics.addUserAttributes(userAttributes)
 ```
 
 Current login user‘s attributes will be cached in disk, so the next time app launch you don't need to set all user's attribute again, of course you can update the current user's attribute when it changes.
