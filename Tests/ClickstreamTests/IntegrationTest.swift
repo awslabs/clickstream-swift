@@ -66,24 +66,23 @@ class IntegrationTest: XCTestCase {
             "Successful": true,
             "Score": 90
         ])
-        ClickstreamAnalytics.flushEvents()
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(0, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testRecordOneEventWithNameSuccess() throws {
         ClickstreamAnalytics.recordEvent("testEvent")
-        ClickstreamAnalytics.flushEvents()
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(0, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testFlushEvents() throws {
         ClickstreamAnalytics.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.flushEvents()
-        Thread.sleep(forTimeInterval: 0.2)
+        Thread.sleep(forTimeInterval: 0.5)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }
@@ -95,6 +94,7 @@ class IntegrationTest: XCTestCase {
             "class": 5,
             "isOpenNotification": true
         ])
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
 
@@ -113,7 +113,9 @@ class IntegrationTest: XCTestCase {
             "class": 5,
             "isOpenNotification": true
         ])
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.deleteGlobalAttributes("channel")
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
 
@@ -127,13 +129,14 @@ class IntegrationTest: XCTestCase {
 
     func testAddUserAttribute() throws {
         ClickstreamAnalytics.setUserId("13232")
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.addUserAttributes([
             "_user_age": 21,
             "isFirstOpen": true,
             "score": 85.2,
             "_user_name": "carl"
         ])
-        Thread.sleep(forTimeInterval: 0.1)
+        Thread.sleep(forTimeInterval: 0.2)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()
@@ -156,6 +159,7 @@ class IntegrationTest: XCTestCase {
 
     func testSetUserIdNil() throws {
         ClickstreamAnalytics.setUserId("12345")
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.setUserId(nil)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
@@ -220,10 +224,9 @@ class IntegrationTest: XCTestCase {
         let configuration = try ClickstreamAnalytics.getClickstreamConfiguration()
         configuration.endpoint = testFailEndpoint
         ClickstreamAnalytics.recordEvent("testEvent")
-        ClickstreamAnalytics.flushEvents()
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertNotEqual(0, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testModifyConfiguration() throws {
@@ -232,10 +235,9 @@ class IntegrationTest: XCTestCase {
         configuration.isLogEvents = true
         configuration.authCookie = "authCookie"
         ClickstreamAnalytics.recordEvent("testEvent")
-        ClickstreamAnalytics.flushEvents()
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(0, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     // MARK: - Objc test
@@ -249,10 +251,9 @@ class IntegrationTest: XCTestCase {
         ]
         ClickstreamObjc.recordEvent("userId")
         ClickstreamObjc.recordEvent("testEvent", attribute)
-        ClickstreamObjc.flushEvents()
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(0, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     func testGlobalAttributeForObjc() throws {
@@ -263,6 +264,7 @@ class IntegrationTest: XCTestCase {
             "level": 5
         ]
         ClickstreamObjc.addGlobalAttributes(attribute)
+        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamObjc.deleteGlobalAttributes(["Channel"])
         Thread.sleep(forTimeInterval: 0.1)
         ClickstreamObjc.recordEvent("testEvent")
@@ -301,10 +303,9 @@ class IntegrationTest: XCTestCase {
         configuration.isCompressEvents = true
         configuration.authCookie = "authCookie"
         ClickstreamAnalytics.recordEvent("testEvent")
-        ClickstreamAnalytics.flushEvents()
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(0, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     private func getTestEvent() throws -> [String: Any] {

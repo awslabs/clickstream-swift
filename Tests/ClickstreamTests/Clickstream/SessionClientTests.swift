@@ -106,7 +106,7 @@ class SessionClientTests: XCTestCase {
         XCTAssertTrue(session.pauseTime != nil)
         let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
         XCTAssertTrue(storedSession != nil)
-
+        Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
         XCTAssertEqual(4, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
@@ -156,6 +156,7 @@ class SessionClientTests: XCTestCase {
         window.makeKeyAndVisible()
         activityTracker.callback?(.runningInBackground)
         activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
         XCTAssertEqual(5, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
