@@ -9,7 +9,6 @@ import Foundation
 
 /// ClickstreamAnalytics api for objective-c
 @objcMembers public class ClickstreamObjc: NSObject {
-    
     /// Hide the constructor
     @nonobjc
     override private init() {
