@@ -14,9 +14,11 @@ class AutoRecordEventClient {
     private let clickstream: ClickstreamContext
     private var isEntrances = false
     private var isFirstOpen: Bool
+    private var isFirstTime = true
     private var startEngageTimestamp: Int64!
     private var lastScreenName: String?
     private var lastScreenPath: String?
+    private var lastScreenStartTime: Int64?
 
     init(clickstream: ClickstreamContext) {
         self.clickstream = clickstream
@@ -58,7 +60,7 @@ class AutoRecordEventClient {
         }
     }
 
-    func handleFirstOpen() {
+    func handleAppStart() {
         checkAppVersionUpdate(clickstream: clickstream)
         checkOSVersionUpdate(clickstream: clickstream)
         if isFirstOpen {
@@ -67,6 +69,14 @@ class AutoRecordEventClient {
             UserDefaultsUtil.saveIsFirstOpen(storage: clickstream.storage, isFirstOpen: "false")
             isFirstOpen = false
         }
+        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.APP_START)
+        event.addAttribute(isFirstTime, forKey: Event.ReservedAttribute.IS_FIRST_TIME)
+        if lastScreenName != nil, lastScreenPath != nil {
+            event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.SCREEN_NAME)
+            event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.SCREEN_ID)
+        }
+        recordEvent(event)
+        isFirstTime = false
     }
 
     func recordUserEngagement() {
@@ -74,6 +84,10 @@ class AutoRecordEventClient {
         if engagementTime > Constants.minEngagementTime {
             let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.USER_ENGAGEMENT)
             event.addAttribute(engagementTime, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+            if lastScreenName != nil, lastScreenPath != nil {
+                event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.SCREEN_NAME)
+                event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.SCREEN_ID)
+            }
             recordEvent(event)
         }
     }
@@ -95,6 +109,7 @@ class AutoRecordEventClient {
         if !clickstream.configuration.isTrackScreenViewEvents {
             return
         }
+        let currentTimestamp = Date().millisecondsSince1970
         let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
         event.addAttribute(screenName, forKey: Event.ReservedAttribute.SCREEN_NAME)
         event.addAttribute(screenPath, forKey: Event.ReservedAttribute.SCREEN_ID)
@@ -103,13 +118,16 @@ class AutoRecordEventClient {
             event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_ID)
         }
         event.addAttribute(isEntrances ? 1 : 0, forKey: Event.ReservedAttribute.ENTRANCES)
-        event.addAttribute(Date().millisecondsSince1970 - startEngageTimestamp,
-                           forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+        if !isEntrances, lastScreenStartTime != nil {
+            event.addAttribute(currentTimestamp - lastScreenStartTime!,
+                               forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+        }
         recordEvent(event)
 
         isEntrances = false
         lastScreenName = screenName
         lastScreenPath = screenPath
+        lastScreenStartTime = currentTimestamp
     }
 
     func recordEvent(_ event: ClickstreamEvent) {

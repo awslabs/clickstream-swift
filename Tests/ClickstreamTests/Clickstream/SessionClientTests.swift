@@ -75,9 +75,10 @@ class SessionClientTests: XCTestCase {
 
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(2, events.count)
+        XCTAssertEqual(3, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
-        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
     }
 
     func testGoBackground() {
@@ -91,9 +92,10 @@ class SessionClientTests: XCTestCase {
         XCTAssertTrue(storedSession != nil)
 
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(2, events.count)
+        XCTAssertEqual(3, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
-        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
     }
 
     func testGoBackgroundWithUserEngagement() {
@@ -104,12 +106,13 @@ class SessionClientTests: XCTestCase {
         XCTAssertTrue(session.pauseTime != nil)
         let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
         XCTAssertTrue(storedSession != nil)
-
+        Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(4, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
-        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
-        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[3].eventType)
     }
 
     func testReturnToForeground() {
@@ -137,9 +140,35 @@ class SessionClientTests: XCTestCase {
 
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(5, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
-        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[4].eventType)
+    }
+
+    func testReturnToForegroundWithScreenView() {
+        activityTracker.callback?(.runningInForeground)
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        activityTracker.callback?(.runningInBackground)
+        activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(5, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertTrue(events[1].attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
+
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[4].eventType)
+        let appStartEvent = events[4]
+        XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_NAME])
+        XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_ID])
+        XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
     }
 }
