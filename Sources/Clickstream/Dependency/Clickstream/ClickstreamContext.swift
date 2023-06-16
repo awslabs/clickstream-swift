@@ -42,7 +42,7 @@ extension UserDefaults: UserDefaultsBehaviour {
     /// Time interval after which the events are automatically submitted to server
     private let sendEventsInterval: Int
     /// Whether to track app exception events automatically
-    public var isTrackAppExceptionEvents: Bool
+    var isTrackAppExceptionEvents: Bool
     /// Whether to track app scren view events automatically
     public var isTrackScreenViewEvents: Bool
     /// Whether to compress events when send to server

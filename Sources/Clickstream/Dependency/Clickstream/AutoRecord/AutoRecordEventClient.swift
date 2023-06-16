@@ -28,6 +28,9 @@ class AutoRecordEventClient {
                 UIViewController.swizzle(viewDidAppear: onViewDidAppear)
             #endif
         }
+        if clickstream.configuration.isTrackAppExceptionEvents {
+            setupExceptionHandler()
+        }
     }
 
     func checkAppVersionUpdate(clickstream: ClickstreamContext) {
@@ -130,6 +133,26 @@ class AutoRecordEventClient {
         lastScreenStartTime = currentTimestamp
     }
 
+    func setupExceptionHandler() {
+        NSSetUncaughtExceptionHandler { exception in
+            AutoRecordEventClient.handleException(exception)
+        }
+    }
+
+    static func handleException(_ exception: NSException) {
+        let name = exception.name.rawValue
+        let reason = exception.reason ?? ""
+        let stackTrace = exception.callStackSymbols.joined(separator: "\n")
+        let attribute: ClickstreamAttribute = [
+            Event.ReservedAttribute.EXCEPTION_NAME: name,
+            Event.ReservedAttribute.EXCEPTION_REASON: reason,
+            Event.ReservedAttribute.EXCEPTION_STACK: stackTrace
+        ]
+        ClickstreamAnalytics.recordEvent(Event.PresetEvent.APP_EXCEPTION, attribute)
+        Thread.sleep(forTimeInterval: 0.2)
+        log.info("Recorded an app exception event, error name:\(name)")
+    }
+
     func recordEvent(_ event: ClickstreamEvent) {
         Task {
             try await clickstream.analyticsClient.record(event)
@@ -142,3 +165,5 @@ extension AutoRecordEventClient {
         static let minEngagementTime = 1_000
     }
 }
+
+extension AutoRecordEventClient: ClickstreamLogger {}
