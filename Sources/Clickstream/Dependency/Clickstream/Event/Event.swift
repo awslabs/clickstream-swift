@@ -167,6 +167,9 @@ enum Event {
         static let SCREEN_ID = "_screen_id"
         static let SCREEN_NAME = "_screen_name"
         static let IS_FIRST_TIME = "_is_first_time"
+        static let EXCEPTION_NAME = "_exception_name"
+        static let EXCEPTION_REASON = "_exception_reason"
+        static let EXCEPTION_STACK = "_excepiton_stack"
     }
 
     enum User {
@@ -209,6 +212,7 @@ enum Event {
         static let USER_ENGAGEMENT = "_user_engagement"
         static let SCREEN_VIEW = "_screen_view"
         static let APP_START = "_app_start"
+        static let APP_EXCEPTION = "_app_exception"
     }
 
     enum ErrorType {

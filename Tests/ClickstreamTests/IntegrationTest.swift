@@ -308,6 +308,19 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(1, eventCount)
     }
 
+    func testAppException() throws {
+        let exception = NSException(name: NSExceptionName("TestException"), reason: "Testing", userInfo: nil)
+        AutoRecordEventClient.handleException(exception)
+        Thread.sleep(forTimeInterval: 0.5)
+        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
+        XCTAssertTrue(event["event_type"] as! String == Event.PresetEvent.APP_EXCEPTION)
+        let attributes = event["attributes"] as! [String: Any]
+        XCTAssertTrue(attributes[Event.ReservedAttribute.EXCEPTION_NAME] as! String == exception.name.rawValue)
+        XCTAssertTrue(attributes[Event.ReservedAttribute.EXCEPTION_REASON] as? String == exception.reason)
+        XCTAssertTrue(attributes[Event.ReservedAttribute.EXCEPTION_STACK] as! String
+            == exception.callStackSymbols.joined(separator: "\n"))
+    }
+
     private func getTestEvent() throws -> [String: Any] {
         var testEvent: [String: Any] = JsonObject()
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
