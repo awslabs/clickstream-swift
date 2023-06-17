@@ -24,131 +24,131 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         analyticsPlugin.analyticsClient = analyticsClient
     }
 
-    func testIdentifyUser() async {
+    func testIdentifyUser() {
         let userProfile = AnalyticsUserProfile(location: nil, properties: [
             "user_age": 22,
             "user_name": "carl",
         ])
         let expectation = expectation(description: "Identify user")
-        await analyticsClient.setAddUserAttributeExpectation(expectation, count: 2)
+        analyticsClient.setAddUserAttributeExpectation(expectation, count: 2)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
-        await waitForExpectations(timeout: 1)
-        let addCount = await analyticsClient.addUserAttributeCount
+        waitForExpectations(timeout: 1)
+        let addCount = analyticsClient.addUserAttributeCount
         XCTAssertEqual(2, addCount)
     }
 
-    func testUpdateUserAttributes() async {
+    func testUpdateUserAttributes() {
         let userProfile = AnalyticsUserProfile(location: nil, properties: [
             "user_age": 22,
             "user_name": "carl",
         ])
         let expectation = expectation(description: "Identify user")
-        await analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
+        analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
-        await waitForExpectations(timeout: 1)
-        let updateCount = await analyticsClient.updateUserAttributeCount
+        waitForExpectations(timeout: 1)
+        let updateCount = analyticsClient.updateUserAttributeCount
         XCTAssertEqual(1, updateCount)
     }
 
-    func testIdentifyUserForSetUserId() async {
+    func testIdentifyUserForSetUserId() {
         let expectation = expectation(description: "Identify user set user id not nil")
-        await analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
+        analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
-        await waitForExpectations(timeout: 1)
-        let updateCount = await analyticsClient.updateUserIdCount
+        waitForExpectations(timeout: 1)
+        let updateCount = analyticsClient.updateUserIdCount
         XCTAssertEqual(1, updateCount)
     }
 
-    func testIdentifyUserForNilUserId() async {
+    func testIdentifyUserForNilUserId() {
         let expectation = expectation(description: "Identify user set user id not nil")
-        await analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
+        analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: Event.User.USER_ID_NIL, userProfile: nil)
-        await waitForExpectations(timeout: 1)
-        let updateCount = await analyticsClient.updateUserIdCount
+        waitForExpectations(timeout: 1)
+        let updateCount = analyticsClient.updateUserIdCount
         XCTAssertEqual(1, updateCount)
     }
 
-    func testUpdateUserAttributesForUserIdUpdate() async {
+    func testUpdateUserAttributesForUserIdUpdate() {
         let expectation = expectation(description: "Identify user")
-        await analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
+        analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
         analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
-        await waitForExpectations(timeout: 1)
-        let updateCount = await analyticsClient.updateUserAttributeCount
+        waitForExpectations(timeout: 1)
+        let updateCount = analyticsClient.updateUserAttributeCount
         XCTAssertEqual(1, updateCount)
     }
 
-    func testRecordEvent() async {
+    func testRecordEvent() {
         let expectation = expectation(description: "record event")
-        await analyticsClient.setRecordExpectation(expectation)
+        analyticsClient.setRecordExpectation(expectation)
         let event = BaseClickstreamEvent(name: "testEvent", attribute: testAttribute)
         analyticsPlugin.record(event: event)
-        await waitForExpectations(timeout: 1)
-        let recordCount = await analyticsClient.recordCount
+        waitForExpectations(timeout: 1)
+        let recordCount = analyticsClient.recordCount
         XCTAssertEqual(1, recordCount)
     }
 
-    func testRecordEventWhenIsEnableFalse() async {
+    func testRecordEventWhenIsEnableFalse() {
         analyticsPlugin.isEnabled = false
         let event = BaseClickstreamEvent(name: "testName", attribute: testAttribute)
         analyticsPlugin.record(event: event)
-        let recordCount = await analyticsClient.recordCount
+        let recordCount = analyticsClient.recordCount
         XCTAssertEqual(0, recordCount)
     }
 
-    func testRecordEventWithName() async {
+    func testRecordEventWithName() {
         let expectation = expectation(description: "record event")
-        await analyticsClient.setRecordExpectation(expectation)
+        analyticsClient.setRecordExpectation(expectation)
         analyticsPlugin.record(eventWithName: "testEvent")
-        await waitForExpectations(timeout: 1)
-        let recordCount = await analyticsClient.recordCount
+        waitForExpectations(timeout: 1)
+        let recordCount = analyticsClient.recordCount
         XCTAssertEqual(1, recordCount)
     }
 
-    func testRecordEventWithNameWhenIsEnableFalse() async {
+    func testRecordEventWithNameWhenIsEnableFalse() {
         analyticsPlugin.isEnabled = false
         analyticsPlugin.record(eventWithName: "testEvent")
-        let recordCount = await analyticsClient.recordCount
+        let recordCount = analyticsClient.recordCount
         XCTAssertEqual(0, recordCount)
     }
 
-    func testRegisterGlobalAttribute() async {
+    func testRegisterGlobalAttribute() {
         let expectation = expectation(description: "add global attribute")
-        await analyticsClient.setAddGlobalAttributeExpectation(expectation, count: 4)
+        analyticsClient.setAddGlobalAttributeExpectation(expectation, count: 4)
         analyticsPlugin.registerGlobalProperties(testAttribute)
-        await waitForExpectations(timeout: 1)
-        let addGlobalAttributeCallCount = await analyticsClient.addGlobalAttributeCalls.count
+        waitForExpectations(timeout: 1)
+        let addGlobalAttributeCallCount = analyticsClient.addGlobalAttributeCalls.count
         XCTAssertEqual(addGlobalAttributeCallCount, testAttribute.count)
     }
 
-    func testUnregisterGlobalAttribute() async {
+    func testUnregisterGlobalAttribute() {
         let expectation = expectation(description: "add global attribute")
-        await analyticsClient.setRemoveGlobalAttributeExpectation(expectation, count: 4)
+        analyticsClient.setRemoveGlobalAttributeExpectation(expectation, count: 4)
         analyticsPlugin.unregisterGlobalProperties(Set<String>(testAttribute.keys))
-        await waitForExpectations(timeout: 1)
-        let removeGlobalAttributeCallCount = await analyticsClient.removeGlobalAttributeCalls.count
+        waitForExpectations(timeout: 1)
+        let removeGlobalAttributeCallCount = analyticsClient.removeGlobalAttributeCalls.count
         XCTAssertEqual(removeGlobalAttributeCallCount, testAttribute.count)
     }
 
-    func testFlushEvent() async {
+    func testFlushEvent() {
         let expectation = expectation(description: "flush event")
-        await analyticsClient.setSubmitEventsExpectation(expectation, count: 1)
+        analyticsClient.setSubmitEventsExpectation(expectation, count: 1)
         analyticsPlugin.flushEvents()
-        await waitForExpectations(timeout: 1)
-        let submitEventsCount = await analyticsClient.submitEventsCount
+        waitForExpectations(timeout: 1)
+        let submitEventsCount = analyticsClient.submitEventsCount
         XCTAssertEqual(1, submitEventsCount)
     }
 
-    func testFlushEventWhenIsEnableFalse() async {
+    func testFlushEventWhenIsEnableFalse() {
         analyticsPlugin.isEnabled = false
         analyticsPlugin.flushEvents()
-        let submitEventsCount = await analyticsClient.submitEventsCount
+        let submitEventsCount = analyticsClient.submitEventsCount
         XCTAssertEqual(0, submitEventsCount)
     }
 
-    func testFlushEventWhenNetworkIsOffline() async {
+    func testFlushEventWhenNetworkIsOffline() {
         mockNetworkMonitor.isOnline = false
         analyticsPlugin.flushEvents()
-        let submitEventsCount = await analyticsClient.submitEventsCount
+        let submitEventsCount = analyticsClient.submitEventsCount
         XCTAssertEqual(0, submitEventsCount)
     }
 

@@ -8,7 +8,7 @@
 @testable import Clickstream
 import XCTest
 
-actor MockAnalyticsClient: AnalyticsClientBehaviour {
+class MockAnalyticsClient: AnalyticsClientBehaviour {
     // MARK: - AddUserAttribute
 
     private var addUserAttributeExpectation: XCTestExpectation?
@@ -100,10 +100,8 @@ actor MockAnalyticsClient: AnalyticsClientBehaviour {
         createEventCount += 1
     }
 
-    nonisolated func createEvent(withEventType eventType: String) -> ClickstreamEvent {
-        Task {
-            await increaseCreateEventCount()
-        }
+    func createEvent(withEventType eventType: String) -> ClickstreamEvent {
+        increaseCreateEventCount()
         let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)
         return ClickstreamEvent(eventType: eventType, appId: "", uniqueId: "", session: Session(uniqueId: "", sessionIndex: 1),
                                 systemInfo: SystemInfo(storage: storage), netWorkType: "WIFI")

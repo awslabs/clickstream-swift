@@ -47,7 +47,7 @@ class IntegrationTest: XCTestCase {
             try Amplify.add(plugin: analyticsPlugin)
             try Amplify.configure(config)
             analyticsClient = analyticsPlugin!.analyticsClient as? AnalyticsClient
-            eventRecorder = await analyticsClient.eventRecorder as? EventRecorder
+            eventRecorder = analyticsClient.eventRecorder as? EventRecorder
         } catch {
             XCTFail("Error setting up Amplify: \(error)")
         }
@@ -94,7 +94,6 @@ class IntegrationTest: XCTestCase {
             "class": 5,
             "isOpenNotification": true
         ])
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
 
@@ -113,9 +112,7 @@ class IntegrationTest: XCTestCase {
             "class": 5,
             "isOpenNotification": true
         ])
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.deleteGlobalAttributes("channel")
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
 
@@ -129,14 +126,12 @@ class IntegrationTest: XCTestCase {
 
     func testAddUserAttribute() throws {
         ClickstreamAnalytics.setUserId("13232")
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.addUserAttributes([
             "_user_age": 21,
             "isFirstOpen": true,
             "score": 85.2,
             "_user_name": "carl"
         ])
-        Thread.sleep(forTimeInterval: 0.2)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()
@@ -159,7 +154,6 @@ class IntegrationTest: XCTestCase {
 
     func testSetUserIdNil() throws {
         ClickstreamAnalytics.setUserId("12345")
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.setUserId(nil)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
@@ -264,9 +258,7 @@ class IntegrationTest: XCTestCase {
             "level": 5
         ]
         ClickstreamObjc.addGlobalAttributes(attribute)
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamObjc.deleteGlobalAttributes(["Channel"])
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamObjc.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()
@@ -286,7 +278,6 @@ class IntegrationTest: XCTestCase {
             "_user_name": "carl"
         ]
         ClickstreamObjc.addUserAttributes(userAttribute)
-        Thread.sleep(forTimeInterval: 0.1)
         ClickstreamObjc.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()
