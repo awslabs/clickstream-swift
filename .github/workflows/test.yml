@@ -8,11 +8,11 @@ on:
 
 jobs:
   test:
-    runs-on: macos-12
+    runs-on: macos-13-xl
     steps:
       - uses: actions/checkout@v3
       - name: Run test
-        run: xcodebuild test -scheme aws-solution-clickstream-swift -destination 'platform=iOS Simulator,name=iPhone 14 Pro,OS=latest' -resultBundlePath .build/test/TestResults.xcresult | xcpretty --simple --color --report junit
+        run: xcodebuild test -scheme aws-solution-clickstream-swift -destination 'platform=iOS Simulator,name=iPhone 14 Pro,OS=latest' -resultBundlePath .build/test/TestResults.xcresult | xcpretty --simple --color --report junit && exit ${PIPESTATUS[0]}
       - name: Upload Test Report
         uses: codecov/codecov-action@v3
         with:

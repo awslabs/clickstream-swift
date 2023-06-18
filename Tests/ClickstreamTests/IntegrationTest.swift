@@ -82,7 +82,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.flushEvents()
-        Thread.sleep(forTimeInterval: 0.5)
+        Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }
