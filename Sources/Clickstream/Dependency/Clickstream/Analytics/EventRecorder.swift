@@ -16,7 +16,7 @@ protocol AnalyticsEventRecording {
 
     /// Submit locally stored events
     /// - Returns: A collection of events submitted to Clickstream
-    func submitEvents() throws
+    func submitEvents()
 }
 
 /// An AnalyticsEventRecording implementation that stores and submits clickstream events

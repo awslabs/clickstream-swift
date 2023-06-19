@@ -10,21 +10,21 @@ import Foundation
 
 extension AWSClickstreamPlugin {
     func identifyUser(userId: String, userProfile: AnalyticsUserProfile?) {
-        Task {
-            if userId == Event.User.USER_ID_EMPTY {
-                if let attributes = userProfile?.properties {
-                    for attribute in attributes {
-                        await analyticsClient.addUserAttribute(attribute.value, forKey: attribute.key)
-                    }
-                }
-            } else {
-                if userId == Event.User.USER_ID_NIL {
-                    await analyticsClient.updateUserId(nil)
-                } else {
-                    await analyticsClient.updateUserId(userId)
+        if userId == Event.User.USER_ID_EMPTY {
+            if let attributes = userProfile?.properties {
+                for attribute in attributes {
+                    analyticsClient.addUserAttribute(attribute.value, forKey: attribute.key)
                 }
             }
-            await analyticsClient.updateUserAttributes()
+        } else {
+            if userId == Event.User.USER_ID_NIL {
+                analyticsClient.updateUserId(nil)
+            } else {
+                analyticsClient.updateUserId(userId)
+            }
+        }
+        analyticsClient.updateUserAttributes()
+        Task {
             record(eventWithName: Event.PresetEvent.PROFILE_SET)
         }
     }
@@ -59,17 +59,13 @@ extension AWSClickstreamPlugin {
 
     func registerGlobalProperties(_ properties: AnalyticsProperties) {
         properties.forEach { key, value in
-            Task {
-                await analyticsClient.addGlobalAttribute(value, forKey: key)
-            }
+            analyticsClient.addGlobalAttribute(value, forKey: key)
         }
     }
 
     func unregisterGlobalProperties(_ keys: Set<String>?) {
         keys?.forEach { key in
-            Task {
-                await analyticsClient.removeGlobalAttribute(forKey: key)
-            }
+            analyticsClient.removeGlobalAttribute(forKey: key)
         }
     }
 
@@ -83,9 +79,7 @@ extension AWSClickstreamPlugin {
             log.error("Device is offline, skipping submitting events to Clickstream server")
             return
         }
-        Task {
-            try await analyticsClient.submitEvents()
-        }
+        analyticsClient.submitEvents()
     }
 
     func getEscapeHatch() -> ClickstreamContext {

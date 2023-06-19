@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AnalyticsClientBehaviour: Actor {
+protocol AnalyticsClientBehaviour {
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String)
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String)
     func removeGlobalAttribute(forKey key: String)
@@ -15,14 +15,14 @@ protocol AnalyticsClientBehaviour: Actor {
     func updateUserId(_ id: String?)
     func updateUserAttributes()
 
-    nonisolated func createEvent(withEventType eventType: String) -> ClickstreamEvent
+    func createEvent(withEventType eventType: String) -> ClickstreamEvent
     func record(_ event: ClickstreamEvent) async throws
-    func submitEvents() throws
+    func submitEvents()
 }
 
 typealias SessionProvider = () -> Session?
 
-actor AnalyticsClient: AnalyticsClientBehaviour {
+class AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var eventRecorder: AnalyticsEventRecording
     private let sessionProvider: SessionProvider
     private(set) lazy var globalAttributes: [String: AttributeValue] = [:]
@@ -101,7 +101,7 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
 
     // MARK: - Event recording
 
-    nonisolated func createEvent(withEventType eventType: String) -> ClickstreamEvent {
+    func createEvent(withEventType eventType: String) -> ClickstreamEvent {
         let (isValid, errorType) = Event.isValidEventType(eventType: eventType)
         precondition(isValid, errorType)
 
@@ -124,7 +124,7 @@ actor AnalyticsClient: AnalyticsClientBehaviour {
         try eventRecorder.save(event)
     }
 
-    func submitEvents() throws {
-        try eventRecorder.submitEvents()
+    func submitEvents() {
+        eventRecorder.submitEvents()
     }
 }

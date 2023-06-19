@@ -155,7 +155,11 @@ class AutoRecordEventClient {
 
     func recordEvent(_ event: ClickstreamEvent) {
         Task {
-            try await clickstream.analyticsClient.record(event)
+            do {
+                try await clickstream.analyticsClient.record(event)
+            } catch {
+                log.error("Record event error:\(error)")
+            }
         }
     }
 }

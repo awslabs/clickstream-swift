@@ -32,7 +32,7 @@ class EventRecorderTest: XCTestCase {
                 HttpResponse.badRequest(.text("request fail"))
             }
             server["/collect/success/delay"] = { _ in
-                Thread.sleep(forTimeInterval: 0.5)
+                Thread.sleep(forTimeInterval: 0.1)
                 return HttpResponse.ok(.text("request success"))
             }
             try! server.start()
@@ -376,11 +376,7 @@ class EventRecorderTest: XCTestCase {
         eventRecorder.submitEvents()
         eventRecorder.submitEvents()
         XCTAssertEqual(2, eventRecorder.queue.operationCount)
-        if clickstream.systemInfo.model == "iPhone 14 Pro" {
-            Thread.sleep(forTimeInterval: 15)
-        } else {
-            Thread.sleep(forTimeInterval: 0.5)
-        }
+        Thread.sleep(forTimeInterval: 0.5)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
     }

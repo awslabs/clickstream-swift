@@ -78,7 +78,7 @@ class AutoRecordEventClientTest: XCTestCase {
         XCTAssertTrue(viewController.viewDidAppearCalled)
 
         XCTAssertTrue(eventRecorder.saveCount == 1)
-        XCTAssertTrue(eventRecorder.lastSavedEvent?.eventType == Event.PresetEvent.SCREEN_VIEW)
+        XCTAssertEqual(eventRecorder.lastSavedEvent?.eventType, Event.PresetEvent.SCREEN_VIEW)
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
@@ -105,7 +105,7 @@ class AutoRecordEventClientTest: XCTestCase {
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
         XCTAssertTrue(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP]
-                      as! Int64 >= 0)
+            as! Int64 >= 0)
 
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_ID])
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_NAME])
