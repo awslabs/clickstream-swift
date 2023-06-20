@@ -20,6 +20,7 @@ class EventRecorderTest: XCTestCase {
     var eventRecorder: EventRecorder!
     var clickstream: ClickstreamContext!
     var server: HttpServer!
+    var activityTracker: MockActivityTracker!
 
     override func setUp() async throws {
         do {
@@ -52,6 +53,23 @@ class EventRecorderTest: XCTestCase {
                                                 netWorkType: NetWorkType.Wifi)
             eventRecorder = try! EventRecorder(clickstream: clickstream)
             dbUtil = eventRecorder.dbUtil
+
+            activityTracker = MockActivityTracker()
+            let sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)
+            clickstream.sessionClient = sessionClient
+            let sessionProvider: () -> Session? = { [weak sessionClient] in
+                guard let sessionClient else {
+                    fatalError("SessionClient was deallocated")
+                }
+                return sessionClient.getCurrentSession()
+            }
+            let analyticsClient = try AnalyticsClient(
+                clickstream: clickstream,
+                eventRecorder: eventRecorder,
+                sessionProvider: sessionProvider
+            )
+            clickstream.analyticsClient = analyticsClient
+            clickstream.networkMonitor = MockNetworkMonitor()
         } catch {
             XCTFail("Fail to setup EventRecorder error:\(error)")
         }
@@ -389,6 +407,15 @@ class EventRecorderTest: XCTestCase {
             eventRecorder.submitEvents()
         }
         XCTAssertTrue(eventRecorder.queue.operationCount <= 1_000)
+    }
+
+    func testBackgroundModeAutoSendRequest() throws {
+        activityTracker.callback?(.runningInForeground)
+        try eventRecorder.save(clickstreamEvent)
+        activityTracker.callback?(.runningInBackground)
+        Thread.sleep(forTimeInterval: 0.3)
+        let totalEvent = try dbUtil.getEventCount()
+        XCTAssertEqual(0, totalEvent)
     }
 }
 

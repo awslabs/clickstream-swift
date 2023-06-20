@@ -93,6 +93,7 @@ class AutoRecordEventClient {
             }
             recordEvent(event)
         }
+        clickstream.analyticsClient.submitEvents(inBackgroundMode: true)
     }
 
     func updateEngageTimestamp() {

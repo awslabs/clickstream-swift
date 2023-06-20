@@ -7,6 +7,9 @@
 
 import Amplify
 import Foundation
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 /// AnalyticsEventRecording saves and submits clickstream events
 protocol AnalyticsEventRecording {
@@ -15,8 +18,8 @@ protocol AnalyticsEventRecording {
     func save(_ event: ClickstreamEvent) throws
 
     /// Submit locally stored events
-    /// - Returns: A collection of events submitted to Clickstream
-    func submitEvents()
+    /// - Parameter inBackgroundMode: wheter use background mode to send request
+    func submitEvents(inBackgroundMode: Bool)
 }
 
 /// An AnalyticsEventRecording implementation that stores and submits clickstream events
@@ -46,8 +49,7 @@ class EventRecorder: AnalyticsEventRecording {
         try dbUtil.saveEvent(storageEvent)
         if clickstream.configuration.isLogEvents {
             setLogLevel(logLevel: LogLevel.debug)
-            log.debug("saved event: \(event.eventType)")
-            log.debug(eventJson)
+            logEventPrettier(event: event)
         }
         while try dbUtil.getTotalSize() > Constants.maxDbSize {
             let events = try dbUtil.getEventsWith(limit: 5)
@@ -61,10 +63,17 @@ class EventRecorder: AnalyticsEventRecording {
     }
 
     /// submit an batch events, add the processEvent() as operation into queue
-    func submitEvents() {
+    func submitEvents(inBackgroundMode: Bool = false) {
         if queue.operationCount < Constants.maxEventOperations {
             let operation = BlockOperation { [weak self] in
+                var taskId: UIBackgroundTaskIdentifier?
+                if inBackgroundMode {
+                    taskId = self?.startBackgroundTask()
+                }
                 _ = self?.processEvent()
+                if inBackgroundMode, taskId != nil {
+                    self?.endBackgroundTask(taskId: taskId!)
+                }
             }
             queue.addOperation(operation)
         } else {
@@ -106,7 +115,6 @@ class EventRecorder: AnalyticsEventRecording {
         } catch {
             log.error("Failed to send event:\(error)")
         }
-        log.info("Send \(totalEventSend) events in one submit")
         return totalEventSend
     }
 
@@ -132,6 +140,31 @@ class EventRecorder: AnalyticsEventRecording {
             eventsJson.append("]")
         }
         return BatchEvent(eventsJson: eventsJson, eventCount: eventCount, lastEventId: lastEventId)
+    }
+
+    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
+        var taskId: UIBackgroundTaskIdentifier?
+        #if canImport(UIKit)
+            taskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
+            log.debug("Start background task")
+        #endif
+        return taskId!
+    }
+
+    func endBackgroundTask(taskId: UIBackgroundTaskIdentifier) {
+        #if canImport(UIKit)
+            UIApplication.shared.endBackgroundTask(taskId)
+            log.debug("Ended background task")
+        #endif
+    }
+
+    func logEventPrettier(event: ClickstreamEvent) {
+        log.debug("Event saved, event name: \(event.eventType)")
+        print("attributes: {")
+        for (key, value) in event.attributes {
+            print("  \"\(key)\": \(value)")
+        }
+        print("}")
     }
 }
 
