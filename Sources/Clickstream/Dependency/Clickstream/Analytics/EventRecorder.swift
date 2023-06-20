@@ -66,13 +66,16 @@ class EventRecorder: AnalyticsEventRecording {
     func submitEvents(inBackgroundMode: Bool = false) {
         if queue.operationCount < Constants.maxEventOperations {
             let operation = BlockOperation { [weak self] in
-                var taskId: UIBackgroundTaskIdentifier?
                 if inBackgroundMode {
-                    taskId = self?.startBackgroundTask()
-                }
-                _ = self?.processEvent()
-                if inBackgroundMode, taskId != nil {
-                    self?.endBackgroundTask(taskId: taskId!)
+                    #if canImport(UIKit)
+                        let taskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
+                        self?.log.debug("Start background task")
+                        _ = self?.processEvent()
+                        UIApplication.shared.endBackgroundTask(taskId)
+                        self?.log.debug("Ended background task")
+                    #endif
+                } else {
+                    _ = self?.processEvent()
                 }
             }
             queue.addOperation(operation)
@@ -140,22 +143,6 @@ class EventRecorder: AnalyticsEventRecording {
             eventsJson.append("]")
         }
         return BatchEvent(eventsJson: eventsJson, eventCount: eventCount, lastEventId: lastEventId)
-    }
-
-    func startBackgroundTask() -> UIBackgroundTaskIdentifier {
-        var taskId: UIBackgroundTaskIdentifier?
-        #if canImport(UIKit)
-            taskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
-            log.debug("Start background task")
-        #endif
-        return taskId!
-    }
-
-    func endBackgroundTask(taskId: UIBackgroundTaskIdentifier) {
-        #if canImport(UIKit)
-            UIApplication.shared.endBackgroundTask(taskId)
-            log.debug("Ended background task")
-        #endif
     }
 
     func logEventPrettier(event: ClickstreamEvent) {
