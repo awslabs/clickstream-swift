@@ -19,7 +19,7 @@ class MockEventRecorder: AnalyticsEventRecording {
     }
 
     var submitCount = 0
-    func submitEvents(inBackgroundMode: Bool = false) {
+    func submitEvents(isBackgroundMode: Bool = false) {
         submitCount += 1
     }
 }

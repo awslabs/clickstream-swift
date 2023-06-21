@@ -18,8 +18,8 @@ protocol AnalyticsEventRecording {
     func save(_ event: ClickstreamEvent) throws
 
     /// Submit locally stored events
-    /// - Parameter inBackgroundMode: wheter use background mode to send request
-    func submitEvents(inBackgroundMode: Bool)
+    /// - Parameter isBackgroundMode: whether use background mode to send request
+    func submitEvents(isBackgroundMode: Bool)
 }
 
 /// An AnalyticsEventRecording implementation that stores and submits clickstream events
@@ -63,16 +63,16 @@ class EventRecorder: AnalyticsEventRecording {
     }
 
     /// submit an batch events, add the processEvent() as operation into queue
-    func submitEvents(inBackgroundMode: Bool = false) {
+    func submitEvents(isBackgroundMode: Bool = false) {
         if queue.operationCount < Constants.maxEventOperations {
             let operation = BlockOperation { [weak self] in
-                if inBackgroundMode {
+                if isBackgroundMode {
                     #if canImport(UIKit)
                         let taskId = UIApplication.shared.beginBackgroundTask(expirationHandler: nil)
                         self?.log.debug("Start background task")
                         _ = self?.processEvent()
                         UIApplication.shared.endBackgroundTask(taskId)
-                        self?.log.debug("Ended background task")
+                        self?.log.debug("Background task is the end")
                     #endif
                 } else {
                     _ = self?.processEvent()
