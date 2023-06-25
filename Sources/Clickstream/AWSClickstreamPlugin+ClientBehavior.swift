@@ -79,7 +79,7 @@ extension AWSClickstreamPlugin {
             log.error("Device is offline, skipping submitting events to Clickstream server")
             return
         }
-        analyticsClient.submitEvents()
+        analyticsClient.submitEvents(isBackgroundMode: false)
     }
 
     func getEscapeHatch() -> ClickstreamContext {

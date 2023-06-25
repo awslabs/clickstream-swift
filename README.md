@@ -108,8 +108,7 @@ do {
     configuration.sessionTimeoutDuration = 1800000
     configuration.isTrackScreenViewEvents = true
     configuration.isLogEvents = true
-    configuration.isCompressEvents = true    
-    configuration.isLogEvents = true
+    configuration.isCompressEvents = true
 } catch {
     print("Failed to config ClickstreamAnalytics: \(error)")
 }

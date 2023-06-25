@@ -228,7 +228,9 @@ class IntegrationTest: XCTestCase {
         configuration.isCompressEvents = true
         configuration.isLogEvents = true
         configuration.authCookie = "authCookie"
-        ClickstreamAnalytics.recordEvent("testEvent")
+        ClickstreamAnalytics.recordEvent("testEvent", [
+            "isLogEvent": true
+        ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(1, eventCount)

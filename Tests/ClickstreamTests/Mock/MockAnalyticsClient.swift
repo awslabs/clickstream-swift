@@ -135,7 +135,7 @@ class MockAnalyticsClient: AnalyticsClientBehaviour {
     }
 
     var submitEventsCount = 0
-    func submitEvents() {
+    func submitEvents(isBackgroundMode: Bool = false) {
         submitEventsCount += 1
         submitEventsExpectation?.fulfill()
     }

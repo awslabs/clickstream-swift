@@ -17,7 +17,7 @@ protocol AnalyticsClientBehaviour {
 
     func createEvent(withEventType eventType: String) -> ClickstreamEvent
     func record(_ event: ClickstreamEvent) async throws
-    func submitEvents()
+    func submitEvents(isBackgroundMode: Bool)
 }
 
 typealias SessionProvider = () -> Session?
@@ -124,7 +124,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         try eventRecorder.save(event)
     }
 
-    func submitEvents() {
-        eventRecorder.submitEvents()
+    func submitEvents(isBackgroundMode: Bool = false) {
+        eventRecorder.submitEvents(isBackgroundMode: isBackgroundMode)
     }
 }
