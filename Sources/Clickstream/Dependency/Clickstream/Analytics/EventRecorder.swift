@@ -146,12 +146,12 @@ class EventRecorder: AnalyticsEventRecording {
     }
 
     func logEventPrettier(event: ClickstreamEvent) {
-        log.debug("Event saved, event name: \(event.eventType)")
-        print("attributes: {")
+        var attributesStr = "attributes:{\n"
         for (key, value) in event.attributes {
-            print("  \"\(key)\": \(value)")
+            attributesStr += "  \"\(key)\": \(value)\n"
         }
-        print("}")
+        attributesStr += "}"
+        log.debug("Event saved, event name: \(event.eventType)\n\(attributesStr)")
     }
 }
 
