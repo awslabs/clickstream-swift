@@ -31,7 +31,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         ])
         let expectation = expectation(description: "Identify user")
         analyticsClient.setAddUserAttributeExpectation(expectation, count: 2)
-        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
+        analyticsPlugin.identifyUser(Event.User.USER_ID_EMPTY, withProfile: userProfile)
         waitForExpectations(timeout: 1)
         let addCount = analyticsClient.addUserAttributeCount
         XCTAssertEqual(2, addCount)
@@ -44,7 +44,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         ])
         let expectation = expectation(description: "Identify user")
         analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
-        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_EMPTY, userProfile: userProfile)
+        analyticsPlugin.identifyUser(Event.User.USER_ID_EMPTY, withProfile: userProfile)
         waitForExpectations(timeout: 1)
         let updateCount = analyticsClient.updateUserAttributeCount
         XCTAssertEqual(1, updateCount)
@@ -53,7 +53,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     func testIdentifyUserForSetUserId() {
         let expectation = expectation(description: "Identify user set user id not nil")
         analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
-        analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
+        analyticsPlugin.identifyUser("13231", withProfile: nil)
         waitForExpectations(timeout: 1)
         let updateCount = analyticsClient.updateUserIdCount
         XCTAssertEqual(1, updateCount)
@@ -62,7 +62,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     func testIdentifyUserForNilUserId() {
         let expectation = expectation(description: "Identify user set user id not nil")
         analyticsClient.setUpdateUserIdExpectation(expectation, count: 1)
-        analyticsPlugin.identifyUser(userId: Event.User.USER_ID_NIL, userProfile: nil)
+        analyticsPlugin.identifyUser(Event.User.USER_ID_NIL, withProfile: nil)
         waitForExpectations(timeout: 1)
         let updateCount = analyticsClient.updateUserIdCount
         XCTAssertEqual(1, updateCount)
@@ -71,7 +71,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
     func testUpdateUserAttributesForUserIdUpdate() {
         let expectation = expectation(description: "Identify user")
         analyticsClient.setUpdateUserAttributesExpectation(expectation, count: 1)
-        analyticsPlugin.identifyUser(userId: "13231", userProfile: nil)
+        analyticsPlugin.identifyUser("13231", withProfile: nil)
         waitForExpectations(timeout: 1)
         let updateCount = analyticsClient.updateUserAttributeCount
         XCTAssertEqual(1, updateCount)

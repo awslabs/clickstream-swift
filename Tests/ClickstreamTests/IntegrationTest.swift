@@ -31,7 +31,7 @@ class IntegrationTest: XCTestCase {
         try! server.start()
         analyticsPlugin = AWSClickstreamPlugin()
         let appId = JSONValue(stringLiteral: "testAppId" + String(describing: Date().millisecondsSince1970))
-        await Amplify.reset()
+        Amplify.reset()
         let plugins: [String: JSONValue] = [
             "awsClickstreamPlugin": [
                 "appId": appId,
@@ -54,8 +54,8 @@ class IntegrationTest: XCTestCase {
     }
 
     override func tearDown() async throws {
-        await Amplify.reset()
-        analyticsPlugin.reset()
+//        Amplify.reset()
+        analyticsPlugin.reset(onComplete: {})
         server.stop()
         try eventRecorder.dbUtil.deleteAllEvents()
     }

@@ -46,7 +46,7 @@ class ClickstreamPluginTestBase: XCTestCase {
         analyticsPlugin.configure(autoFlushEventsTimer: nil,
                                   networkMonitor: mockNetworkMonitor)
 
-        await Amplify.reset()
+        Amplify.reset()
         let config = AmplifyConfiguration()
         do {
             try Amplify.configure(config)
@@ -56,7 +56,7 @@ class ClickstreamPluginTestBase: XCTestCase {
     }
 
     override func tearDown() async throws {
-        await Amplify.reset()
-        analyticsPlugin.reset()
+        Amplify.reset()
+        analyticsPlugin.reset(onComplete: {})
     }
 }
