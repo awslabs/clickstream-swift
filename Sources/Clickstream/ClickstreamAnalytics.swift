@@ -48,24 +48,27 @@ public enum ClickstreamAnalytics {
     /// Delete global attributes
     /// - Parameter attributes: the global attributes names to delete
     public static func deleteGlobalAttributes(_ attributes: String...) {
-        Amplify.Analytics.unregisterGlobalProperties(attributes)
+        var stringSet = Set<String>()
+        for string in attributes {
+            stringSet.insert(string)
+        }
+        Amplify.Analytics.unregisterGlobalProperties(stringSet)
     }
 
     /// Add user attributes
     /// - Parameter attributes: the user attributes to add
     public static func addUserAttributes(_ attributes: ClickstreamAttribute) {
         let userProfile = AnalyticsUserProfile(location: nil, properties: attributes)
-        Amplify.Analytics.identifyUser(userId: Event.User.USER_ID_EMPTY,
-                                       userProfile: userProfile)
+        Amplify.Analytics.identifyUser(Event.User.USER_ID_EMPTY, withProfile: userProfile)
     }
 
     /// Set user id for login and logout
     /// - Parameter userId: current userId, nil for logout
     public static func setUserId(_ userId: String?) {
         if userId == nil {
-            Amplify.Analytics.identifyUser(userId: Event.User.USER_ID_NIL)
+            Amplify.Analytics.identifyUser(Event.User.USER_ID_NIL)
         } else {
-            Amplify.Analytics.identifyUser(userId: userId!)
+            Amplify.Analytics.identifyUser(userId!)
         }
     }
 

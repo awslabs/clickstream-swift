@@ -29,7 +29,7 @@ class IntegrationTest: XCTestCase {
             HttpResponse.badRequest(.text("request fail"))
         }
         try! server.start()
-        await Amplify.reset()
+        Amplify.reset()
         let appId = "testAppId" + UUID().uuidString
         let configure = ClickstreamConfiguration.getDefaultConfiguration()
             .withAppId(appId)
@@ -53,8 +53,8 @@ class IntegrationTest: XCTestCase {
 
     override func tearDown() async throws {
         ClickstreamAnalytics.enable()
-        await Amplify.reset()
-        analyticsPlugin.reset()
+//        Amplify.reset()
+        analyticsPlugin.reset(onComplete: {})
         server.stop()
         try eventRecorder.dbUtil.deleteAllEvents()
     }
