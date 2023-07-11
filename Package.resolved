@@ -5,17 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/aws-amplify/amplify-swift.git",
       "state" : {
-        "revision" : "abe8aae8d5e750147619ef2917c6219672c5e3cc",
-        "version" : "2.10.0"
-      }
-    },
-    {
-      "identity" : "amplify-swift-utils-notifications",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/aws-amplify/amplify-swift-utils-notifications.git",
-      "state" : {
-        "revision" : "d4fd3c17e8d40efc821f448d3d6cff75b8f3b0dd",
-        "version" : "1.0.0"
+        "revision" : "64ac769564196c9867d00339b9fe1dd39cf539c8",
+        "version" : "1.30.3"
       }
     },
     {
@@ -23,26 +14,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/aws-amplify/aws-appsync-realtime-client-ios.git",
       "state" : {
-        "revision" : "3de274c68a3cb60c8aec18b5bc0a8c07860219cd",
-        "version" : "3.0.0"
+        "revision" : "b036e83716789c13a3480eeb292b70caa54114f2",
+        "version" : "3.1.0"
       }
     },
     {
-      "identity" : "aws-crt-swift",
+      "identity" : "aws-sdk-ios-spm",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/awslabs/aws-crt-swift",
+      "location" : "https://github.com/aws-amplify/aws-sdk-ios-spm.git",
       "state" : {
-        "revision" : "6feec6c3787877807aa9a00fad09591b96752376",
-        "version" : "0.6.1"
-      }
-    },
-    {
-      "identity" : "aws-sdk-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/awslabs/aws-sdk-swift.git",
-      "state" : {
-        "revision" : "24bae88a2391fe75da8a940a544d1ef6441f5321",
-        "version" : "0.13.0"
+        "revision" : "4269367873180e7f18a1ded7148c98151732a93f",
+        "version" : "2.33.1"
       }
     },
     {
@@ -50,17 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/1024jp/GzipSwift",
       "state" : {
-        "revision" : "7a7f17761c76a932662ab77028a4329f67d645a4",
-        "version" : "5.2.0"
-      }
-    },
-    {
-      "identity" : "smithy-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/awslabs/smithy-swift",
-      "state" : {
-        "revision" : "7b28da158d92cd06a3549140d43b8fbcf64a94a6",
-        "version" : "0.15.0"
+        "revision" : "ba0b6cb51cc6202f896e469b87d2889a46b10d1b",
+        "version" : "5.1.1"
       }
     },
     {
@@ -82,39 +55,12 @@
       }
     },
     {
-      "identity" : "swift-collections",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections",
-      "state" : {
-        "revision" : "937e904258d22af6e447a0b72c0bc67583ef64a2",
-        "version" : "1.0.4"
-      }
-    },
-    {
-      "identity" : "swift-log",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-log.git",
-      "state" : {
-        "revision" : "32e8d724467f8fe623624570367e3d50c5638e46",
-        "version" : "1.5.2"
-      }
-    },
-    {
       "identity" : "swifter",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/httpswift/swifter",
       "state" : {
         "revision" : "9483a5d459b45c3ffd059f7b55f9638e268632fd",
         "version" : "1.5.0"
-      }
-    },
-    {
-      "identity" : "xmlcoder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/MaxDesiatov/XMLCoder.git",
-      "state" : {
-        "revision" : "c438dad94f6a243b411b70a4b4bac54595064808",
-        "version" : "0.15.0"
       }
     }
   ],
