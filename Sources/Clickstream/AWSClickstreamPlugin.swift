@@ -9,6 +9,7 @@ import Amplify
 import Foundation
 
 final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
+    
     var clickstream: ClickstreamContext!
 
     /// Automatically flushes the events that have been recorded on an interval
