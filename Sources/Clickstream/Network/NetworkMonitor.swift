@@ -16,17 +16,16 @@ protocol NetworkMonitor: AnyObject {
 }
 
 var currentNetWorkType: String = NetWorkType.UnKnow
+var currentIsOnline: Bool = true
 
 extension NWPathMonitor: NetworkMonitor {
-    var isOnline: Bool {
-        currentPath.status == .satisfied
-    }
-
+    var isOnline: Bool { currentIsOnline }
     var netWorkType: String { currentNetWorkType }
 
     func startMonitoring(using queue: DispatchQueue) {
         start(queue: queue)
         pathUpdateHandler = { path in
+            currentIsOnline = path.status == .satisfied
             if path.usesInterfaceType(.wifi) {
                 currentNetWorkType = NetWorkType.Wifi
             } else if path.usesInterfaceType(.cellular) {
