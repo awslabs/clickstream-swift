@@ -9,7 +9,7 @@
 import UIKit
 
 private var hasSwizzled = false
-private var viewDidAppearFunc: ((String, String) -> Void)?
+private var viewDidAppearFunc: ((String, String, String) -> Void)?
 extension UIViewController: ClickstreamLogger {}
 
 extension UIViewController {
@@ -19,7 +19,8 @@ extension UIViewController {
 
         let screenName = NSStringFromClass(type(of: self))
         let screenPath = getPath()
-        viewDidAppearFunc?(screenName, screenPath)
+        let screenHashValue = String(describing: hashValue)
+        viewDidAppearFunc?(screenName, screenPath, screenHashValue)
     }
 
     func getPath() -> String {
@@ -31,7 +32,7 @@ extension UIViewController {
         return path
     }
 
-    static func swizzle(viewDidAppear: @escaping (String, String) -> Void) {
+    static func swizzle(viewDidAppear: @escaping (String, String, String) -> Void) {
         viewDidAppearFunc = viewDidAppear
         guard !hasSwizzled else { return }
 

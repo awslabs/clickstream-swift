@@ -15,10 +15,11 @@ class AutoRecordEventClient {
     private var isEntrances = false
     private var isFirstOpen: Bool
     private var isFirstTime = true
-    private var startEngageTimestamp: Int64!
+    private var lastEngageTime: Int64 = 0
     private var lastScreenName: String?
     private var lastScreenPath: String?
-    private var lastScreenStartTime: Int64?
+    private var lastScreenUniqueId: String?
+    private var lastScreenStartTimestamp: Int64 = 0
 
     init(clickstream: ClickstreamContext) {
         self.clickstream = clickstream
@@ -31,6 +32,84 @@ class AutoRecordEventClient {
         if clickstream.configuration.isTrackAppExceptionEvents {
             setupExceptionHandler()
         }
+    }
+
+    func onViewDidAppear(screenName: String, screenPath: String, screenHashValue: String) {
+        let screenUniqueId = getScreenUniqueId(screenHashValue)
+        if !isSameScreen(screenName, screenPath, screenUniqueId) {
+            recordUserEngagement()
+            recordScreenView(screenName, screenPath, screenUniqueId)
+        }
+    }
+
+    func recordScreenView(_ screenName: String, _ screenPath: String, _ screenUniqueId: String) {
+        if !clickstream.configuration.isTrackScreenViewEvents {
+            return
+        }
+        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
+        let eventTimestamp = event.timestamp
+        event.addAttribute(screenName, forKey: Event.ReservedAttribute.SCREEN_NAME)
+        event.addAttribute(screenPath, forKey: Event.ReservedAttribute.SCREEN_ID)
+        event.addAttribute(screenUniqueId, forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
+        if lastScreenName != nil, lastScreenPath != nil, lastScreenUniqueId != nil {
+            event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_NAME)
+            event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_ID)
+            event.addAttribute(lastScreenUniqueId!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_UNIQUEID)
+        }
+        let previousTimestamp = getPreviousScreenViewTimestamp()
+        if previousTimestamp > 0 {
+            event.addAttribute(previousTimestamp, forKey: Event.ReservedAttribute.PREVIOUS_TIMESTAMP)
+        }
+        event.addAttribute(isEntrances ? 1 : 0, forKey: Event.ReservedAttribute.ENTRANCES)
+        if lastEngageTime > 0 {
+            event.addAttribute(lastEngageTime, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+        }
+        recordEvent(event)
+
+        isEntrances = false
+        lastScreenName = screenName
+        lastScreenPath = screenPath
+        lastScreenUniqueId = screenUniqueId
+        lastScreenStartTimestamp = eventTimestamp
+        UserDefaultsUtil.savePreviousScreenViewTimestamp(storage: clickstream.storage, timestamp: eventTimestamp)
+    }
+
+    func recordUserEngagement() {
+        if lastScreenStartTimestamp == 0 { return }
+        lastEngageTime = Date().millisecondsSince1970 - lastScreenStartTimestamp
+        if clickstream.configuration.isTrackUserEngagementEvents, lastEngageTime > Constants.minEngagementTime {
+            let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.USER_ENGAGEMENT)
+            event.addAttribute(lastEngageTime, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
+            if lastScreenName != nil, lastScreenPath != nil, lastScreenUniqueId != nil {
+                event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.SCREEN_NAME)
+                event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.SCREEN_ID)
+                event.addAttribute(lastScreenUniqueId!, forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
+            }
+            recordEvent(event)
+        }
+    }
+
+    func getPreviousScreenViewTimestamp() -> Int64 {
+        if lastScreenStartTimestamp > 0 {
+            return lastScreenStartTimestamp
+        } else {
+            return UserDefaultsUtil.getPreviousScreenViewTimestamp(storage: clickstream.storage)
+        }
+    }
+
+    func getScreenUniqueId(_ screenHashValue: String) -> String {
+        let shortDeviceId = clickstream.systemInfo.deviceId.padding(toLength: Constants.maxDeviceIdLength,
+                                                                    withPad: Constants.paddingChar,
+                                                                    startingAt: 0)
+        return "\(shortDeviceId)-\(screenHashValue)"
+    }
+
+    func isSameScreen(_ screenName: String, _ screenPath: String, _ screenUniqueId: String) -> Bool {
+        lastScreenName != nil
+            && lastScreenPath != nil
+            && screenName == lastScreenName
+            && screenPath == lastScreenPath
+            && screenUniqueId == lastScreenUniqueId
     }
 
     func checkAppVersionUpdate(clickstream: ClickstreamContext) {
@@ -82,24 +161,6 @@ class AutoRecordEventClient {
         isFirstTime = false
     }
 
-    func recordUserEngagement() {
-        let engagementTime = Date().millisecondsSince1970 - startEngageTimestamp
-        if engagementTime > Constants.minEngagementTime {
-            let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.USER_ENGAGEMENT)
-            event.addAttribute(engagementTime, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
-            if lastScreenName != nil, lastScreenPath != nil {
-                event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.SCREEN_NAME)
-                event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.SCREEN_ID)
-            }
-            recordEvent(event)
-        }
-        clickstream.analyticsClient.submitEvents(isBackgroundMode: true)
-    }
-
-    func updateEngageTimestamp() {
-        startEngageTimestamp = Date().millisecondsSince1970
-    }
-
     func recordSessionStartEvent() {
         let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SESSION_START)
         recordEvent(event)
@@ -107,31 +168,6 @@ class AutoRecordEventClient {
 
     func setIsEntrances() {
         isEntrances = true
-    }
-
-    func onViewDidAppear(screenName: String, screenPath: String) {
-        if !clickstream.configuration.isTrackScreenViewEvents {
-            return
-        }
-        let currentTimestamp = Date().millisecondsSince1970
-        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
-        event.addAttribute(screenName, forKey: Event.ReservedAttribute.SCREEN_NAME)
-        event.addAttribute(screenPath, forKey: Event.ReservedAttribute.SCREEN_ID)
-        if lastScreenName != nil, lastScreenPath != nil {
-            event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_NAME)
-            event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.PREVIOUS_SCREEN_ID)
-        }
-        event.addAttribute(isEntrances ? 1 : 0, forKey: Event.ReservedAttribute.ENTRANCES)
-        if !isEntrances, lastScreenStartTime != nil {
-            event.addAttribute(currentTimestamp - lastScreenStartTime!,
-                               forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
-        }
-        recordEvent(event)
-
-        isEntrances = false
-        lastScreenName = screenName
-        lastScreenPath = screenPath
-        lastScreenStartTime = currentTimestamp
     }
 
     func setupExceptionHandler() {
@@ -168,6 +204,8 @@ class AutoRecordEventClient {
 extension AutoRecordEventClient {
     enum Constants {
         static let minEngagementTime = 1_000
+        static let maxDeviceIdLength = 8
+        static let paddingChar = "_"
     }
 }
 
