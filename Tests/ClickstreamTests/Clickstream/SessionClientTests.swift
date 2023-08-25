@@ -104,10 +104,10 @@ class SessionClientTests: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
-        
+
         Thread.sleep(forTimeInterval: 1)
         activityTracker.callback?(.runningInBackground)
-        
+
         let session = sessionClient.getCurrentSession()!
         XCTAssertTrue(session.pauseTime != nil)
         let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
