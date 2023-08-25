@@ -68,6 +68,7 @@ class SessionClient: SessionClientBehaviour {
         log.debug("Application entered the background.")
         storeSession()
         autoRecordClient.recordUserEngagement()
+        autoRecordClient.recordAppEnd()
         clickstream.analyticsClient.submitEvents(isBackgroundMode: true)
     }
 

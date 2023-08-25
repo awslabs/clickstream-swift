@@ -215,6 +215,7 @@ enum Event {
         static let USER_ENGAGEMENT = "_user_engagement"
         static let SCREEN_VIEW = "_screen_view"
         static let APP_START = "_app_start"
+        static let APP_END = "_app_end"
         static let APP_EXCEPTION = "_app_exception"
     }
 
