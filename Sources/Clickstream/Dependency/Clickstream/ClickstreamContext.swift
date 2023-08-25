@@ -45,6 +45,7 @@ extension UserDefaults: UserDefaultsBehaviour {
     var isTrackAppExceptionEvents: Bool
     /// Whether to track app scren view events automatically
     public var isTrackScreenViewEvents: Bool
+    public var isTrackUserEngagementEvents: Bool
     /// Whether to compress events when send to server
     public var isCompressEvents: Bool
     /// Whether to log events json in console when debug
@@ -59,6 +60,7 @@ extension UserDefaults: UserDefaultsBehaviour {
          sendEventsInterval: Int,
          isTrackAppExceptionEvents: Bool = true,
          isTrackScreenViewEvents: Bool = true,
+         isTrackUserEngagementEvents: Bool = true,
          isCompressEvents: Bool = true,
          isLogEvents: Bool = false,
          sessionTimeoutDuration: Int64 = 1_800_000)
@@ -68,6 +70,7 @@ extension UserDefaults: UserDefaultsBehaviour {
         self.sendEventsInterval = sendEventsInterval
         self.isTrackAppExceptionEvents = isTrackAppExceptionEvents
         self.isTrackScreenViewEvents = isTrackScreenViewEvents
+        self.isTrackUserEngagementEvents = isTrackUserEngagementEvents
         self.isCompressEvents = isCompressEvents
         self.isLogEvents = isLogEvents
         self.sessionTimeoutDuration = sessionTimeoutDuration

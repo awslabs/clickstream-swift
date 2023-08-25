@@ -173,7 +173,16 @@ enum UserDefaultsUtil {
     static func saveBundleSequenceId(storage: ClickstreamContextStorage, bundleSequenceId: Int) {
         storage.userDefaults.save(key: Constants.isFirstOpenKey, value: String(describing: bundleSequenceId))
     }
+
+    static func getPreviousScreenViewTimestamp(storage: ClickstreamContextStorage) -> Int64 {
+        Int64(storage.userDefaults.string(forKey: Constants.previousScreenViewTimestampKey) ?? "0")!
+    }
+
+    static func savePreviousScreenViewTimestamp(storage: ClickstreamContextStorage, timestamp: Int64) {
+        storage.userDefaults.save(key: Constants.previousScreenViewTimestampKey, value: String(describing: timestamp))
+    }
 }
+
 // swiftlint:enable force_cast
 
 extension UserDefaultsUtil {
@@ -190,6 +199,7 @@ extension UserDefaultsUtil {
         static let sessionKey = prefix + "sessionKey"
         static let isFirstOpenKey = prefix + "isFirstOpenKey"
         static let bundleSequenceIdKey = prefix + "bundleSequenceIdKey"
+        static let previousScreenViewTimestampKey = prefix + "previousScreenViewTimestampKey"
     }
 }
 

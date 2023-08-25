@@ -107,6 +107,7 @@ do {
     configuration.authCookie = "your authentication cookie"
     configuration.sessionTimeoutDuration = 1800000
     configuration.isTrackScreenViewEvents = true
+    configuration.isTrackUserEngagementEvents = true
     configuration.isLogEvents = true
     configuration.isCompressEvents = true
 } catch {

@@ -100,19 +100,26 @@ class SessionClientTests: XCTestCase {
 
     func testGoBackgroundWithUserEngagement() {
         activityTracker.callback?(.runningInForeground)
+        let viewControllerA = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewControllerA
+        window.makeKeyAndVisible()
+
         Thread.sleep(forTimeInterval: 1)
         activityTracker.callback?(.runningInBackground)
+
         let session = sessionClient.getCurrentSession()!
         XCTAssertTrue(session.pauseTime != nil)
         let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
         XCTAssertTrue(storedSession != nil)
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(4, events.count)
+        XCTAssertEqual(5, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
-        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[4].eventType)
     }
 
     func testReturnToForeground() {

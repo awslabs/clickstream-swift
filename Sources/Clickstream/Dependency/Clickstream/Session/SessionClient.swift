@@ -57,7 +57,6 @@ class SessionClient: SessionClientBehaviour {
 
     private func handleAppEnterForeground() {
         log.debug("Application entered the foreground.")
-        autoRecordClient.updateEngageTimestamp()
         autoRecordClient.handleAppStart()
         let isNewSession = initialSession()
         if isNewSession {
@@ -69,6 +68,7 @@ class SessionClient: SessionClientBehaviour {
         log.debug("Application entered the background.")
         storeSession()
         autoRecordClient.recordUserEngagement()
+        clickstream.analyticsClient.submitEvents(isBackgroundMode: true)
     }
 
     private func respond(to newState: ApplicationState) {
