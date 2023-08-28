@@ -143,8 +143,10 @@ class AutoRecordEventClient {
     }
 
     func handleAppStart() {
-        checkAppVersionUpdate(clickstream: clickstream)
-        checkOSVersionUpdate(clickstream: clickstream)
+        if isFirstTime {
+            checkAppVersionUpdate(clickstream: clickstream)
+            checkOSVersionUpdate(clickstream: clickstream)
+        }
         if isFirstOpen {
             let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.FIRST_OPEN)
             recordEvent(event)
@@ -159,6 +161,16 @@ class AutoRecordEventClient {
         }
         recordEvent(event)
         isFirstTime = false
+    }
+
+    func recordAppEnd() {
+        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.APP_END)
+        if lastScreenName != nil, lastScreenPath != nil, lastScreenUniqueId != nil {
+            event.addAttribute(lastScreenName!, forKey: Event.ReservedAttribute.SCREEN_NAME)
+            event.addAttribute(lastScreenPath!, forKey: Event.ReservedAttribute.SCREEN_ID)
+            event.addAttribute(lastScreenUniqueId!, forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
+        }
+        recordEvent(event)
     }
 
     func recordSessionStartEvent() {

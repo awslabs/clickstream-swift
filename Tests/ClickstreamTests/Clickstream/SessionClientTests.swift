@@ -92,10 +92,13 @@ class SessionClientTests: XCTestCase {
         XCTAssertTrue(storedSession != nil)
 
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(4, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_END, events[3].eventType)
+        XCTAssertNil(events[3].attributes[Event.ReservedAttribute.SCREEN_ID])
+        XCTAssertNil(events[3].attributes[Event.ReservedAttribute.SCREEN_NAME])
     }
 
     func testGoBackgroundWithUserEngagement() {
@@ -114,12 +117,16 @@ class SessionClientTests: XCTestCase {
         XCTAssertTrue(storedSession != nil)
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(5, events.count)
+        XCTAssertEqual(6, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
         XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[3].eventType)
         XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[4].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_END, events[5].eventType)
+        XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_NAME])
+        XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_ID])
+        XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_UNIQUEID])
     }
 
     func testReturnToForeground() {
@@ -147,12 +154,13 @@ class SessionClientTests: XCTestCase {
 
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(5, events.count)
+        XCTAssertEqual(6, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
-        XCTAssertEqual(Event.PresetEvent.APP_START, events[3].eventType)
-        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[4].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_END, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[4].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[5].eventType)
     }
 
     func testReturnToForegroundWithScreenView() {
@@ -165,15 +173,16 @@ class SessionClientTests: XCTestCase {
         activityTracker.callback?(.runningInForeground)
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(5, events.count)
+        XCTAssertEqual(6, events.count)
         XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
         XCTAssertTrue(events[1].attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
 
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
         XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[3].eventType)
-        XCTAssertEqual(Event.PresetEvent.APP_START, events[4].eventType)
-        let appStartEvent = events[4]
+        XCTAssertEqual(Event.PresetEvent.APP_END, events[4].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[5].eventType)
+        let appStartEvent = events[5]
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
