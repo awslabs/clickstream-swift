@@ -89,6 +89,10 @@ class AutoRecordEventClient {
         }
     }
 
+    func updateLastScreenStartTimestamp() {
+        lastScreenStartTimestamp = Date().millisecondsSince1970
+    }
+
     func getPreviousScreenViewTimestamp() -> Int64 {
         if lastScreenStartTimestamp > 0 {
             return lastScreenStartTimestamp
