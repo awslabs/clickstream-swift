@@ -58,6 +58,7 @@ class SessionClient: SessionClientBehaviour {
     private func handleAppEnterForeground() {
         log.debug("Application entered the foreground.")
         autoRecordClient.handleAppStart()
+        autoRecordClient.updateLastScreenStartTimestamp()
         let isNewSession = initialSession()
         if isNewSession {
             autoRecordClient.setIsEntrances()

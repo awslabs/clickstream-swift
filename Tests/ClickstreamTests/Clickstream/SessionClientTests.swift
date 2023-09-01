@@ -187,4 +187,21 @@ class SessionClientTests: XCTestCase {
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
     }
+
+    func testLastScreenStartTimeStampUpdatedAfterReturnToForeground() {
+        activityTracker.callback?(.runningInForeground)
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        Thread.sleep(forTimeInterval: 0.2)
+        activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 1)
+        activityTracker.callback?(.runningInBackground)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(7, events.count)
+        let userEngagementEvent = events[6]
+        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, userEngagementEvent.eventType)
+        XCTAssertTrue((userEngagementEvent.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP] as! Int64) < 1_200)
+    }
 }
