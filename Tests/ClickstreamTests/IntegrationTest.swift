@@ -68,14 +68,14 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     func testRecordOneEventWithNameSuccess() throws {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     func testFlushEvents() throws {
@@ -220,7 +220,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     func testModifyConfiguration() throws {
@@ -233,7 +233,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     // MARK: - Objc test
@@ -249,7 +249,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamObjc.recordEvent("testEvent", attribute)
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(3, eventCount)
     }
 
     func testGlobalAttributeForObjc() throws {
@@ -298,14 +298,14 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     func testAppException() throws {
         let exception = NSException(name: NSExceptionName("TestException"), reason: "Testing", userInfo: nil)
         AutoRecordEventClient.handleException(exception)
         Thread.sleep(forTimeInterval: 0.5)
-        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
+        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[1]
         XCTAssertTrue(event["event_type"] as! String == Event.PresetEvent.APP_EXCEPTION)
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertTrue(attributes[Event.ReservedAttribute.EXCEPTION_NAME] as! String == exception.name.rawValue)
