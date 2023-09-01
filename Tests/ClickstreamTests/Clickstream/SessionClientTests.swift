@@ -198,8 +198,9 @@ class SessionClientTests: XCTestCase {
         activityTracker.callback?(.runningInForeground)
         Thread.sleep(forTimeInterval: 1)
         activityTracker.callback?(.runningInBackground)
+        Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(7, events.count)
+        XCTAssertEqual(8, events.count)
         let userEngagementEvent = events[6]
         XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, userEngagementEvent.eventType)
         XCTAssertTrue((userEngagementEvent.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP] as! Int64) < 1_200)
