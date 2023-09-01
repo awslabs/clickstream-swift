@@ -10,7 +10,7 @@ import Foundation
 
 protocol SessionClientBehaviour: AnyObject {
     func startActivityTracking()
-    func initialSession() -> Bool
+    func initialSession()
     func storeSession()
 }
 
@@ -38,17 +38,21 @@ class SessionClient: SessionClientBehaviour {
         }
     }
 
-    func initialSession() -> Bool {
+    func initialSession() {
         session = Session.getCurrentSession(clickstream: clickstream)
         if session!.isNewSession {
             autoRecordClient.recordSessionStartEvent()
         }
-        return session!.isNewSession
+        if session!.isNewSession {
+            autoRecordClient.setIsEntrances()
+        }
     }
 
     func storeSession() {
-        session?.pause()
-        UserDefaultsUtil.saveSession(storage: clickstream.storage, session: session!)
+        if session != nil {
+            session?.pause()
+            UserDefaultsUtil.saveSession(storage: clickstream.storage, session: session!)
+        }
     }
 
     func getCurrentSession() -> Session? {
@@ -59,10 +63,7 @@ class SessionClient: SessionClientBehaviour {
         log.debug("Application entered the foreground.")
         autoRecordClient.handleAppStart()
         autoRecordClient.updateLastScreenStartTimestamp()
-        let isNewSession = initialSession()
-        if isNewSession {
-            autoRecordClient.setIsEntrances()
-        }
+        initialSession()
     }
 
     private func handleAppEnterBackground() {

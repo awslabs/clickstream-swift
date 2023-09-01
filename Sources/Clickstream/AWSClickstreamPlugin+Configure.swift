@@ -50,7 +50,7 @@ extension AWSClickstreamPlugin {
         clickstream.analyticsClient = analyticsClient
         let networkMonitor = NWPathMonitor()
         clickstream.networkMonitor = networkMonitor
-
+        sessionClient.initialSession()
         var autoFlushEventsTimer: DispatchSourceTimer?
         if configuration.sendEventsInterval != 0 {
             let timeInterval = TimeInterval(Double(configuration.sendEventsInterval) / 1_000)
