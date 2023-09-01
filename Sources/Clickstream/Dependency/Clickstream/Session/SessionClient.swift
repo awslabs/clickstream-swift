@@ -42,8 +42,6 @@ class SessionClient: SessionClientBehaviour {
         session = Session.getCurrentSession(clickstream: clickstream)
         if session!.isNewSession {
             autoRecordClient.recordSessionStartEvent()
-        }
-        if session!.isNewSession {
             autoRecordClient.setIsEntrances()
         }
     }
