@@ -202,6 +202,6 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(7, events.count)
         let userEngagementEvent = events[6]
         XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, userEngagementEvent.eventType)
-        XCTAssertTrue((userEngagementEvent.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP] as! Int64) < 1200)
+        XCTAssertTrue((userEngagementEvent.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP] as! Int64) < 1_200)
     }
 }
