@@ -105,7 +105,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
     func getJsonStringFromObject(jsonObject: JsonObject) -> String {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [.sortedKeys])
-            return String(data: jsonData, encoding: .utf8)!
+            return String(data: jsonData, encoding: .utf8) ?? ""
         } catch {
             log.error("Error serializing dictionary to JSON: \(error.localizedDescription)")
         }
