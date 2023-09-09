@@ -35,10 +35,9 @@ class AutoRecordEventClient {
     }
 
     func onViewDidAppear(screenName: String, screenPath: String, screenHashValue: String) {
-        let screenUniqueId = getScreenUniqueId(screenHashValue)
-        if !isSameScreen(screenName, screenPath, screenUniqueId) {
+        if !isSameScreen(screenName, screenPath, screenHashValue) {
             recordUserEngagement()
-            recordScreenView(screenName, screenPath, screenUniqueId)
+            recordScreenView(screenName, screenPath, screenHashValue)
         }
     }
 
@@ -99,13 +98,6 @@ class AutoRecordEventClient {
         } else {
             return UserDefaultsUtil.getPreviousScreenViewTimestamp(storage: clickstream.storage)
         }
-    }
-
-    func getScreenUniqueId(_ screenHashValue: String) -> String {
-        let shortDeviceId = clickstream.systemInfo.deviceId.padding(toLength: Constants.maxDeviceIdLength,
-                                                                    withPad: Constants.paddingChar,
-                                                                    startingAt: 0)
-        return "\(shortDeviceId)-\(screenHashValue)"
     }
 
     func isSameScreen(_ screenName: String, _ screenPath: String, _ screenUniqueId: String) -> Bool {
@@ -220,8 +212,6 @@ class AutoRecordEventClient {
 extension AutoRecordEventClient {
     enum Constants {
         static let minEngagementTime = 1_000
-        static let maxDeviceIdLength = 8
-        static let paddingChar = "_"
     }
 }
 

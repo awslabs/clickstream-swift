@@ -80,13 +80,16 @@ class AutoRecordEventClientTest: XCTestCase {
         XCTAssertEqual(eventRecorder.lastSavedEvent?.eventType, Event.PresetEvent.SCREEN_VIEW)
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_NAME])
-        XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID])
         XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
         XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_ID])
         XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_NAME])
         XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_UNIQUEID])
         XCTAssertNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.PREVIOUS_TIMESTAMP])
         XCTAssertTrue(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.ENTRANCES] as! Int == 1)
+
+        let screenUniqueId = eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String
+        XCTAssertNotNil(screenUniqueId)
+        XCTAssertEqual(screenUniqueId, String(describing: viewController.hashValue))
     }
 
     func testTwoScreenViewWithoutUserEngagement() {
