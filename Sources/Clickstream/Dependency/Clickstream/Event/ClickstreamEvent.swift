@@ -45,8 +45,9 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
 
     func addAttribute(_ attribute: AttributeValue, forKey key: String) {
         let eventError = Event.checkAttribute(currentNumber: attributes.count, key: key, value: attribute)
-        if eventError != nil, key != Event.ReservedAttribute.EXCEPTION_STACK {
-            attributes[eventError!.errorType] = eventError!.errorMessage
+        if eventError.errorCode > 0, key != Event.ReservedAttribute.EXCEPTION_STACK {
+            attributes[Event.ReservedAttribute.ERROR_CODE] = eventError.errorCode
+            attributes[Event.ReservedAttribute.ERROR_MESSAGE] = eventError.errorMessage
         } else {
             attributes[key] = attribute
         }

@@ -100,7 +100,7 @@ class MockAnalyticsClient: AnalyticsClientBehaviour {
         createEventCount += 1
     }
 
-    func createEvent(withEventType eventType: String) -> ClickstreamEvent {
+    func createEvent(withEventType eventType: String) -> ClickstreamEvent? {
         increaseCreateEventCount()
         let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)
         return ClickstreamEvent(eventType: eventType, appId: "", uniqueId: "", session: Session(uniqueId: "", sessionIndex: 1),

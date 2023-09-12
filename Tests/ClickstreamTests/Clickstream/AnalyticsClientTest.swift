@@ -55,26 +55,30 @@ class AnalyticsClientTest: XCTestCase {
     func testAddGlobalAttributeForExceedNameLength() {
         let exceedName = String(repeating: "a", count: 51)
         analyticsClient.addGlobalAttribute("value", forKey: exceedName)
-        let errorValue = analyticsClient.globalAttributes["_error_name_length_exceed"] as? String
-        XCTAssertNotNil(errorValue)
-        XCTAssertTrue(errorValue!.contains(exceedName))
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_NAME_LENGTH_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
     }
 
     func testAddGlobalAttributeForInvalidName() {
         let invalidName = "1_goods_expose"
         analyticsClient.addGlobalAttribute("value", forKey: invalidName)
-        let errorValue = analyticsClient.globalAttributes["_error_name_invalid"] as? String
-        XCTAssertNotNil(errorValue)
-        XCTAssertTrue(errorValue!.contains(invalidName))
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_NAME_INVALID, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertTrue(errorValue.contains(invalidName))
     }
 
     func testAddGlobalAttributeForExceedValueLength() {
         let exceedValue = String(repeating: "a", count: 1_025)
         analyticsClient.addGlobalAttribute(exceedValue, forKey: "name01")
-        let errorValue = analyticsClient.globalAttributes["_error_value_length_exceed"] as? String
-        XCTAssertNotNil(errorValue)
-        XCTAssertTrue(errorValue!.contains("name01"))
-        XCTAssertTrue(errorValue!.contains("attribute value:"))
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_LENGTH_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertTrue(errorValue.contains("name01"))
     }
 
     func testRemoveGlobalAttribute() {
@@ -100,17 +104,20 @@ class AnalyticsClientTest: XCTestCase {
         for i in 0 ..< 501 {
             analyticsClient.addGlobalAttribute("value", forKey: "name\(i)")
         }
-        let sizeExceedValue = analyticsClient.globalAttributes["_error_attribute_size_exceed"] as? String
-        XCTAssertNotNil(sizeExceedValue)
-        XCTAssertTrue(sizeExceedValue!.contains("name500"))
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_SIZE_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+
+        XCTAssertTrue(errorValue.contains("name500"))
     }
 
     func testAddGlobalAttributeSameNameMultiTimes() {
         for i in 0 ..< 500 {
             analyticsClient.addGlobalAttribute("value\(i)", forKey: "name")
         }
-        let sizeExceedValue = analyticsClient.globalAttributes["_error_attribute_size_exceed"]
-        XCTAssertNil(sizeExceedValue)
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(0, eventRecorder.saveCount)
         let globalAttributeCount = analyticsClient.globalAttributes.count
         XCTAssertEqual(1, globalAttributeCount)
     }
@@ -128,26 +135,34 @@ class AnalyticsClientTest: XCTestCase {
     func testAddUserAttributeForExceedNameLength() {
         let exceedName = String(repeating: "a", count: 51)
         analyticsClient.addUserAttribute("value", forKey: exceedName)
-        let errorValue = analyticsClient.globalAttributes["_error_name_length_exceed"] as? String
-        XCTAssertNotNil(errorValue)
-        XCTAssertTrue(errorValue!.contains(exceedName))
+
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.USER_ATTRIBUTE_NAME_LENGTH_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertTrue(errorValue.contains(exceedName))
     }
 
     func testAddUserAttributeForInvalidName() {
         let invalidName = "1_goods_expose"
         analyticsClient.addUserAttribute("value", forKey: invalidName)
-        let errorValue = analyticsClient.globalAttributes["_error_name_invalid"] as? String
-        XCTAssertNotNil(errorValue)
-        XCTAssertTrue(errorValue!.contains(invalidName))
+
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.USER_ATTRIBUTE_NAME_INVALID, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertTrue(errorValue.contains(invalidName))
     }
 
     func testAddUserAttributeForExceedValueLength() {
         let exceedValue = String(repeating: "a", count: 257)
         analyticsClient.addUserAttribute(exceedValue, forKey: "name01")
-        let errorValue = analyticsClient.globalAttributes["_error_value_length_exceed"] as? String
-        XCTAssertNotNil(errorValue)
-        XCTAssertTrue(errorValue!.contains("name01"))
-        XCTAssertTrue(errorValue!.contains("attribute value:"))
+
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.USER_ATTRIBUTE_VALUE_LENGTH_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertTrue(errorValue.contains("name01"))
     }
 
     func testRemoveUserAttribute() {
@@ -173,17 +188,19 @@ class AnalyticsClientTest: XCTestCase {
         for i in 0 ..< 101 {
             analyticsClient.addUserAttribute("value", forKey: "name\(i)")
         }
-        let sizeExceedValue = analyticsClient.globalAttributes["_error_attribute_size_exceed"] as? String
-        XCTAssertNotNil(sizeExceedValue)
-        XCTAssertTrue(sizeExceedValue!.contains("name100"))
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.USER_ATTRIBUTE_SIZE_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+        let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertTrue(errorValue.contains("attribute name"))
     }
 
     func testAddUserAttributeSameNameMultiTimes() {
         for i in 0 ..< 100 {
             analyticsClient.addUserAttribute("value\(i)", forKey: "name")
         }
-        let sizeExceedValue = analyticsClient.globalAttributes["_error_attribute_size_exceed"]
-        XCTAssertNil(sizeExceedValue)
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertEqual(0, eventRecorder.saveCount)
         let userAttributeCount = analyticsClient.userAttributes.count
         XCTAssertEqual(2, userAttributeCount)
     }
@@ -237,12 +254,12 @@ class AnalyticsClientTest: XCTestCase {
 
     func testCreateEvent() {
         let eventType = "testEvent"
-        let event = analyticsClient.createEvent(withEventType: eventType)
+        let event = analyticsClient.createEvent(withEventType: eventType)!
         XCTAssertEqual(event.eventType, eventType)
     }
 
     func testRecordRecordEventWithGlobalAttribute() async {
-        let event = analyticsClient.createEvent(withEventType: "testEvent")
+        let event = analyticsClient.createEvent(withEventType: "testEvent")!
         XCTAssertTrue(event.attributes.isEmpty)
 
         analyticsClient.addGlobalAttribute("test_0", forKey: "attribute_0")
@@ -268,7 +285,7 @@ class AnalyticsClientTest: XCTestCase {
     }
 
     func testRecordRecordEventWithUserAttribute() async {
-        let event = analyticsClient.createEvent(withEventType: "testEvent")
+        let event = analyticsClient.createEvent(withEventType: "testEvent")!
         XCTAssertTrue(event.attributes.isEmpty)
 
         analyticsClient.addUserAttribute("test_0", forKey: "attribute_0")
