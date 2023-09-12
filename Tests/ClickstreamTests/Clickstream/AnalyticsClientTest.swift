@@ -254,12 +254,12 @@ class AnalyticsClientTest: XCTestCase {
 
     func testCreateEvent() {
         let eventType = "testEvent"
-        let event = analyticsClient.createEvent(withEventType: eventType)!
+        let event = analyticsClient.createEvent(withEventType: eventType)
         XCTAssertEqual(event.eventType, eventType)
     }
 
     func testRecordRecordEventWithGlobalAttribute() async {
-        let event = analyticsClient.createEvent(withEventType: "testEvent")!
+        let event = analyticsClient.createEvent(withEventType: "testEvent")
         XCTAssertTrue(event.attributes.isEmpty)
 
         analyticsClient.addGlobalAttribute("test_0", forKey: "attribute_0")
@@ -285,7 +285,7 @@ class AnalyticsClientTest: XCTestCase {
     }
 
     func testRecordRecordEventWithUserAttribute() async {
-        let event = analyticsClient.createEvent(withEventType: "testEvent")!
+        let event = analyticsClient.createEvent(withEventType: "testEvent")
         XCTAssertTrue(event.attributes.isEmpty)
 
         analyticsClient.addUserAttribute("test_0", forKey: "attribute_0")
@@ -313,5 +313,22 @@ class AnalyticsClientTest: XCTestCase {
     func testSubmit() {
         analyticsClient.submitEvents()
         XCTAssertEqual(eventRecorder.submitCount, 1)
+    }
+
+    func testCheckEventNameWithNameInvalidError() {
+        let isValidEvent = analyticsClient.checkEventName("01Event")
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertFalse(isValidEvent)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.EVENT_NAME_INVALID, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
+    }
+
+    func testCheckEventNameWithNameLengthExceedError() {
+        let exceedName = String(repeating: "a", count: 51)
+        let isValidEvent = analyticsClient.checkEventName(exceedName)
+        Thread.sleep(forTimeInterval: 0.02)
+        XCTAssertFalse(isValidEvent)
+        XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
+        XCTAssertEqual(Event.ErrorCode.EVENT_NAME_LENGTH_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
     }
 }

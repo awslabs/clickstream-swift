@@ -38,7 +38,10 @@ extension AWSClickstreamPlugin {
             log.warn("Cannot record events. Clickstream is disabled")
             return
         }
-        if let clickstreamEvent = analyticsClient.createEvent(withEventType: event.name) {
+
+        let isValidEventName = analyticsClient.checkEventName(event.name)
+        if isValidEventName {
+            let clickstreamEvent = analyticsClient.createEvent(withEventType: event.name)
             if let attributes = event.attribute {
                 clickstreamEvent.addAttribute(attributes)
             }

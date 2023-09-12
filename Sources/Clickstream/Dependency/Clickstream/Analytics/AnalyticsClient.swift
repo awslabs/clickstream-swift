@@ -15,7 +15,8 @@ protocol AnalyticsClientBehaviour {
     func updateUserId(_ id: String?)
     func updateUserAttributes()
 
-    func createEvent(withEventType eventType: String) -> ClickstreamEvent?
+    func checkEventName(_ eventName: String) -> Bool
+    func createEvent(withEventType eventType: String) -> ClickstreamEvent
     func record(_ event: ClickstreamEvent) async throws
     func submitEvents(isBackgroundMode: Bool)
 }
@@ -101,12 +102,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
 
     // MARK: - Event recording
 
-    func createEvent(withEventType eventType: String) -> ClickstreamEvent? {
-        let eventError = Event.checkEventType(eventType: eventType)
-        if eventError.errorCode > 0 {
-            recordEventError(eventError)
-            return nil
-        }
+    func createEvent(withEventType eventType: String) -> ClickstreamEvent {
         let event = ClickstreamEvent(eventType: eventType,
                                      appId: clickstream.configuration.appId,
                                      uniqueId: clickstream.userUniqueId,
@@ -114,6 +110,15 @@ class AnalyticsClient: AnalyticsClientBehaviour {
                                      systemInfo: clickstream.systemInfo,
                                      netWorkType: clickstream.networkMonitor.netWorkType)
         return event
+    }
+
+    func checkEventName(_ eventName: String) -> Bool {
+        let eventError = Event.checkEventType(eventType: eventName)
+        if eventError.errorCode > 0 {
+            recordEventError(eventError)
+            return false
+        }
+        return true
     }
 
     func record(_ event: ClickstreamEvent) async throws {
@@ -129,7 +134,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     func recordEventError(_ eventError: Event.EventError) {
         Task {
             do {
-                let event = createEvent(withEventType: Event.PresetEvent.CLICKSTREAM_ERROR)!
+                let event = createEvent(withEventType: Event.PresetEvent.CLICKSTREAM_ERROR)
                 event.addAttribute(eventError.errorCode, forKey: Event.ReservedAttribute.ERROR_CODE)
                 event.addAttribute(eventError.errorMessage, forKey: Event.ReservedAttribute.ERROR_MESSAGE)
                 try await record(event)
