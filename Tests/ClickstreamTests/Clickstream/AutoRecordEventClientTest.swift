@@ -34,6 +34,7 @@ class AutoRecordEventClientTest: XCTestCase {
         )
         clickstream.analyticsClient = analyticsClient
         autoRecordEventClient = AutoRecordEventClient(clickstream: clickstream)
+        analyticsClient.autoRecordClient = autoRecordEventClient
     }
 
     override func tearDown() {
@@ -148,7 +149,6 @@ class AutoRecordEventClientTest: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, event1.eventType)
         XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, event2.eventType)
 
-        XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_ID] as! String, event1.attributes[Event.ReservedAttribute.SCREEN_ID] as! String)
         XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_NAME] as! String, event1.attributes[Event.ReservedAttribute.SCREEN_NAME] as! String)
         XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String, event1.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String)
         XCTAssertNotNil(event1.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])

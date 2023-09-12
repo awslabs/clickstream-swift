@@ -125,7 +125,6 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[4].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_END, events[5].eventType)
         XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_NAME])
-        XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_UNIQUEID])
     }
 
@@ -184,7 +183,6 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.APP_START, events[5].eventType)
         let appStartEvent = events[5]
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_NAME])
-        XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
     }
 

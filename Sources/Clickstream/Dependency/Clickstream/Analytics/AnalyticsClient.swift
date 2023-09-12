@@ -29,6 +29,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var userAttributes: [String: Any] = [:]
     private let clickstream: ClickstreamContext
     private(set) var userId: String?
+    var autoRecordClient: AutoRecordEventClient?
 
     init(clickstream: ClickstreamContext,
          eventRecorder: AnalyticsEventRecording,
@@ -39,6 +40,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         self.sessionProvider = sessionProvider
         self.userId = UserDefaultsUtil.getCurrentUserId(storage: clickstream.storage)
         self.userAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
+        self.autoRecordClient = (clickstream.sessionClient as? SessionClient)?.autoRecordClient
     }
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
@@ -117,6 +119,14 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     func record(_ event: ClickstreamEvent) async throws {
         for (key, attribute) in globalAttributes {
             event.addGlobalAttribute(attribute, forKey: key)
+        }
+        if let autoRecordClient {
+            if autoRecordClient.lastScreenName != nil, autoRecordClient.lastScreenUniqueId != nil {
+                event.addGlobalAttribute(autoRecordClient.lastScreenName!,
+                                         forKey: Event.ReservedAttribute.SCREEN_NAME)
+                event.addGlobalAttribute(autoRecordClient.lastScreenUniqueId!,
+                                         forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
+            }
         }
         event.setUserAttribute(userAttributes)
         let objId = ObjectIdentifier(event)
