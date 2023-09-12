@@ -93,6 +93,14 @@ class MockAnalyticsClient: AnalyticsClientBehaviour {
         updateUserAttributesExpectation?.fulfill()
     }
 
+    // MARK: - CheckEventName
+
+    var checkEventNameCount = 0
+    func checkEventName(_ eventName: String) -> Bool {
+        checkEventNameCount += 1
+        return true
+    }
+
     // MARK: - CreateEvent
 
     var createEventCount = 0

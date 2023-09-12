@@ -37,27 +37,30 @@ class ClickstreamEventTest: XCTestCase {
     func testAddAttributeErrorForInvalidKey() {
         clickstreamEvent.addAttribute(133_232_123, forKey: "1GoodsId")
         XCTAssertNil(clickstreamEvent.attribute(forKey: "isNewGoods"))
-        let erroValueString = clickstreamEvent.attribute(forKey: Event.ErrorType.ATTRIBUTE_NAME_INVALID) as! String
-        XCTAssertNotNil(erroValueString)
-        XCTAssertTrue(erroValueString.contains("1GoodsId"))
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_NAME_INVALID, errorCode)
+        XCTAssertTrue(errorValueString.contains("1GoodsId"))
     }
 
     func testAddAttributeErrorForExceedMaxLenthOfKey() {
         let longAttributeKey = String(repeating: "a", count: 51)
         clickstreamEvent.addAttribute("testValue", forKey: longAttributeKey)
         XCTAssertNil(clickstreamEvent.attribute(forKey: "longAttributeKey"))
-        let erroValueString = clickstreamEvent.attribute(forKey: Event.ErrorType.ATTRIBUTE_NAME_LENGTH_EXCEED) as! String
-        XCTAssertNotNil(erroValueString)
-        XCTAssertTrue(erroValueString.contains(longAttributeKey))
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_NAME_LENGTH_EXCEED, errorCode)
+        XCTAssertTrue(errorValueString.contains(longAttributeKey))
     }
 
     func testAddAttributeErrorForExceedMaxLenthOfValue() {
         let longAttributeValue = String(repeating: "a", count: 1_025)
         clickstreamEvent.addAttribute(longAttributeValue, forKey: "testKey")
         XCTAssertNil(clickstreamEvent.attribute(forKey: "testKey"))
-        let erroValueString = clickstreamEvent.attribute(forKey: Event.ErrorType.ATTRIBUTE_VALUE_LENGTH_EXCEED) as! String
-        XCTAssertNotNil(erroValueString)
-        XCTAssertTrue(erroValueString.contains("testKey"))
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_LENGTH_EXCEED, errorCode)
+        XCTAssertTrue(errorValueString.contains("testKey"))
     }
 
     func testEventEqualsFail() {
