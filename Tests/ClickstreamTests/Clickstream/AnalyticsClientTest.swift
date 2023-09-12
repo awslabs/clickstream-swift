@@ -104,7 +104,7 @@ class AnalyticsClientTest: XCTestCase {
         for i in 0 ..< 501 {
             analyticsClient.addGlobalAttribute("value", forKey: "name\(i)")
         }
-        Thread.sleep(forTimeInterval: 0.05)
+        Thread.sleep(forTimeInterval: 0.1)
         XCTAssertEqual(Event.PresetEvent.CLICKSTREAM_ERROR, eventRecorder.lastSavedEvent?.eventType)
         XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_SIZE_EXCEED, eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int)
         let errorValue = eventRecorder.lastSavedEvent?.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
