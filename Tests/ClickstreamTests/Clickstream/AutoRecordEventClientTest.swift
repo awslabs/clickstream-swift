@@ -137,7 +137,9 @@ class AutoRecordEventClientTest: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
-        Thread.sleep(forTimeInterval: 1.01)
+        
+        autoRecordEventClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
+        
         window.rootViewController = viewControllerB
         window.makeKeyAndVisible()
         XCTAssertTrue(viewControllerA.viewDidAppearCalled)
@@ -181,7 +183,7 @@ class AutoRecordEventClientTest: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
-        Thread.sleep(forTimeInterval: 1.01)
+        autoRecordEventClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
         window.rootViewController = viewControllerB
         window.makeKeyAndVisible()
         XCTAssertNotEqual(Event.PresetEvent.USER_ENGAGEMENT, eventRecorder.savedEvents[1].eventType)

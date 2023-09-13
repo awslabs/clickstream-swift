@@ -19,7 +19,7 @@ class AutoRecordEventClient {
     private(set) var lastScreenName: String?
     private var lastScreenPath: String?
     private(set) var lastScreenUniqueId: String?
-    private var lastScreenStartTimestamp: Int64 = 0
+    private(set) var lastScreenStartTimestamp: Int64 = 0
 
     init(clickstream: ClickstreamContext) {
         self.clickstream = clickstream
@@ -81,8 +81,8 @@ class AutoRecordEventClient {
         }
     }
 
-    func updateLastScreenStartTimestamp() {
-        lastScreenStartTimestamp = Date().millisecondsSince1970
+    func updateLastScreenStartTimestamp(_ timestamp: Int64) {
+        lastScreenStartTimestamp = timestamp
     }
 
     func getPreviousScreenViewTimestamp() -> Int64 {
