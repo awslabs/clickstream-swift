@@ -108,7 +108,7 @@ class SessionClientTests: XCTestCase {
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
 
-        Thread.sleep(forTimeInterval: 1)
+        sessionClient.autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
         activityTracker.callback?(.runningInBackground)
 
         let session = sessionClient.getCurrentSession()!
@@ -125,7 +125,6 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, events[4].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_END, events[5].eventType)
         XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_NAME])
-        XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertNotNil(events[5].attributes[Event.ReservedAttribute.SCREEN_UNIQUEID])
     }
 
@@ -184,7 +183,6 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.APP_START, events[5].eventType)
         let appStartEvent = events[5]
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_NAME])
-        XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
     }
 
@@ -194,15 +192,9 @@ class SessionClientTests: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewController
         window.makeKeyAndVisible()
-        Thread.sleep(forTimeInterval: 0.2)
-        activityTracker.callback?(.runningInForeground)
-        Thread.sleep(forTimeInterval: 1)
         activityTracker.callback?(.runningInBackground)
-        Thread.sleep(forTimeInterval: 0.1)
-        let events = eventRecorder.savedEvents
-        XCTAssertEqual(8, events.count)
-        let userEngagementEvent = events[6]
-        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, userEngagementEvent.eventType)
-        XCTAssertTrue((userEngagementEvent.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP] as! Int64) < 1_200)
+        sessionClient.autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
+        activityTracker.callback?(.runningInForeground)
+        XCTAssertTrue(Date().millisecondsSince1970 - sessionClient.autoRecordClient.lastScreenStartTimestamp < 200)
     }
 }

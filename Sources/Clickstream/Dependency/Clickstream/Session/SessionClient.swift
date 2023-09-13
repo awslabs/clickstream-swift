@@ -20,7 +20,7 @@ class SessionClient: SessionClientBehaviour {
     private let activityTracker: ActivityTrackerBehaviour
     private let sessionClientQueue = DispatchQueue(label: Constants.queue,
                                                    attributes: .concurrent)
-    private let autoRecordClient: AutoRecordEventClient
+    let autoRecordClient: AutoRecordEventClient
 
     init(activityTracker: ActivityTrackerBehaviour? = nil, clickstream: ClickstreamContext) {
         self.clickstream = clickstream
@@ -60,7 +60,7 @@ class SessionClient: SessionClientBehaviour {
     private func handleAppEnterForeground() {
         log.debug("Application entered the foreground.")
         autoRecordClient.handleAppStart()
-        autoRecordClient.updateLastScreenStartTimestamp()
+        autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970)
         initialSession()
     }
 

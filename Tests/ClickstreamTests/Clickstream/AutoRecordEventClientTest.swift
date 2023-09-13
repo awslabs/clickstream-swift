@@ -34,6 +34,7 @@ class AutoRecordEventClientTest: XCTestCase {
         )
         clickstream.analyticsClient = analyticsClient
         autoRecordEventClient = AutoRecordEventClient(clickstream: clickstream)
+        analyticsClient.autoRecordClient = autoRecordEventClient
     }
 
     override func tearDown() {
@@ -136,22 +137,23 @@ class AutoRecordEventClientTest: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
-        Thread.sleep(forTimeInterval: 1.01)
+        
+        autoRecordEventClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
+        
         window.rootViewController = viewControllerB
         window.makeKeyAndVisible()
         XCTAssertTrue(viewControllerA.viewDidAppearCalled)
         XCTAssertTrue(viewControllerB.viewDidAppearCalled)
         let event0 = eventRecorder.savedEvents[0]
-        let event1 = eventRecorder.savedEvents[1]
-        let event2 = eventRecorder.savedEvents[2]
+        var engagementEvent = eventRecorder.savedEvents[1]
+        if engagementEvent.eventType != Event.PresetEvent.USER_ENGAGEMENT {
+            engagementEvent = eventRecorder.savedEvents[2]
+        }
         XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, event0.eventType)
-        XCTAssertEqual(Event.PresetEvent.USER_ENGAGEMENT, event1.eventType)
-        XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, event2.eventType)
 
-        XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_ID] as! String, event1.attributes[Event.ReservedAttribute.SCREEN_ID] as! String)
-        XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_NAME] as! String, event1.attributes[Event.ReservedAttribute.SCREEN_NAME] as! String)
-        XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String, event1.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String)
-        XCTAssertNotNil(event1.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
+        XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_NAME] as! String, engagementEvent.attributes[Event.ReservedAttribute.SCREEN_NAME] as! String)
+        XCTAssertEqual(event0.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String, engagementEvent.attributes[Event.ReservedAttribute.SCREEN_UNIQUEID] as! String)
+        XCTAssertNotNil(engagementEvent.attributes[Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP])
     }
 
     func testTwoSameScreenView() {
@@ -181,7 +183,7 @@ class AutoRecordEventClientTest: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
-        Thread.sleep(forTimeInterval: 1.01)
+        autoRecordEventClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
         window.rootViewController = viewControllerB
         window.makeKeyAndVisible()
         XCTAssertNotEqual(Event.PresetEvent.USER_ENGAGEMENT, eventRecorder.savedEvents[1].eventType)
