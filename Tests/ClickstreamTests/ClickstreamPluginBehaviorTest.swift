@@ -77,6 +77,12 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         XCTAssertEqual(1, updateCount)
     }
 
+    func testCheckEventName() {
+        let result = analyticsClient.checkEventName("testEvent")
+        XCTAssertTrue(result)
+        XCTAssertEqual(1, analyticsClient.checkEventNameCount)
+    }
+
     func testRecordEvent() {
         let expectation = expectation(description: "record event")
         analyticsClient.setRecordExpectation(expectation)

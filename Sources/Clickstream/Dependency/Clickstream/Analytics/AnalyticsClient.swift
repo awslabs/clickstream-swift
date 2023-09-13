@@ -15,6 +15,7 @@ protocol AnalyticsClientBehaviour {
     func updateUserId(_ id: String?)
     func updateUserAttributes()
 
+    func checkEventName(_ eventName: String) -> Bool
     func createEvent(withEventType eventType: String) -> ClickstreamEvent
     func record(_ event: ClickstreamEvent) async throws
     func submitEvents(isBackgroundMode: Bool)
@@ -45,8 +46,8 @@ class AnalyticsClient: AnalyticsClientBehaviour {
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
         let eventError = Event.checkAttribute(currentNumber: globalAttributes.count, key: key, value: attribute)
-        if eventError != nil {
-            globalAttributes[eventError!.errorType] = eventError!.errorMessage
+        if eventError.errorCode > 0 {
+            recordEventError(eventError)
         } else {
             globalAttributes[key] = attribute
         }
@@ -54,8 +55,8 @@ class AnalyticsClient: AnalyticsClientBehaviour {
 
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
         let eventError = Event.checkUserAttribute(currentNumber: userAttributes.count, key: key, value: attribute)
-        if eventError != nil {
-            globalAttributes[eventError!.errorType] = eventError!.errorMessage
+        if eventError.errorCode > 0 {
+            recordEventError(eventError)
         } else {
             var userAttribute = JsonObject()
             if let attributeValue = attribute as? Double {
@@ -104,9 +105,6 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     // MARK: - Event recording
 
     func createEvent(withEventType eventType: String) -> ClickstreamEvent {
-        let (isValid, errorType) = Event.isValidEventType(eventType: eventType)
-        precondition(isValid, errorType)
-
         let event = ClickstreamEvent(eventType: eventType,
                                      appId: clickstream.configuration.appId,
                                      uniqueId: clickstream.userUniqueId,
@@ -114,6 +112,15 @@ class AnalyticsClient: AnalyticsClientBehaviour {
                                      systemInfo: clickstream.systemInfo,
                                      netWorkType: clickstream.networkMonitor.netWorkType)
         return event
+    }
+
+    func checkEventName(_ eventName: String) -> Bool {
+        let eventError = Event.checkEventType(eventType: eventName)
+        if eventError.errorCode > 0 {
+            recordEventError(eventError)
+            return false
+        }
+        return true
     }
 
     func record(_ event: ClickstreamEvent) async throws {
@@ -134,7 +141,22 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         try eventRecorder.save(event)
     }
 
+    func recordEventError(_ eventError: Event.EventError) {
+        Task {
+            do {
+                let event = createEvent(withEventType: Event.PresetEvent.CLICKSTREAM_ERROR)
+                event.addAttribute(eventError.errorCode, forKey: Event.ReservedAttribute.ERROR_CODE)
+                event.addAttribute(eventError.errorMessage, forKey: Event.ReservedAttribute.ERROR_MESSAGE)
+                try await record(event)
+            } catch {
+                log.error("Failed to record event with error:\(error)")
+            }
+        }
+    }
+
     func submitEvents(isBackgroundMode: Bool = false) {
         eventRecorder.submitEvents(isBackgroundMode: isBackgroundMode)
     }
 }
+
+extension AnalyticsClient: ClickstreamLogger {}

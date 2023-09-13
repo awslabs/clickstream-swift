@@ -15,7 +15,7 @@ enum Event {
     ///   - key: attribute key
     ///   - value: attribute value
     /// - Returns: the ErrorType
-    static func checkAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
+    static func checkAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError {
         if currentNumber >= Limit.MAX_NUM_OF_ATTRIBUTES {
             let errorMsg = """
             reached the max number of attributes limit (\(Limit.MAX_NUM_OF_ATTRIBUTES)).\
@@ -23,7 +23,7 @@ enum Event {
             """
             log.error(errorMsg)
             let errorString = "attribute name: \(key)"
-            return EventError(errorType: ErrorType.ATTRIBUTE_SIZE_EXCEED,
+            return EventError(errorCode: ErrorCode.ATTRIBUTE_SIZE_EXCEED,
                               errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
         }
         let nameLength = key.utf8.count
@@ -34,7 +34,7 @@ enum Event {
             """
             log.error(errorMsg)
             let errorString = "attribute name length is:(\(nameLength)) name is: \(key)"
-            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_LENGTH_EXCEED,
+            return EventError(errorCode: ErrorCode.ATTRIBUTE_NAME_LENGTH_EXCEED,
                               errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
         }
         if !isValidName(name: key) {
@@ -44,7 +44,7 @@ enum Event {
              so the attribute will not be recorded
             """
             log.error(errorMsg)
-            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_INVALID,
+            return EventError(errorCode: ErrorCode.ATTRIBUTE_NAME_INVALID,
                               errorMessage: "\(key.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
         }
         if let value = value as? String {
@@ -57,11 +57,11 @@ enum Event {
                 """
                 log.error(errorMsg)
                 let errrorString = "attribute name: \(key), attribute value: \(value)"
-                return EventError(errorType: ErrorType.ATTRIBUTE_VALUE_LENGTH_EXCEED,
+                return EventError(errorCode: ErrorCode.ATTRIBUTE_VALUE_LENGTH_EXCEED,
                                   errorMessage: "\(errrorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
             }
         }
-        return nil
+        return EventError(errorCode: ErrorCode.NO_ERROR, errorMessage: "")
     }
 
     /// Check the user attribute error.
@@ -70,7 +70,7 @@ enum Event {
     ///   - key: attribute key
     ///   - value: attribute value
     /// - Returns: the ErrorType
-    static func checkUserAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError? {
+    static func checkUserAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError {
         if currentNumber >= Limit.MAX_NUM_OF_USER_ATTRIBUTES {
             let errorMsg = """
             reached the max number of user attributes limit (\(Limit.MAX_NUM_OF_USER_ATTRIBUTES)).\
@@ -78,7 +78,7 @@ enum Event {
             """
             log.error(errorMsg)
             let errorString = "attribute name: \(key)"
-            return EventError(errorType: ErrorType.ATTRIBUTE_SIZE_EXCEED,
+            return EventError(errorCode: ErrorCode.USER_ATTRIBUTE_SIZE_EXCEED,
                               errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))...")
         }
         let nameLength = key.utf8.count
@@ -90,7 +90,7 @@ enum Event {
             """
             log.error(errorMsg)
             let errorString = "user attribute name length is:(\(nameLength)) name is: \(key)"
-            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_LENGTH_EXCEED,
+            return EventError(errorCode: ErrorCode.USER_ATTRIBUTE_NAME_LENGTH_EXCEED,
                               errorMessage: "\(errorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
         }
         if !isValidName(name: key) {
@@ -100,7 +100,7 @@ enum Event {
              so the attribute will not be recorded
             """
             log.error(errorMsg)
-            return EventError(errorType: ErrorType.ATTRIBUTE_NAME_INVALID,
+            return EventError(errorCode: ErrorCode.USER_ATTRIBUTE_NAME_INVALID,
                               errorMessage: "\(key.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
         }
         if let value = value as? String {
@@ -113,31 +113,33 @@ enum Event {
                 """
                 log.error(errorMsg)
                 let errrorString = "attribute name: \(key), attribute value: \(value)"
-                return EventError(errorType: ErrorType.ATTRIBUTE_VALUE_LENGTH_EXCEED,
+                return EventError(errorCode: ErrorCode.USER_ATTRIBUTE_VALUE_LENGTH_EXCEED,
                                   errorMessage: "\(errrorString.prefix(Limit.MAX_LENGTH_OF_ERROR_VALUE))")
             }
         }
-        return nil
+        return EventError(errorCode: ErrorCode.NO_ERROR, errorMessage: "")
     }
 
     /// Check the event name whether valide
     /// - Parameter eventType: the event name
-    /// - Returns: the eventType is valide and the error type
-    static func isValidEventType(eventType: String) -> (Bool, String) {
+    /// - Returns: the EventError object
+    static func checkEventType(eventType: String) -> EventError {
         if eventType.utf8.count > Event.Limit.MAX_EVENT_TYPE_LENGTH {
             let errorMsg = """
             Event name is too long, the max event type length is \
             \(Limit.MAX_EVENT_TYPE_LENGTH) characters. event name: \(eventType)
             """
-            return (false, errorMsg)
+            log.error(errorMsg)
+            return EventError(errorCode: ErrorCode.EVENT_NAME_LENGTH_EXCEED, errorMessage: errorMsg)
         } else if !isValidName(name: eventType) {
             let errorMsg = """
             Event name can only contains uppercase and lowercase letters, underscores, number,\
              and is not start with a number. event name: \(eventType)
             """
-            return (false, errorMsg)
+            log.error(errorMsg)
+            return EventError(errorCode: ErrorCode.EVENT_NAME_INVALID, errorMessage: errorMsg)
         }
-        return (true, "")
+        return EventError(errorCode: ErrorCode.NO_ERROR, errorMessage: "")
     }
 
     /// Verify the string whether only contains number, uppercase and lowercase letters,
@@ -173,6 +175,8 @@ enum Event {
         static let EXCEPTION_NAME = "_exception_name"
         static let EXCEPTION_REASON = "_exception_reason"
         static let EXCEPTION_STACK = "_excepiton_stack"
+        static let ERROR_CODE = "_error_code"
+        static let ERROR_MESSAGE = "_error_message"
     }
 
     enum User {
@@ -217,20 +221,28 @@ enum Event {
         static let APP_START = "_app_start"
         static let APP_END = "_app_end"
         static let APP_EXCEPTION = "_app_exception"
+        static let CLICKSTREAM_ERROR = "_clickstream_error"
     }
 
-    enum ErrorType {
-        static let ATTRIBUTE_NAME_INVALID = "_error_name_invalid"
-        static let ATTRIBUTE_NAME_LENGTH_EXCEED = "_error_name_length_exceed"
-        static let ATTRIBUTE_VALUE_LENGTH_EXCEED = "_error_value_length_exceed"
-        static let ATTRIBUTE_SIZE_EXCEED = "_error_attribute_size_exceed"
+    enum ErrorCode {
+        static let NO_ERROR = 0
+        static let EVENT_NAME_INVALID = 1_001
+        static let EVENT_NAME_LENGTH_EXCEED = 1_002
+        static let ATTRIBUTE_NAME_LENGTH_EXCEED = 2_001
+        static let ATTRIBUTE_NAME_INVALID = 2_002
+        static let ATTRIBUTE_VALUE_LENGTH_EXCEED = 2_003
+        static let ATTRIBUTE_SIZE_EXCEED = 2_004
+        static let USER_ATTRIBUTE_SIZE_EXCEED = 3_001
+        static let USER_ATTRIBUTE_NAME_LENGTH_EXCEED = 3_002
+        static let USER_ATTRIBUTE_NAME_INVALID = 3_003
+        static let USER_ATTRIBUTE_VALUE_LENGTH_EXCEED = 3_004
     }
 
     class EventError {
-        let errorType: String
+        let errorCode: Int
         let errorMessage: String
-        init(errorType: String, errorMessage: String) {
-            self.errorType = errorType
+        init(errorCode: Int, errorMessage: String) {
+            self.errorCode = errorCode
             self.errorMessage = errorMessage
         }
     }

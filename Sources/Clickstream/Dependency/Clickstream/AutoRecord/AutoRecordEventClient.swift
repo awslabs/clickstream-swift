@@ -187,7 +187,7 @@ class AutoRecordEventClient {
             do {
                 try await clickstream.analyticsClient.record(event)
             } catch {
-                log.error("Record event error:\(error)")
+                log.error("Failed to record event with error:\(error)")
             }
         }
     }
