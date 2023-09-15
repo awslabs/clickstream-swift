@@ -11,8 +11,7 @@ import Foundation
 private typealias Limit = Event.Limit
 typealias JsonObject = [String: Any]
 
-class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
-    var hashCode: Int!
+class ClickstreamEvent: AnalyticsPropertiesModel {
     let eventId: String
     let appId: String
     let uniqueId: String
@@ -65,14 +64,9 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
         attributes[key]
     }
 
-    func toJson(forHashCode: Bool = false) -> String {
+    func toJson() -> String {
         var event = JsonObject()
-        if !forHashCode {
-            if hashCode == nil {
-                hashCode = hashValue
-            }
-            event["hashCode"] = String(format: "%08X", hashCode)
-        }
+        event["hashCode"] = ""
         event["unique_id"] = uniqueId
         event["event_type"] = eventType
         event["event_id"] = eventId
@@ -100,6 +94,8 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
         event["app_title"] = systemInfo.appTitle
         event["user"] = userAttributes
         event["attributes"] = getAttributeObject(from: attributes)
+        let eventJson = getJsonStringFromObject(jsonObject: event)
+        event["hashCode"] = eventJson.hashCode()
         return getJsonStringFromObject(jsonObject: event)
     }
 
@@ -132,10 +128,6 @@ class ClickstreamEvent: AnalyticsPropertiesModel, Hashable {
             }
         }
         return attribute
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(toJson(forHashCode: true))
     }
 
     static func == (lhs: ClickstreamEvent, rhs: ClickstreamEvent) -> Bool {
