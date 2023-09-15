@@ -136,8 +136,6 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             }
         }
         event.setUserAttribute(userAttributes)
-        let objId = ObjectIdentifier(event)
-        event.hashCode = objId.hashValue
         try eventRecorder.save(event)
     }
 

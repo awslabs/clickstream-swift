@@ -64,7 +64,7 @@ class ClickstreamEventTest: XCTestCase {
     }
 
     func testEventEqualsFail() {
-        let event1 = clickstreamEvent
+        let event1 = clickstreamEvent!
         let event2 = ClickstreamEvent(eventType: "testEvent",
                                       appId: testAppId,
                                       uniqueId: UUID().uuidString,
