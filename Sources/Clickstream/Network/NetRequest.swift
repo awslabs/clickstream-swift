@@ -32,7 +32,8 @@ enum NetRequest {
             URLQueryItem(name: "platform", value: "iOS"),
             URLQueryItem(name: "appId", value: configuration.appId),
             URLQueryItem(name: "compression", value: compression),
-            URLQueryItem(name: "event_bundle_sequence_id", value: String(describing: bundleSequenceId))
+            URLQueryItem(name: "event_bundle_sequence_id", value: String(describing: bundleSequenceId)),
+            URLQueryItem(name: "hashCode", value: requestData.hashCode())
         ]
 
         var request = URLRequest(url: urlComponts.url!, timeoutInterval: 15.0)

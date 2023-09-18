@@ -107,7 +107,6 @@ class EventRecorderTest: XCTestCase {
     func testGetEventWithAllAttribute() throws {
         try eventRecorder.save(clickstreamEvent)
         let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
-        XCTAssertNotNil(event["hashCode"])
         XCTAssertEqual(clickstream.userUniqueId, event["unique_id"] as! String)
         XCTAssertEqual("testEvent", event["event_type"] as! String)
         XCTAssertNotNil(event["event_id"])
@@ -411,36 +410,6 @@ class EventRecorderTest: XCTestCase {
         try eventRecorder.save(clickstreamEvent)
         activityTracker.callback?(.runningInBackground)
         XCTAssertTrue(eventRecorder.queue.operationCount > 0)
-    }
-
-    func testGetEventHashCodeTwice() {
-        let eventJson = clickstreamEvent.toJson()
-        let hashCode1 = eventJson.hashCode()
-        let hashCode2 = eventJson.hashCode()
-        XCTAssertEqual(hashCode1, hashCode2)
-    }
-
-    func testEventModified() throws {
-        let originJson = clickstreamEvent.toJson()
-        let originJsonData = originJson.data(using: .utf8)!
-        var jsonObject = try JSONSerialization.jsonObject(with: originJsonData, options: []) as! [String: Any]
-        let originHashCode = jsonObject["hashCode"] as! String
-        jsonObject["hashCode"] = ""
-        jsonObject["event_type"] = "testEvent1"
-        let jsonWithoutHashCode = clickstreamEvent.getJsonStringFromObject(jsonObject: jsonObject)
-        let computedHashCode = jsonWithoutHashCode.hashCode()
-        XCTAssertNotEqual(originHashCode, computedHashCode)
-    }
-
-    func testEventNotModified() throws {
-        let originJson = clickstreamEvent.toJson()
-        let originJsonData = originJson.data(using: .utf8)!
-        var jsonObject = try JSONSerialization.jsonObject(with: originJsonData, options: []) as! [String: Any]
-        let originHashCode = jsonObject["hashCode"] as! String
-        jsonObject["hashCode"] = ""
-        let jsonWithoutHashCode = clickstreamEvent.getJsonStringFromObject(jsonObject: jsonObject)
-        let computedHashCode = jsonWithoutHashCode.hashCode()
-        XCTAssertEqual(originHashCode, computedHashCode)
     }
 }
 
