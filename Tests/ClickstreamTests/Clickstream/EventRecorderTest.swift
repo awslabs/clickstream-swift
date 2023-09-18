@@ -107,6 +107,7 @@ class EventRecorderTest: XCTestCase {
     func testGetEventWithAllAttribute() throws {
         try eventRecorder.save(clickstreamEvent)
         let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
+        XCTAssertNil(event["hashCode"])
         XCTAssertEqual(clickstream.userUniqueId, event["unique_id"] as! String)
         XCTAssertEqual("testEvent", event["event_type"] as! String)
         XCTAssertNotNil(event["event_id"])
