@@ -139,7 +139,7 @@ class AutoRecordEventClientTest: XCTestCase {
         window.makeKeyAndVisible()
         
         autoRecordEventClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
-        
+        Thread.sleep(forTimeInterval: 0.02)
         window.rootViewController = viewControllerB
         window.makeKeyAndVisible()
         XCTAssertTrue(viewControllerA.viewDidAppearCalled)
