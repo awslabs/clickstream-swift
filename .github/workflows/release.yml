@@ -27,3 +27,12 @@ jobs:
           git add .
           git commit -m 'release: clickstream Swift ${{ env.NEW_VERSION }}'
           git push
+          git tag ${{ env.NEW_VERSION }}
+          git push origin ${{ env.NEW_VERSION }}
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Clickstream Swift ${{ env.NEW_VERSION }}"
+          tag_name: "${{ env.NEW_VERSION }}"
+          prerelease: true
+          generate_release_notes: true
