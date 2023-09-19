@@ -15,6 +15,7 @@ class EventRecorderTest: XCTestCase {
     let testSuccessEndpoint = "http://localhost:8080/collect"
     let testFailEndpoint = "http://localhost:8080/collect/fail"
     let testSuccessWithDelayEndpoint = "http://localhost:8080/collect/success/delay"
+    let testHashCodeEndpoint = "http://localhost:8080/collect/hashcode"
     var dbUtil: ClickstreamDBProtocol!
     var clickstreamEvent: ClickstreamEvent!
     var eventRecorder: EventRecorder!
@@ -411,6 +412,23 @@ class EventRecorderTest: XCTestCase {
         try eventRecorder.save(clickstreamEvent)
         activityTracker.callback?(.runningInBackground)
         XCTAssertTrue(eventRecorder.queue.operationCount > 0)
+    }
+
+    func testVerifyHashCodeInRequestParameter() {
+        clickstream.configuration.endpoint = testHashCodeEndpoint
+        let eventJson = "[" + clickstreamEvent.toJson() + "]"
+        let eventJsonHashCode = eventJson.hashCode()
+        server["/collect/hashcode"] = { request in
+            let queryParams = request.queryParams
+            // swift lambda for get the hashCode value in queryParams dictionary
+            let hashCodeValue = queryParams.first(where: { $0.0 == "hashCode" })?.1
+            if hashCodeValue == eventJsonHashCode {
+                return .ok(.text("Success"))
+            }
+            return .badRequest(.text("Fail"))
+        }
+        let result = NetRequest.uploadEventWithURLSession(eventsJson: eventJson, configuration: clickstream.configuration, bundleSequenceId: 1)
+        XCTAssertTrue(result)
     }
 }
 
