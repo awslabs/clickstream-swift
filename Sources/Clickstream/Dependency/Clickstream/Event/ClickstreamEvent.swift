@@ -66,7 +66,6 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
 
     func toJson() -> String {
         var event = JsonObject()
-        event["hashCode"] = ""
         event["unique_id"] = uniqueId
         event["event_type"] = eventType
         event["event_id"] = eventId
@@ -94,8 +93,6 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         event["app_title"] = systemInfo.appTitle
         event["user"] = userAttributes
         event["attributes"] = getAttributeObject(from: attributes)
-        let eventJson = getJsonStringFromObject(jsonObject: event)
-        event["hashCode"] = eventJson.hashCode()
         return getJsonStringFromObject(jsonObject: event)
     }
 

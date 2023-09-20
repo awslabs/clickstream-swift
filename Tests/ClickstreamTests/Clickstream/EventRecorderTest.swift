@@ -15,6 +15,7 @@ class EventRecorderTest: XCTestCase {
     let testSuccessEndpoint = "http://localhost:8080/collect"
     let testFailEndpoint = "http://localhost:8080/collect/fail"
     let testSuccessWithDelayEndpoint = "http://localhost:8080/collect/success/delay"
+    let testHashCodeEndpoint = "http://localhost:8080/collect/hashcode"
     var dbUtil: ClickstreamDBProtocol!
     var clickstreamEvent: ClickstreamEvent!
     var eventRecorder: EventRecorder!
@@ -107,7 +108,7 @@ class EventRecorderTest: XCTestCase {
     func testGetEventWithAllAttribute() throws {
         try eventRecorder.save(clickstreamEvent)
         let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
-        XCTAssertNotNil(event["hashCode"])
+        XCTAssertNil(event["hashCode"])
         XCTAssertEqual(clickstream.userUniqueId, event["unique_id"] as! String)
         XCTAssertEqual("testEvent", event["event_type"] as! String)
         XCTAssertNotNil(event["event_id"])
@@ -413,34 +414,21 @@ class EventRecorderTest: XCTestCase {
         XCTAssertTrue(eventRecorder.queue.operationCount > 0)
     }
 
-    func testGetEventHashCodeTwice() {
-        let eventJson = clickstreamEvent.toJson()
-        let hashCode1 = eventJson.hashCode()
-        let hashCode2 = eventJson.hashCode()
-        XCTAssertEqual(hashCode1, hashCode2)
-    }
-
-    func testEventModified() throws {
-        let originJson = clickstreamEvent.toJson()
-        let originJsonData = originJson.data(using: .utf8)!
-        var jsonObject = try JSONSerialization.jsonObject(with: originJsonData, options: []) as! [String: Any]
-        let originHashCode = jsonObject["hashCode"] as! String
-        jsonObject["hashCode"] = ""
-        jsonObject["event_type"] = "testEvent1"
-        let jsonWithoutHashCode = clickstreamEvent.getJsonStringFromObject(jsonObject: jsonObject)
-        let computedHashCode = jsonWithoutHashCode.hashCode()
-        XCTAssertNotEqual(originHashCode, computedHashCode)
-    }
-
-    func testEventNotModified() throws {
-        let originJson = clickstreamEvent.toJson()
-        let originJsonData = originJson.data(using: .utf8)!
-        var jsonObject = try JSONSerialization.jsonObject(with: originJsonData, options: []) as! [String: Any]
-        let originHashCode = jsonObject["hashCode"] as! String
-        jsonObject["hashCode"] = ""
-        let jsonWithoutHashCode = clickstreamEvent.getJsonStringFromObject(jsonObject: jsonObject)
-        let computedHashCode = jsonWithoutHashCode.hashCode()
-        XCTAssertEqual(originHashCode, computedHashCode)
+    func testVerifyHashCodeInRequestParameter() {
+        clickstream.configuration.endpoint = testHashCodeEndpoint
+        let eventJson = "[" + clickstreamEvent.toJson() + "]"
+        let eventJsonHashCode = eventJson.hashCode()
+        server["/collect/hashcode"] = { request in
+            let queryParams = request.queryParams
+            // swift lambda for get the hashCode value in queryParams dictionary
+            let hashCodeValue = queryParams.first(where: { $0.0 == "hashCode" })?.1
+            if hashCodeValue == eventJsonHashCode {
+                return .ok(.text("Success"))
+            }
+            return .badRequest(.text("Fail"))
+        }
+        let result = NetRequest.uploadEventWithURLSession(eventsJson: eventJson, configuration: clickstream.configuration, bundleSequenceId: 1)
+        XCTAssertTrue(result)
     }
 }
 
