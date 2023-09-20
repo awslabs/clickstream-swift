@@ -13,12 +13,15 @@ class AutoRecordEventClientTest: XCTestCase {
     private var clickstream: ClickstreamContext!
     private var eventRecorder: MockEventRecorder!
     private var autoRecordEventClient: AutoRecordEventClient!
+    private var activityTracker: MockActivityTracker!
+    private var sessionClient: SessionClient!
     let testAppId = "testAppId"
     let testEndpoint = "https://example.com/collect"
 
     override func setUp() async throws {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         let mockNetworkMonitor = MockNetworkMonitor()
+        activityTracker = MockActivityTracker()
         let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
                                                                    endpoint: testEndpoint,
                                                                    sendEventsInterval: 10_000,
@@ -26,6 +29,8 @@ class AutoRecordEventClientTest: XCTestCase {
                                                                    isCompressEvents: false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
         clickstream.networkMonitor = mockNetworkMonitor
+        sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)
+        clickstream.sessionClient = sessionClient
         eventRecorder = MockEventRecorder()
         let analyticsClient = try AnalyticsClient(
             clickstream: clickstream,
@@ -33,12 +38,15 @@ class AutoRecordEventClientTest: XCTestCase {
             sessionProvider: { nil }
         )
         clickstream.analyticsClient = analyticsClient
-        autoRecordEventClient = AutoRecordEventClient(clickstream: clickstream)
-        analyticsClient.autoRecordClient = autoRecordEventClient
+
+        autoRecordEventClient = sessionClient.autoRecordClient
     }
 
     override func tearDown() {
         eventRecorder = nil
+        activityTracker = nil
+        sessionClient = nil
+        activityTracker?.resetCounters()
     }
 
     func testAppVersionUpdate() {
@@ -70,6 +78,7 @@ class AutoRecordEventClientTest: XCTestCase {
     }
 
     func testOneScreenView() {
+        activityTracker.callback?(.runningInForeground)
         autoRecordEventClient.setIsEntrances()
         let viewController = MockViewControllerA()
         let window = UIWindow(frame: UIScreen.main.bounds)
@@ -77,7 +86,7 @@ class AutoRecordEventClientTest: XCTestCase {
         window.makeKeyAndVisible()
         XCTAssertTrue(viewController.viewDidAppearCalled)
 
-        XCTAssertTrue(eventRecorder.saveCount == 1)
+        XCTAssertTrue(eventRecorder.saveCount == 4)
         XCTAssertEqual(eventRecorder.lastSavedEvent?.eventType, Event.PresetEvent.SCREEN_VIEW)
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertNotNil(eventRecorder.lastSavedEvent!.attributes[Event.ReservedAttribute.SCREEN_NAME])
@@ -137,7 +146,7 @@ class AutoRecordEventClientTest: XCTestCase {
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = viewControllerA
         window.makeKeyAndVisible()
-        
+
         autoRecordEventClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
         Thread.sleep(forTimeInterval: 0.02)
         window.rootViewController = viewControllerB
