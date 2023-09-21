@@ -36,7 +36,9 @@ class AutoRecordEventClient {
 
     func onViewDidAppear(screenName: String, screenPath: String, screenHashValue: String) {
         if !isSameScreen(screenName, screenPath, screenHashValue) {
-            recordUserEngagement()
+            if lastScreenName != nil {
+                recordUserEngagement()
+            }
             recordScreenView(screenName, screenPath, screenHashValue)
         }
     }
@@ -86,11 +88,7 @@ class AutoRecordEventClient {
     }
 
     func getPreviousScreenViewTimestamp() -> Int64 {
-        if lastScreenStartTimestamp > 0 {
-            return lastScreenStartTimestamp
-        } else {
-            return UserDefaultsUtil.getPreviousScreenViewTimestamp(storage: clickstream.storage)
-        }
+        UserDefaultsUtil.getPreviousScreenViewTimestamp(storage: clickstream.storage)
     }
 
     func isSameScreen(_ screenName: String, _ screenPath: String, _ screenUniqueId: String) -> Bool {
