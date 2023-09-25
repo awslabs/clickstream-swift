@@ -48,6 +48,10 @@ class SystemInfoTest: XCTestCase {
         XCTAssertEqual("iPhone 14 Plus", SystemInfo.getModel(identifier: "iPhone14,8"))
         XCTAssertEqual("iPhone 14 Pro", SystemInfo.getModel(identifier: "iPhone15,2"))
         XCTAssertEqual("iPhone 14 Pro Max", SystemInfo.getModel(identifier: "iPhone15,3"))
+        XCTAssertEqual("iPhone 15", SystemInfo.getModel(identifier: "iPhone15,4"))
+        XCTAssertEqual("iPhone 15 Plus", SystemInfo.getModel(identifier: "iPhone15,5"))
+        XCTAssertEqual("iPhone 15 Pro", SystemInfo.getModel(identifier: "iPhone16,1"))
+        XCTAssertEqual("iPhone 15 Pro Max", SystemInfo.getModel(identifier: "iPhone16,2"))
     }
 
     func testGetModelFor_iPad() {
