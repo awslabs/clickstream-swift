@@ -71,6 +71,25 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(2, eventCount)
     }
 
+    func testRecordEventWithItem() throws {
+        let item_book: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            ClickstreamAnalytics.Item.ITEM_NAME: "Nature",
+            ClickstreamAnalytics.Item.ITEM_CATEGORY: "book",
+            ClickstreamAnalytics.Item.PRICE: 99.9
+        ]
+        ClickstreamAnalytics.recordEvent("testEvent", ["id": 123], [item_book])
+        Thread.sleep(forTimeInterval: 0.2)
+        let testEvent = try getTestEvent()
+        let items = testEvent["items"] as! [JsonObject]
+        XCTAssertEqual(1, items.count)
+        let eventItem = items[0]
+        XCTAssertEqual(123, eventItem["id"] as! Int)
+        XCTAssertEqual("Nature", eventItem["name"] as! String)
+        XCTAssertEqual("book", eventItem["item_category"] as! String)
+        XCTAssertEqual(99.9, eventItem["price"] as! Double)
+    }
+
     func testRecordOneEventWithNameSuccess() throws {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
@@ -250,6 +269,27 @@ class IntegrationTest: XCTestCase {
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(3, eventCount)
+    }
+
+    func testRecordEventWithItemForObjc() throws {
+        let item: NSDictionary = [
+            "id": 123,
+            "name": "Nature",
+            "category": "book",
+            "price": 99.9
+        ]
+        ClickstreamObjc.recordEvent("testEvent",
+                                    ["id": 123],
+                                    [item])
+        Thread.sleep(forTimeInterval: 0.2)
+        let testEvent = try getTestEvent()
+        let items = testEvent["items"] as! [JsonObject]
+        XCTAssertEqual(1, items.count)
+        let eventItem = items[0]
+        XCTAssertEqual(123, eventItem["id"] as! Int)
+        XCTAssertEqual("Nature", eventItem["name"] as! String)
+        XCTAssertEqual("book", eventItem["category"] as! String)
+        XCTAssertEqual(99.9, eventItem["price"] as! Double)
     }
 
     func testGlobalAttributeForObjc() throws {

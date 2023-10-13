@@ -138,6 +138,28 @@ ClickstreamAnalytics.recordEvent("testEvent", attributes)
 ClickstreamAnalytics.recordEvent("button_click")
 ```
 
+#### Record event with items
+
+You can add the following code to log an event with an item.
+
+```swift
+import Clickstream
+
+let attributes: ClickstreamAttribute = [
+    ClickstreamAnalytics.Item.ITEM_ID: "123",
+    ClickstreamAnalytics.Item.CURRENCY: "USD",
+    "event_category": "recommended"
+]
+
+let item_book: ClickstreamAttribute = [
+    ClickstreamAnalytics.Item.ITEM_ID: 123,
+    ClickstreamAnalytics.Item.ITEM_NAME: "Nature",
+    ClickstreamAnalytics.Item.ITEM_CATEGORY: "book",
+    ClickstreamAnalytics.Item.PRICE: 99.9
+]
+ClickstreamAnalytics.recordEvent("view_item", attributes, [item_book])
+```
+
 #### Add global attribute
 
 ```swift
