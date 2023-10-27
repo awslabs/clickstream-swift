@@ -207,6 +207,20 @@ import Clickstream
 ClickstreamAnalytics.flushEvents()
 ```
 
+#### Disable SDK
+
+You can disable the SDK in the scenario you need. After disabling the SDK, the SDK will not handle the logging and sending of any events. Of course you can enable the SDK when you need to continue logging events.
+
+```swift
+import Clickstream
+
+// disable SDK
+ClickstreamAnalytics.disable()
+
+// enable SDK
+ClickstreamAnalytics.enable()
+```
+
 ## How to build&test locally
 
 ### Config your code format

@@ -89,6 +89,7 @@ class ClickstreamContext {
     var configuration: ClickstreamContextConfiguration
     var userUniqueId: String
     let storage: ClickstreamContextStorage
+    var isEnable: Bool
 
     init(with configuration: ClickstreamContextConfiguration,
          userDefaults: UserDefaultsBehaviour = UserDefaults.standard) throws
@@ -97,5 +98,6 @@ class ClickstreamContext {
         self.userUniqueId = UserDefaultsUtil.getCurrentUserUniqueId(storage: storage)
         self.systemInfo = SystemInfo(storage: storage)
         self.configuration = configuration
+        self.isEnable = true
     }
 }

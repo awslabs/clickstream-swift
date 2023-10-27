@@ -73,4 +73,17 @@ public enum ClickstreamAnalytics {
         return (plugin as! AWSClickstreamPlugin).getEscapeHatch().configuration
         // swiftlint:enable force_cast
     }
+
+    /// Disable the SDK
+    /// - Parameter userId: current userId, nil for logout
+    public static func disable() {
+        Amplify.Analytics.disable()
+    }
+    
+    
+    /// Enable the SDK
+    /// - Parameter userId: current userId, nil for logout
+    public static func enable() {
+        Amplify.Analytics.enable()
+    }
 }

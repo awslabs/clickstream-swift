@@ -54,6 +54,7 @@ class IntegrationTest: XCTestCase {
     }
 
     override func tearDown() async throws {
+        ClickstreamAnalytics.enable()
         await Amplify.reset()
         analyticsPlugin.reset()
         server.stop()
@@ -236,6 +237,35 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(2, eventCount)
     }
 
+    func testDisableSDKWillNotRecordCustomEvents() throws {
+        ClickstreamAnalytics.disable()
+        ClickstreamAnalytics.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
+        let eventCount = try eventRecorder.dbUtil.getEventCount()
+        XCTAssertEqual(1, eventCount)
+    }
+
+    func testDisableSDKWillNotRecordExceptionEvents() throws {
+        ClickstreamAnalytics.disable()
+        let exception = NSException(name: NSExceptionName("TestException"), reason: "Testing", userInfo: nil)
+        AutoRecordEventClient.handleException(exception)
+        Thread.sleep(forTimeInterval: 0.5)
+        let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
+        XCTAssertEqual(1, eventArray.count)
+    }
+
+    func testDisableAndEnableSDKTwice() throws {
+        ClickstreamAnalytics.disable()
+        ClickstreamAnalytics.disable()
+        ClickstreamAnalytics.recordEvent("testEvent")
+        ClickstreamAnalytics.enable()
+        ClickstreamAnalytics.enable()
+        ClickstreamAnalytics.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
+        let eventCount = try eventRecorder.dbUtil.getEventCount()
+        XCTAssertEqual(2, eventCount)
+    }
+
     // MARK: - Objc test
 
     func testRecordEventForObjc() throws {
@@ -297,6 +327,16 @@ class IntegrationTest: XCTestCase {
         configuration.authCookie = "authCookie"
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
+        let eventCount = try eventRecorder.dbUtil.getEventCount()
+        XCTAssertEqual(2, eventCount)
+    }
+
+    func testDisableAndEnableSDKForObjc() throws {
+        ClickstreamObjc.disable()
+        ClickstreamObjc.recordEvent("testEvent")
+        ClickstreamObjc.enable()
+        ClickstreamObjc.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(2, eventCount)
     }

@@ -73,6 +73,7 @@ class SessionClient: SessionClientBehaviour {
     }
 
     private func respond(to newState: ApplicationState) {
+        if !clickstream.isEnable { return }
         switch newState {
         case .runningInForeground:
             handleAppEnterForeground()

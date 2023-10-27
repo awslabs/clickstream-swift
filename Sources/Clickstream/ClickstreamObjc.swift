@@ -71,6 +71,16 @@ import Foundation
         try ClickstreamAnalytics.getClickstreamConfiguration()
     }
 
+    /// Disable the SDK
+    public static func disable() {
+        ClickstreamAnalytics.disable()
+    }
+
+    /// Enable the SDK
+    public static func enable() {
+        ClickstreamAnalytics.enable()
+    }
+
     private static func getAttributes(_ attributes: NSDictionary) -> ClickstreamAttribute {
         var result: ClickstreamAttribute = [:]
         for case let (key as String, value) in attributes {
