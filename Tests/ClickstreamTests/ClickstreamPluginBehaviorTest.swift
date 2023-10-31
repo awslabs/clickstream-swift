@@ -22,6 +22,7 @@ class ClickstreamPluginBehaviorTest: ClickstreamPluginTestBase {
         try await super.setUp()
         analyticsClient = MockAnalyticsClient()
         analyticsPlugin.analyticsClient = analyticsClient
+        analyticsPlugin.clickstream = clickstream
     }
 
     func testIdentifyUser() {
