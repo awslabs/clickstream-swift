@@ -94,10 +94,16 @@ extension AWSClickstreamPlugin {
     }
 
     func enable() {
+        if isEnabled { return }
+        self.autoFlushEventsTimer?.resume()
+        clickstream.isEnable = true
         isEnabled = true
     }
 
     func disable() {
+        if !isEnabled { return }
         isEnabled = false
+        clickstream.isEnable = false
+        self.autoFlushEventsTimer?.suspend()
     }
 }

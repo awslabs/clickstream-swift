@@ -77,6 +77,18 @@ public enum ClickstreamAnalytics {
         // swiftlint:enable force_cast
     }
 
+    /// Disable the SDK
+    /// - Parameter userId: current userId, nil for logout
+    public static func disable() {
+        Amplify.Analytics.disable()
+    }
+
+    /// Enable the SDK
+    /// - Parameter userId: current userId, nil for logout
+    public static func enable() {
+        Amplify.Analytics.enable()
+    }
+
     /// ClickstreamAnalytics item attributes
     public enum Item {
         static let ITEM_ID = "id"

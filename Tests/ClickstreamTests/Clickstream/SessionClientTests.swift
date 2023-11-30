@@ -197,4 +197,12 @@ class SessionClientTests: XCTestCase {
         activityTracker.callback?(.runningInForeground)
         XCTAssertTrue(Date().millisecondsSince1970 - sessionClient.autoRecordClient.lastScreenStartTimestamp < 200)
     }
+
+    func testDisableSDKWillNotRecordSessionEvents() {
+        clickstream.isEnable = false
+        activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(0, events.count)
+    }
 }

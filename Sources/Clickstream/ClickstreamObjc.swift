@@ -71,12 +71,23 @@ import Foundation
         try ClickstreamAnalytics.getClickstreamConfiguration()
     }
 
+
     private static func getItems(_ items: [NSDictionary]) -> [ClickstreamAttribute] {
         var resultItems: [ClickstreamAttribute] = []
         for item in items {
             resultItems.append(getAttributes(item))
         }
         return resultItems
+    }
+
+    /// Disable the SDK
+    public static func disable() {
+        ClickstreamAnalytics.disable()
+    }
+
+    /// Enable the SDK
+    public static func enable() {
+        ClickstreamAnalytics.enable()
     }
 
     private static func getAttributes(_ attributes: NSDictionary) -> ClickstreamAttribute {

@@ -197,4 +197,15 @@ class AutoRecordEventClientTest: XCTestCase {
         window.makeKeyAndVisible()
         XCTAssertNotEqual(Event.PresetEvent.USER_ENGAGEMENT, eventRecorder.savedEvents[1].eventType)
     }
+
+    func testDisableSDKWillNotRecordScreenViewEvents() {
+        clickstream.isEnable = false
+        activityTracker.callback?(.runningInForeground)
+        autoRecordEventClient.setIsEntrances()
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        XCTAssertTrue(eventRecorder.saveCount == 0)
+    }
 }

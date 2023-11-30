@@ -35,6 +35,7 @@ class AutoRecordEventClient {
     }
 
     func onViewDidAppear(screenName: String, screenPath: String, screenHashValue: String) {
+        if !clickstream.isEnable { return }
         if !isSameScreen(screenName, screenPath, screenHashValue) {
             if lastScreenName != nil {
                 recordUserEngagement()
