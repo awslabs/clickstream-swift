@@ -14,24 +14,27 @@ class EventChecker {
     /// - Parameter eventType: the event name
     /// - Returns: the EventError object
     static func checkEventType(eventType: String) -> EventError {
+        let error = EventError()
+        var errorMsg: String?
         if eventType.utf8.count > Event.Limit.MAX_EVENT_TYPE_LENGTH {
-            let errorMsg = """
+            errorMsg = """
             Event name is too long, the max event type length is \
             \(Event.Limit.MAX_EVENT_TYPE_LENGTH) characters. event name: \(eventType)
             """
-            log.error(errorMsg)
-            return EventError(errorCode: Event.ErrorCode.EVENT_NAME_LENGTH_EXCEED,
-                              errorMessage: getErrorMessage(errorMsg))
+            error.errorCode = Event.ErrorCode.EVENT_NAME_LENGTH_EXCEED
+            error.errorMessage = getErrorMessage(errorMsg!)
         } else if !isValidName(name: eventType) {
-            let errorMsg = """
+            errorMsg = """
             Event name can only contains uppercase and lowercase letters, underscores, number,\
              and is not start with a number. event name: \(eventType)
             """
-            log.error(errorMsg)
-            return EventError(errorCode: Event.ErrorCode.EVENT_NAME_INVALID,
-                              errorMessage: getErrorMessage(errorMsg))
+            error.errorCode = Event.ErrorCode.EVENT_NAME_INVALID
+            error.errorMessage = getErrorMessage(errorMsg!)
         }
-        return EventError(errorCode: Event.ErrorCode.NO_ERROR, errorMessage: "")
+        if errorMsg != nil {
+            log.error(errorMsg!)
+        }
+        return error
     }
 
     /// Check the attribute error.
@@ -41,52 +44,49 @@ class EventChecker {
     ///   - value: attribute value
     /// - Returns: the ErrorType
     static func checkAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError {
+        let error = EventError()
+        var errorMsg: String?
         if currentNumber >= Event.Limit.MAX_NUM_OF_ATTRIBUTES {
-            let errorMsg = """
+            errorMsg = """
             reached the max number of attributes limit (\(Event.Limit.MAX_NUM_OF_ATTRIBUTES)).\
              and the attribute: \(key) will not be recorded
             """
-            log.error(errorMsg)
             let errorString = "attribute name: \(key)"
-            return EventError(errorCode: Event.ErrorCode.ATTRIBUTE_SIZE_EXCEED,
-                              errorMessage: getErrorMessage(errorString))
-        }
-        let nameLength = key.utf8.count
-        if nameLength > Event.Limit.MAX_LENGTH_OF_NAME {
-            let errorMsg = """
+            error.errorCode = Event.ErrorCode.ATTRIBUTE_SIZE_EXCEED
+            error.errorMessage = getErrorMessage(errorString)
+        } else if key.utf8.count > Event.Limit.MAX_LENGTH_OF_NAME {
+            errorMsg = """
             attribute : \(key), reached the max length of attributes name limit(\(Event.Limit.MAX_LENGTH_OF_NAME).\
-             current length is:(\(nameLength)) and the attribute will not be recorded
+             current length is:(\(key.utf8.count)) and the attribute will not be recorded
             """
-            log.error(errorMsg)
-            let errorString = "attribute name length is:(\(nameLength)) name is: \(key)"
-            return EventError(errorCode: Event.ErrorCode.ATTRIBUTE_NAME_LENGTH_EXCEED,
-                              errorMessage: getErrorMessage(errorString))
-        }
-        if !isValidName(name: key) {
-            let errorMsg = """
+            let errorString = "attribute name length is:(\(key.utf8.count)) name is: \(key)"
+            error.errorCode = Event.ErrorCode.ATTRIBUTE_NAME_LENGTH_EXCEED
+            error.errorMessage = getErrorMessage(errorString)
+        } else if !isValidName(name: key) {
+            errorMsg = """
             attribute : \(key), was not valid, attribute name can only contains uppercase\
              and lowercase letters, underscores, number, and is not start with a number.\
              so the attribute will not be recorded
             """
-            log.error(errorMsg)
-            return EventError(errorCode: Event.ErrorCode.ATTRIBUTE_NAME_INVALID,
-                              errorMessage: getErrorMessage(key))
-        }
-        if let value = value as? String {
+            error.errorCode = Event.ErrorCode.ATTRIBUTE_NAME_INVALID
+            error.errorMessage = getErrorMessage(key)
+        } else if let value = value as? String {
             let valueLength = value.utf8.count
             if valueLength > Event.Limit.MAX_LENGTH_OF_VALUE {
-                let errorMsg = """
+                errorMsg = """
                 attribute : \(key), reached the max length of attributes value limit\
                 (\(Event.Limit.MAX_LENGTH_OF_VALUE)). current length is:(\(valueLength)).\
                  and the attribute will not be recorded, attribute value: \(value)
                 """
-                log.error(errorMsg)
                 let errorString = "attribute name: \(key), attribute value: \(value)"
-                return EventError(errorCode: Event.ErrorCode.ATTRIBUTE_VALUE_LENGTH_EXCEED,
-                                  errorMessage: getErrorMessage(errorString))
+                error.errorCode = Event.ErrorCode.ATTRIBUTE_VALUE_LENGTH_EXCEED
+                error.errorMessage = getErrorMessage(errorString)
             }
         }
-        return EventError(errorCode: Event.ErrorCode.NO_ERROR, errorMessage: "")
+        if errorMsg != nil {
+            log.error(errorMsg!)
+        }
+        return error
     }
 
     /// Check the user attribute error.
@@ -96,53 +96,51 @@ class EventChecker {
     ///   - value: attribute value
     /// - Returns: the ErrorType
     static func checkUserAttribute(currentNumber: Int, key: String, value: AttributeValue) -> EventError {
+        let error = EventError()
+        var errorMsg: String?
         if currentNumber >= Event.Limit.MAX_NUM_OF_USER_ATTRIBUTES {
-            let errorMsg = """
+            errorMsg = """
             reached the max number of user attributes limit (\(Event.Limit.MAX_NUM_OF_USER_ATTRIBUTES)).\
              and the user attribute: \(key) will not be recorded
             """
-            log.error(errorMsg)
             let errorString = "attribute name: \(key)"
-            return EventError(errorCode: Event.ErrorCode.USER_ATTRIBUTE_SIZE_EXCEED,
-                              errorMessage: getErrorMessage(errorString))
-        }
-        let nameLength = key.utf8.count
-        if nameLength > Event.Limit.MAX_LENGTH_OF_NAME {
-            let errorMsg = """
+            error.errorCode = Event.ErrorCode.USER_ATTRIBUTE_SIZE_EXCEED
+            error.errorMessage = getErrorMessage(errorString)
+        } else if key.utf8.count > Event.Limit.MAX_LENGTH_OF_NAME {
+            errorMsg = """
             user attribute : \(key), reached the max length of attributes name limit\
-            (\(Event.Limit.MAX_LENGTH_OF_NAME). current length is:(\(nameLength))\
+            (\(Event.Limit.MAX_LENGTH_OF_NAME). current length is:(\(key.utf8.count))\
              and the attribute will not be recorded
             """
-            log.error(errorMsg)
-            let errorString = "user attribute name length is:(\(nameLength)) name is: \(key)"
-            return EventError(errorCode: Event.ErrorCode.USER_ATTRIBUTE_NAME_LENGTH_EXCEED,
-                              errorMessage: getErrorMessage(errorString))
+            let errorString = "user attribute name length is:(\(key.utf8.count)) name is: \(key)"
+            error.errorCode = Event.ErrorCode.USER_ATTRIBUTE_NAME_LENGTH_EXCEED
+            error.errorMessage = getErrorMessage(errorString)
         }
         if !isValidName(name: key) {
-            let errorMsg = """
+            errorMsg = """
             user attribute : \(key), was not valid, user attribute name can only contains uppercase\
              and lowercase letters, underscores, number, and is not start with a number.\
              so the attribute will not be recorded
             """
-            log.error(errorMsg)
-            return EventError(errorCode: Event.ErrorCode.USER_ATTRIBUTE_NAME_INVALID,
-                              errorMessage: getErrorMessage(key))
-        }
-        if let value = value as? String {
+            error.errorCode = Event.ErrorCode.USER_ATTRIBUTE_NAME_INVALID
+            error.errorMessage = getErrorMessage(key)
+        } else if let value = value as? String {
             let valueLength = value.utf8.count
             if valueLength > Event.Limit.MAX_LENGTH_OF_USER_VALUE {
-                let errorMsg = """
+                errorMsg = """
                 user attribute : \(key), reached the max length of attributes value limit\
                  (\(Event.Limit.MAX_LENGTH_OF_USER_VALUE)). current length is:(\(valueLength)).\
                  and the attribute will not be recorded, attribute value: \(value)
                 """
-                log.error(errorMsg)
                 let errrorString = "attribute name: \(key), attribute value: \(value)"
-                return EventError(errorCode: Event.ErrorCode.USER_ATTRIBUTE_VALUE_LENGTH_EXCEED,
-                                  errorMessage: getErrorMessage(errrorString))
+                error.errorCode = Event.ErrorCode.USER_ATTRIBUTE_VALUE_LENGTH_EXCEED
+                error.errorMessage = getErrorMessage(errrorString)
             }
         }
-        return EventError(errorCode: Event.ErrorCode.NO_ERROR, errorMessage: "")
+        if errorMsg != nil {
+            log.error(errorMsg!)
+        }
+        return error
     }
 
     /// Verify the string whether only contains number, uppercase and lowercase letters,
@@ -180,55 +178,50 @@ class EventChecker {
                                errorMessage: getErrorMessage(errorMsg)), resultItem)
         }
         var customKeyNumber = 0
-        var error: EventError?
+        let error = EventError()
+        var errorMsg: String?
         for (key, value) in item {
             let valueString = String(describing: value)
-            var attributeError: EventError?
             if !itemKeySet.contains(key) {
                 customKeyNumber += 1
                 if customKeyNumber > Event.Limit.MAX_NUM_OF_CUSTOM_ITEM_ATTRIBUTE {
-                    let errorMsg = """
+                    errorMsg = """
                     reached the max number of custom item attributes limit (
                     \(Event.Limit.MAX_NUM_OF_CUSTOM_ITEM_ATTRIBUTE) ). and the custom item attribute:
                     \(key) will not be recorded
                     """
-                    log.error(errorMsg)
-                    attributeError = EventError(errorCode: Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_SIZE_EXCEED,
-                                                errorMessage: getErrorMessage("item attribute key: \(key)"))
+                    error.errorCode = Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_SIZE_EXCEED
+                    error.errorMessage = getErrorMessage("item attribute key: \(key)")
                 } else if key.utf8.count > Event.Limit.MAX_LENGTH_OF_NAME {
-                    let errorMsg = """
+                    errorMsg = """
                     item attribute key: \(key), reached the max length of item attributes key limit(
                     \(Event.Limit.MAX_LENGTH_OF_NAME)). current length is:(\(key.utf8.count))
                     and the item attribute will not be recorded"
                     """
-                    log.error(errorMsg)
                     let errorString = "item attribute key length is: (\(key.utf8.count)), key is:\(key)"
-                    attributeError = EventError(errorCode: Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_KEY_LENGTH_EXCEED,
-                                                errorMessage: getErrorMessage(errorString))
+                    error.errorCode = Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_KEY_LENGTH_EXCEED
+                    error.errorMessage = getErrorMessage(errorString)
                 } else if !isValidName(name: key) {
-                    let errorMsg = """
+                    errorMsg = """
                     item attribute key: \(key) was not valid, item attribute key can only contains
                     uppercase and lowercase letters, underscores, number, and is not start with a number.
                     so the item attribute will not be recorded
                     """
-                    log.error(errorMsg)
-                    attributeError = EventError(errorCode: Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_KEY_INVALID,
-                                                errorMessage: getErrorMessage(key))
+                    error.errorCode = Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_KEY_INVALID
+                    error.errorMessage = getErrorMessage(key)
                 }
             }
-            if attributeError == nil, valueString.utf8.count > Event.Limit.MAX_LENGTH_OF_ITEM_VALUE {
-                let errorMsg = """
+            if error.errorCode == Event.ErrorCode.NO_ERROR, valueString.utf8.count > Event.Limit.MAX_LENGTH_OF_ITEM_VALUE {
+                errorMsg = """
                 item attribute : \(key), reached the max length of item attribute value limit (
                 \(Event.Limit.MAX_LENGTH_OF_ITEM_VALUE). current length is: (\(valueString.utf8.count))
                 . and the item attribute will not be recorded, attribute value: \(valueString)
                 """
-                log.error(errorMsg)
                 let errorString = "item attribute name: \(key), item attribute value: \(valueString)"
-                attributeError = EventError(errorCode: Event.ErrorCode.ITEM_ATTRIBUTE_VALUE_LENGTH_EXCEED,
-                                            errorMessage: getErrorMessage(errorString))
+                error.errorCode = Event.ErrorCode.ITEM_ATTRIBUTE_VALUE_LENGTH_EXCEED
+                error.errorMessage = getErrorMessage(errorString)
             }
-            if attributeError != nil, error == nil {
-                error = attributeError
+            if error.errorCode > 0 {
                 break
             }
             if let value = value as? Double {
@@ -237,10 +230,10 @@ class EventChecker {
                 resultItem[key] = value
             }
         }
-        if error != nil {
-            return (error!, resultItem)
+        if errorMsg != nil {
+            log.error(errorMsg!)
         }
-        return (EventError(errorCode: Event.ErrorCode.NO_ERROR, errorMessage: ""), resultItem)
+        return (error, resultItem)
     }
 
     static func getErrorMessage(_ errorMsg: String) -> String {
@@ -248,8 +241,9 @@ class EventChecker {
     }
 
     class EventError {
-        let errorCode: Int
-        let errorMessage: String
+        var errorCode = Event.ErrorCode.NO_ERROR
+        var errorMessage = ""
+        init() {}
         init(errorCode: Int, errorMessage: String) {
             self.errorCode = errorCode
             self.errorMessage = errorMessage
