@@ -6,11 +6,13 @@ Clickstream Swift SDK can help you easily collect and report in-app events from 
 
 The SDK relies on the Amplify for Swift Core Library and is developed according to the Amplify Swift SDK plug-in specification. In addition, we've added features that automatically collect common user events and attributes (e.g., screen view, first open) to simplify data collection for users.
 
+Visit our [Documentation site](https://awslabs.github.io/clickstream-analytics-on-aws/en/latest/sdk-manual/swift/) and to learn more about Clickstream Swift SDK.
+
 ### Platform Support
 
 The Clickstream SDK supports iOS 13+.
 
-[**API Documentation**](https://awslabs.github.io/clickstream-swift/)
+[**API Documentation**](https://awslabs.github.io/clickstream-swift/) 
 
 - [Objective-C API Reference](https://awslabs.github.io/clickstream-swift/Classes/ClickstreamObjc.html)
 
