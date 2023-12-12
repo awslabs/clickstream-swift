@@ -79,8 +79,7 @@ public enum ClickstreamAnalytics {
     public static func disable() {
         Amplify.Analytics.disable()
     }
-    
-    
+
     /// Enable the SDK
     /// - Parameter userId: current userId, nil for logout
     public static func enable() {

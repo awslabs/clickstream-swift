@@ -138,7 +138,11 @@ class AnalyticsClient: AnalyticsClientBehaviour {
                                          forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
             }
         }
-        event.setUserAttribute((event.eventType == Event.PresetEvent.PROFILE_SET) ? allUserAttributes : simpleUserAttributes)
+        if event.eventType == Event.PresetEvent.PROFILE_SET {
+            event.setUserAttribute(allUserAttributes)
+        } else {
+            event.setUserAttribute(simpleUserAttributes)
+        }
         try eventRecorder.save(event)
     }
 
