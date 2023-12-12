@@ -30,8 +30,8 @@ import Foundation
     /// - Parameters:
     ///   - eventName: the event name
     ///   - attributes: the event attributes which type is NSDictionary
-    public static func recordEvent(_ eventName: String, _ attributes: NSDictionary) {
-        ClickstreamAnalytics.recordEvent(eventName, getAttributes(attributes))
+    public static func recordEvent(_ eventName: String, _ attributes: NSDictionary, _ items: [NSDictionary] = []) {
+        ClickstreamAnalytics.recordEvent(eventName, getAttributes(attributes), getItems(items))
     }
 
     /// Use this method to send events immediately
@@ -69,6 +69,15 @@ import Foundation
     /// - Returns: ClickstreamContextConfiguration to modify the configuration of clickstream sdk
     public static func getClickstreamConfiguration() throws -> ClickstreamContextConfiguration {
         try ClickstreamAnalytics.getClickstreamConfiguration()
+    }
+
+
+    private static func getItems(_ items: [NSDictionary]) -> [ClickstreamAttribute] {
+        var resultItems: [ClickstreamAttribute] = []
+        for item in items {
+            resultItems.append(getAttributes(item))
+        }
+        return resultItems
     }
 
     /// Disable the SDK

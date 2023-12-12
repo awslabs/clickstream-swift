@@ -45,6 +45,9 @@ extension AWSClickstreamPlugin {
             if let attributes = event.attribute {
                 clickstreamEvent.addAttribute(attributes)
             }
+            if let items = event.items {
+                clickstreamEvent.addItems(items)
+            }
 
             Task {
                 do {

@@ -47,7 +47,10 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
-        let eventError = Event.checkAttribute(currentNumber: globalAttributes.count, key: key, value: attribute)
+        let eventError = EventChecker.checkAttribute(
+            currentNumber: globalAttributes.count,
+            key: key,
+            value: attribute)
         if eventError.errorCode > 0 {
             recordEventError(eventError)
         } else {
@@ -118,7 +121,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func checkEventName(_ eventName: String) -> Bool {
-        let eventError = Event.checkEventType(eventType: eventName)
+        let eventError = EventChecker.checkEventType(eventType: eventName)
         if eventError.errorCode > 0 {
             recordEventError(eventError)
             return false
@@ -146,7 +149,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         try eventRecorder.save(event)
     }
 
-    func recordEventError(_ eventError: Event.EventError) {
+    func recordEventError(_ eventError: EventChecker.EventError) {
         Task {
             do {
                 let event = createEvent(withEventType: Event.PresetEvent.CLICKSTREAM_ERROR)

@@ -63,6 +63,97 @@ class ClickstreamEventTest: XCTestCase {
         XCTAssertTrue(errorValueString.contains("testKey"))
     }
 
+    func testAddItemWithCustomAttributeScuccess() {
+        let item: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            ClickstreamAnalytics.Item.ITEM_NAME: "testName",
+            ClickstreamAnalytics.Item.PRICE: 99.9,
+            "custom_attr": "customValue",
+            "custom_attr1": 456,
+            "custom_attr2": true,
+            "custom_attr3": 12.34
+        ]
+        clickstreamEvent.addItem(item)
+        XCTAssertFalse(clickstreamEvent.attributes.keys.contains(Event.ReservedAttribute.ERROR_CODE))
+        XCTAssertEqual(1, clickstreamEvent.items.count)
+        let eventItem = clickstreamEvent.items[0] as JsonObject
+        XCTAssertEqual(123, eventItem["id"] as! Int)
+        XCTAssertEqual("testName", eventItem["name"] as! String)
+        XCTAssertEqual(99.9, eventItem["price"] as! Decimal)
+        XCTAssertEqual("customValue", eventItem["custom_attr"] as! String)
+        XCTAssertEqual(12.34, eventItem["custom_attr3"] as! Decimal)
+        XCTAssertTrue(eventItem["custom_attr2"] as! Bool)
+    }
+
+    func testAddItemErrorForExceedMaxNumberOfItem() {
+        for i in 0 ..< 101 {
+            clickstreamEvent.addItem([
+                ClickstreamAnalytics.Item.ITEM_ID: i,
+                ClickstreamAnalytics.Item.ITEM_NAME: "item_name_\(i)"
+            ])
+        }
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ITEM_SIZE_EXCEED, errorCode)
+        XCTAssertTrue(errorValueString.contains("item_name_100"))
+        XCTAssertEqual(100, clickstreamEvent.items.count)
+    }
+
+    func testAddItemErrorForExceedMaxNumberOfCustomAttribute() {
+        var item: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            ClickstreamAnalytics.Item.ITEM_NAME: "item_name_123"
+        ]
+        for i in 0 ..< 11 {
+            item["custom_attr_\(i)"] = "value_\(i)"
+        }
+        clickstreamEvent.addItem(item)
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        XCTAssertEqual(Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_SIZE_EXCEED, errorCode)
+        XCTAssertEqual(0, clickstreamEvent.items.count)
+    }
+
+    func testAddItemErrorForExceedMaxLengthOfAttributeName() {
+        let longAttributeKey = String(repeating: "a", count: 51)
+        let item: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            longAttributeKey: "item_name_123"
+        ]
+        clickstreamEvent.addItem(item)
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_KEY_LENGTH_EXCEED, errorCode)
+        XCTAssertTrue(errorValueString.contains(longAttributeKey))
+        XCTAssertEqual(0, clickstreamEvent.items.count)
+    }
+
+    func testAddItemErrorForInvalidAttributeName() {
+        let item: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            "01Key": "item_name_123"
+        ]
+        clickstreamEvent.addItem(item)
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ITEM_CUSTOM_ATTRIBUTE_KEY_INVALID, errorCode)
+        XCTAssertTrue(errorValueString.contains("01Key"))
+        XCTAssertEqual(0, clickstreamEvent.items.count)
+    }
+
+    func testAddItemErrorForExceedMaxAttributeValueLength() {
+        let longAttributeValue = String(repeating: "a", count: 1_025)
+        let item: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            ClickstreamAnalytics.Item.ITEM_NAME: longAttributeValue
+        ]
+        clickstreamEvent.addItem(item)
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ITEM_ATTRIBUTE_VALUE_LENGTH_EXCEED, errorCode)
+        XCTAssertTrue(errorValueString.contains(ClickstreamAnalytics.Item.ITEM_NAME))
+        XCTAssertEqual(0, clickstreamEvent.items.count)
+    }
+
     func testEventEqualsFail() {
         let event1 = clickstreamEvent!
         let event2 = ClickstreamEvent(eventType: "testEvent",

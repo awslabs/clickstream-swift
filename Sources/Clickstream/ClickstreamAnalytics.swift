@@ -25,8 +25,11 @@ public enum ClickstreamAnalytics {
     /// - Parameters:
     ///   - eventName: the event name
     ///   - attributes: the event attributes
-    public static func recordEvent(_ eventName: String, _ attributes: ClickstreamAttribute) {
-        let event = BaseClickstreamEvent(name: eventName, attribute: attributes)
+    public static func recordEvent(_ eventName: String,
+                                   _ attributes: ClickstreamAttribute,
+                                   _ items: [ClickstreamAttribute] = [])
+    {
+        let event = BaseClickstreamEvent(name: eventName, attribute: attributes, items: items)
         Amplify.Analytics.record(event: event)
     }
 
@@ -84,5 +87,23 @@ public enum ClickstreamAnalytics {
     /// - Parameter userId: current userId, nil for logout
     public static func enable() {
         Amplify.Analytics.enable()
+    }
+
+    /// ClickstreamAnalytics item attributes
+    public enum Item {
+        static let ITEM_ID = "id"
+        static let ITEM_NAME = "name"
+        static let LOCATION_ID = "location_id"
+        static let ITEM_BRAND = "brand"
+        static let CURRENCY = "currency"
+        static let PRICE = "price"
+        static let QUANTITY = "quantity"
+        static let CREATIVE_NAME = "creative_name"
+        static let CREATIVE_SLOT = "creative_slot"
+        static let ITEM_CATEGORY = "item_category"
+        static let ITEM_CATEGORY2 = "item_category2"
+        static let ITEM_CATEGORY3 = "item_category3"
+        static let ITEM_CATEGORY4 = "item_category4"
+        static let ITEM_CATEGORY5 = "item_category5"
     }
 }
