@@ -137,11 +137,16 @@ class IntegrationTest: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()
         let userInfo = testEvent["user"] as! [String: Any]
-        XCTAssertEqual(21, (userInfo["_user_age"] as! JsonObject)["value"] as! Int)
-        XCTAssertEqual(true, (userInfo["isFirstOpen"] as! JsonObject)["value"] as! Bool)
-        XCTAssertEqual(85.2, (userInfo["score"] as! JsonObject)["value"] as! Double)
-        XCTAssertEqual("carl", (userInfo["_user_name"] as! JsonObject)["value"] as! String)
         XCTAssertEqual("13232", (userInfo[Event.ReservedAttribute.USER_ID] as! JsonObject)["value"] as! String)
+        XCTAssertFalse(userInfo.keys.contains("_user_age"))
+        XCTAssertFalse(userInfo.keys.contains("isFirstOpen"))
+        XCTAssertFalse(userInfo.keys.contains("score"))
+        XCTAssertFalse(userInfo.keys.contains("sc_user_nameore"))
+
+        XCTAssertEqual(21, (analyticsClient.allUserAttributes["_user_age"] as! JsonObject)["value"] as! Int)
+        XCTAssertEqual(true, (analyticsClient.allUserAttributes["isFirstOpen"] as! JsonObject)["value"] as! Bool)
+        XCTAssertEqual(85.2, ((analyticsClient.allUserAttributes["score"] as! JsonObject)["value"] as! NSDecimalNumber).doubleValue)
+        XCTAssertEqual("carl", (analyticsClient.allUserAttributes["_user_name"] as! JsonObject)["value"] as! String)
     }
 
     func testSetUserIdString() throws {
@@ -314,10 +319,10 @@ class IntegrationTest: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
         let testEvent = try getTestEvent()
         let userInfo = testEvent["user"] as! [String: Any]
-        XCTAssertEqual(21, (userInfo["_user_age"] as! JsonObject)["value"] as! Int)
-        XCTAssertEqual(true, (userInfo["isFirstOpen"] as! JsonObject)["value"] as! Bool)
-        XCTAssertEqual(85.2, (userInfo["score"] as! JsonObject)["value"] as! Double)
-        XCTAssertEqual("carl", (userInfo["_user_name"] as! JsonObject)["value"] as! String)
+        XCTAssertFalse(userInfo.keys.contains("_user_age"))
+        XCTAssertFalse(userInfo.keys.contains("isFirstOpen"))
+        XCTAssertFalse(userInfo.keys.contains("score"))
+        XCTAssertFalse(userInfo.keys.contains("sc_user_nameore"))
         XCTAssertEqual("3231", (userInfo[Event.ReservedAttribute.USER_ID] as! JsonObject)["value"] as! String)
     }
 
