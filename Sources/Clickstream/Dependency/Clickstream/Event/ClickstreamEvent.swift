@@ -19,6 +19,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
     let timestamp: Date.Timestamp
     let session: Session?
     private(set) lazy var attributes: [String: AttributeValue] = [:]
+    private(set) lazy var items: [ClickstreamAttribute] = []
     private(set) lazy var userAttributes: [String: Any] = [:]
     let systemInfo: SystemInfo
     let netWorkType: String
@@ -43,12 +44,26 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
     }
 
     func addAttribute(_ attribute: AttributeValue, forKey key: String) {
-        let eventError = Event.checkAttribute(currentNumber: attributes.count, key: key, value: attribute)
+        let eventError = EventChecker.checkAttribute(currentNumber: attributes.count, key: key, value: attribute)
         if eventError.errorCode > 0, key != Event.ReservedAttribute.EXCEPTION_STACK {
             attributes[Event.ReservedAttribute.ERROR_CODE] = eventError.errorCode
             attributes[Event.ReservedAttribute.ERROR_MESSAGE] = eventError.errorMessage
         } else {
             attributes[key] = attribute
+        }
+    }
+
+    func addItem(_ item: ClickstreamAttribute) {
+        let checkResult = EventChecker.checkItem(currentNumber: items.count, item: item)
+        let eventError = checkResult.eventError
+        let resultItem = checkResult.resultItem
+        if eventError.errorCode > 0 {
+            attributes[Event.ReservedAttribute.ERROR_CODE] = eventError.errorCode
+            attributes[Event.ReservedAttribute.ERROR_MESSAGE] = eventError.errorMessage
+        } else {
+            if !resultItem.isEmpty {
+                items.append(resultItem)
+            }
         }
     }
 
@@ -91,19 +106,12 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         event["app_version"] = systemInfo.appVersion
         event["app_package_name"] = systemInfo.appPackgeName
         event["app_title"] = systemInfo.appTitle
+        if !items.isEmpty {
+            event["items"] = items
+        }
         event["user"] = userAttributes
         event["attributes"] = getAttributeObject(from: attributes)
-        return getJsonStringFromObject(jsonObject: event)
-    }
-
-    func getJsonStringFromObject(jsonObject: JsonObject) -> String {
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: jsonObject, options: [.sortedKeys])
-            return String(data: jsonData, encoding: .utf8) ?? ""
-        } catch {
-            log.error("Error serializing dictionary to JSON: \(error.localizedDescription)")
-        }
-        return ""
+        return event.toJsonString()
     }
 
     private func getAttributeObject(from dictionary: AnalyticsProperties) -> JsonObject {
