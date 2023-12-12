@@ -211,7 +211,9 @@ class EventChecker {
                     error.errorMessage = getErrorMessage(key)
                 }
             }
-            if error.errorCode == Event.ErrorCode.NO_ERROR, valueString.utf8.count > Event.Limit.MAX_LENGTH_OF_ITEM_VALUE {
+            if error.errorCode == Event.ErrorCode.NO_ERROR,
+               valueString.utf8.count > Event.Limit.MAX_LENGTH_OF_ITEM_VALUE
+            {
                 errorMsg = """
                 item attribute : \(key), reached the max length of item attribute value limit (
                 \(Event.Limit.MAX_LENGTH_OF_ITEM_VALUE). current length is: (\(valueString.utf8.count))

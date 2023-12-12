@@ -27,7 +27,8 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var eventRecorder: AnalyticsEventRecording
     private let sessionProvider: SessionProvider
     private(set) lazy var globalAttributes: [String: AttributeValue] = [:]
-    private(set) var userAttributes: [String: Any] = [:]
+    private(set) var allUserAttributes: [String: Any] = [:]
+    private(set) var simpleUserAttributes: [String: Any] = [:]
     private let clickstream: ClickstreamContext
     private(set) var userId: String?
     var autoRecordClient: AutoRecordEventClient?
@@ -40,7 +41,8 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         self.eventRecorder = eventRecorder
         self.sessionProvider = sessionProvider
         self.userId = UserDefaultsUtil.getCurrentUserId(storage: clickstream.storage)
-        self.userAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
+        self.allUserAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
+        self.simpleUserAttributes = getSimpleUserAttributes()
         self.autoRecordClient = (clickstream.sessionClient as? SessionClient)?.autoRecordClient
     }
 
@@ -57,9 +59,9 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
-        let eventError = EventChecker.checkUserAttribute(
-            currentNumber: userAttributes.count,
-            key: key, value: attribute)
+        let eventError = EventChecker.checkUserAttribute(currentNumber: allUserAttributes.count,
+                                                         key: key,
+                                                         value: attribute)
         if eventError.errorCode > 0 {
             recordEventError(eventError)
         } else {
@@ -70,7 +72,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
                 userAttribute["value"] = attribute
             }
             userAttribute["set_timestamp"] = Date().millisecondsSince1970
-            userAttributes[key] = userAttribute
+            allUserAttributes[key] = userAttribute
         }
     }
 
@@ -79,7 +81,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func removeUserAttribute(forKey key: String) {
-        userAttributes[key] = nil
+        allUserAttributes[key] = nil
     }
 
     func updateUserId(_ id: String?) {
@@ -87,7 +89,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             userId = id
             UserDefaultsUtil.saveCurrentUserId(storage: clickstream.storage, userId: userId)
             if let newUserId = id, !newUserId.isEmpty {
-                userAttributes = JsonObject()
+                allUserAttributes = JsonObject()
                 let userInfo = UserDefaultsUtil.getNewUserInfo(storage: clickstream.storage, userId: newUserId)
                 // swiftlint:disable force_cast
                 clickstream.userUniqueId = userInfo["user_unique_id"] as! String
@@ -100,11 +102,12 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             } else {
                 addUserAttribute(id!, forKey: Event.ReservedAttribute.USER_ID)
             }
+            simpleUserAttributes = getSimpleUserAttributes()
         }
     }
 
     func updateUserAttributes() {
-        UserDefaultsUtil.updateUserAttributes(storage: clickstream.storage, userAttributes: userAttributes)
+        UserDefaultsUtil.updateUserAttributes(storage: clickstream.storage, userAttributes: allUserAttributes)
     }
 
     // MARK: - Event recording
@@ -140,7 +143,11 @@ class AnalyticsClient: AnalyticsClientBehaviour {
                                          forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
             }
         }
-        event.setUserAttribute(userAttributes)
+        if event.eventType == Event.PresetEvent.PROFILE_SET {
+            event.setUserAttribute(allUserAttributes)
+        } else {
+            event.setUserAttribute(simpleUserAttributes)
+        }
         try eventRecorder.save(event)
     }
 
@@ -159,6 +166,17 @@ class AnalyticsClient: AnalyticsClientBehaviour {
 
     func submitEvents(isBackgroundMode: Bool = false) {
         eventRecorder.submitEvents(isBackgroundMode: isBackgroundMode)
+    }
+
+    func getSimpleUserAttributes() -> [String: Any] {
+        simpleUserAttributes = [:]
+        simpleUserAttributes[Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP]
+            = allUserAttributes[Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP]
+        if allUserAttributes.keys.contains(Event.ReservedAttribute.USER_ID) {
+            simpleUserAttributes[Event.ReservedAttribute.USER_ID]
+                = allUserAttributes[Event.ReservedAttribute.USER_ID]
+        }
+        return simpleUserAttributes
     }
 }
 

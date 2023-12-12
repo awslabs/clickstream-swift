@@ -126,8 +126,8 @@ class AnalyticsClientTest: XCTestCase {
 
     func testAddUserAttributeSuccess() {
         analyticsClient.addUserAttribute("appStore", forKey: "userChannel")
-        let userAttributeCount = analyticsClient.userAttributes.count
-        let attributeValue = (analyticsClient.userAttributes["userChannel"] as! JsonObject)["value"] as? String
+        let userAttributeCount = analyticsClient.allUserAttributes.count
+        let attributeValue = (analyticsClient.allUserAttributes["userChannel"] as! JsonObject)["value"] as? String
         XCTAssertEqual(userAttributeCount, 2)
         XCTAssertEqual(attributeValue, "appStore")
     }
@@ -169,8 +169,8 @@ class AnalyticsClientTest: XCTestCase {
         analyticsClient.addUserAttribute("value1", forKey: "name01")
         analyticsClient.addUserAttribute("value2", forKey: "name02")
         analyticsClient.removeUserAttribute(forKey: "name01")
-        let value1 = analyticsClient.userAttributes["name01"]
-        let value2 = analyticsClient.userAttributes["name02"]
+        let value1 = analyticsClient.allUserAttributes["name01"]
+        let value2 = analyticsClient.allUserAttributes["name02"]
         XCTAssertNil(value1)
         XCTAssertNotNil(value2)
     }
@@ -180,7 +180,7 @@ class AnalyticsClientTest: XCTestCase {
             analyticsClient.addUserAttribute("value", forKey: "name\(i)")
         }
         analyticsClient.removeUserAttribute(forKey: "name1000")
-        let userAttributeCount = analyticsClient.userAttributes.count
+        let userAttributeCount = analyticsClient.allUserAttributes.count
         XCTAssertEqual(100, userAttributeCount)
     }
 
@@ -201,7 +201,7 @@ class AnalyticsClientTest: XCTestCase {
         }
         Thread.sleep(forTimeInterval: 0.02)
         XCTAssertEqual(0, eventRecorder.saveCount)
-        let userAttributeCount = analyticsClient.userAttributes.count
+        let userAttributeCount = analyticsClient.allUserAttributes.count
         XCTAssertEqual(2, userAttributeCount)
     }
 
@@ -210,7 +210,7 @@ class AnalyticsClientTest: XCTestCase {
         let userUniqueId = clickstream.userUniqueId
         XCTAssertNil(userId)
         XCTAssertNotNil(userUniqueId)
-        let userAttribute = analyticsClient.userAttributes
+        let userAttribute = analyticsClient.allUserAttributes
         XCTAssertTrue(userAttribute.keys.contains(Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP))
     }
 
@@ -220,9 +220,16 @@ class AnalyticsClientTest: XCTestCase {
         analyticsClient.updateUserId(userIdForA)
         analyticsClient.addUserAttribute(12, forKey: "user_age")
         analyticsClient.updateUserId(userIdForA)
-        let userAttribute = analyticsClient.userAttributes
+        let userAttribute = analyticsClient.allUserAttributes
         XCTAssertTrue(userAttribute.keys.contains("user_age"))
         XCTAssertEqual(userUniqueId, clickstream.userUniqueId)
+    }
+
+    func testGetSimpleUserAttributeWithUserId() {
+        analyticsClient.updateUserId("123")
+        let simpleUserAttributes = analyticsClient.getSimpleUserAttributes()
+        XCTAssertTrue(simpleUserAttributes.keys.contains(Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP))
+        XCTAssertTrue(simpleUserAttributes.keys.contains(Event.ReservedAttribute.USER_ID))
     }
 
     func testUpdateDifferentUserId() {
@@ -232,7 +239,7 @@ class AnalyticsClientTest: XCTestCase {
         analyticsClient.updateUserId(userIdForA)
         analyticsClient.addUserAttribute(12, forKey: "user_age")
         analyticsClient.updateUserId(userIdForB)
-        let userAttribute = analyticsClient.userAttributes
+        let userAttribute = analyticsClient.allUserAttributes
         XCTAssertFalse(userAttribute.keys.contains("user_age"))
         XCTAssertNotEqual(userUniqueId, clickstream.userUniqueId)
     }
@@ -284,7 +291,7 @@ class AnalyticsClientTest: XCTestCase {
         }
     }
 
-    func testRecordRecordEventWithUserAttribute() async {
+    func testRecordRecordEventWithoutCustomUserAttribute() async {
         let event = analyticsClient.createEvent(withEventType: "testEvent")
         XCTAssertTrue(event.attributes.isEmpty)
 
@@ -300,10 +307,10 @@ class AnalyticsClientTest: XCTestCase {
                 return
             }
 
-            XCTAssertEqual(savedEvent.userAttributes.count, 4)
-            XCTAssertEqual((savedEvent.userAttributes["attribute_0"] as! JsonObject)["value"] as? String, "test_0")
-            XCTAssertEqual((savedEvent.userAttributes["metric_0"] as! JsonObject)["value"] as? Int, 0)
-            XCTAssertEqual((savedEvent.userAttributes["metric_1"] as! JsonObject)["value"] as? Int, 1)
+            XCTAssertEqual(savedEvent.userAttributes.count, 1)
+            XCTAssertFalse(savedEvent.userAttributes.keys.contains("test_0"))
+            XCTAssertFalse(savedEvent.userAttributes.keys.contains("metric_0"))
+            XCTAssertFalse(savedEvent.userAttributes.keys.contains("metric_1"))
 
         } catch {
             XCTFail("Unexpected exception while attempting to record event")

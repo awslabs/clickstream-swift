@@ -71,7 +71,6 @@ import Foundation
         try ClickstreamAnalytics.getClickstreamConfiguration()
     }
 
-
     private static func getItems(_ items: [NSDictionary]) -> [ClickstreamAttribute] {
         var resultItems: [ClickstreamAttribute] = []
         for item in items {

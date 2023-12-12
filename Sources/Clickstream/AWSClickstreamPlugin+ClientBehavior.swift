@@ -95,7 +95,7 @@ extension AWSClickstreamPlugin {
 
     func enable() {
         if isEnabled { return }
-        self.autoFlushEventsTimer?.resume()
+        autoFlushEventsTimer?.resume()
         clickstream.isEnable = true
         isEnabled = true
     }
@@ -104,6 +104,6 @@ extension AWSClickstreamPlugin {
         if !isEnabled { return }
         isEnabled = false
         clickstream.isEnable = false
-        self.autoFlushEventsTimer?.suspend()
+        autoFlushEventsTimer?.suspend()
     }
 }
