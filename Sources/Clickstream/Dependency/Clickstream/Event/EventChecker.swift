@@ -32,7 +32,7 @@ class EventChecker {
             error.errorMessage = getErrorMessage(errorMsg!)
         }
         if errorMsg != nil {
-            log.error(errorMsg!)
+            log.warn(errorMsg!)
         }
         return error
     }
@@ -84,7 +84,7 @@ class EventChecker {
             }
         }
         if errorMsg != nil {
-            log.error(errorMsg!)
+            log.warn(errorMsg!)
         }
         return error
     }
@@ -138,7 +138,7 @@ class EventChecker {
             }
         }
         if errorMsg != nil {
-            log.error(errorMsg!)
+            log.warn(errorMsg!)
         }
         return error
     }
@@ -173,7 +173,7 @@ class EventChecker {
             reached the max number of items limit \(Event.Limit.MAX_NUM_OF_ITEMS).
              and the item: \(itemJsonString) will not be recorded
             """
-            log.error(errorMsg)
+            log.warn(errorMsg)
             return (EventError(errorCode: Event.ErrorCode.ITEM_SIZE_EXCEED,
                                errorMessage: getErrorMessage(errorMsg)), resultItem)
         }
@@ -231,7 +231,7 @@ class EventChecker {
             }
         }
         if errorMsg != nil {
-            log.error(errorMsg!)
+            log.warn(errorMsg!)
         }
         return (error, resultItem)
     }
