@@ -59,7 +59,9 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
-        let eventError = Event.checkUserAttribute(currentNumber: allUserAttributes.count, key: key, value: attribute)
+        let eventError = EventChecker.checkUserAttribute(currentNumber: allUserAttributes.count,
+                                                         key: key,
+                                                         value: attribute)
         if eventError.errorCode > 0 {
             recordEventError(eventError)
         } else {
