@@ -416,7 +416,7 @@ class EventRecorderTest: XCTestCase {
 
     func testVerifyHashCodeInRequestParameter() {
         clickstream.configuration.endpoint = testHashCodeEndpoint
-        let eventJson = "[" + clickstreamEvent.toJson() + "]"
+        let eventJson = "[" + clickstreamEvent.toJsonObject().toJsonString() + "]"
         let eventJsonHashCode = eventJson.hashCode()
         server["/collect/hashcode"] = { request in
             let queryParams = request.queryParams

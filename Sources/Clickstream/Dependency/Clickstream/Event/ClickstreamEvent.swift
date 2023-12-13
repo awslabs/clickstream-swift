@@ -79,7 +79,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         attributes[key]
     }
 
-    func toJson() -> String {
+    func toJsonObject() -> JsonObject {
         var event = JsonObject()
         event["unique_id"] = uniqueId
         event["event_type"] = eventType
@@ -111,7 +111,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         }
         event["user"] = userAttributes
         event["attributes"] = getAttributeObject(from: attributes)
-        return event.toJsonString()
+        return event
     }
 
     private func getAttributeObject(from dictionary: AnalyticsProperties) -> JsonObject {
@@ -136,7 +136,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
     }
 
     static func == (lhs: ClickstreamEvent, rhs: ClickstreamEvent) -> Bool {
-        lhs.toJson() == rhs.toJson()
+        lhs.toJsonObject().toJsonString() == rhs.toJsonObject().toJsonString()
     }
 }
 

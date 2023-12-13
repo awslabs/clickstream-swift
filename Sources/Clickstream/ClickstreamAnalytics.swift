@@ -89,21 +89,36 @@ public enum ClickstreamAnalytics {
         Amplify.Analytics.enable()
     }
 
-    /// ClickstreamAnalytics item attributes
+    /// ClickstreamAnalytics preset item attributes
+    /// In addition to the item attributes defined below, you can add up to 10 custom attributes to an item.
     public enum Item {
-        static let ITEM_ID = "id"
-        static let ITEM_NAME = "name"
-        static let LOCATION_ID = "location_id"
-        static let ITEM_BRAND = "brand"
-        static let CURRENCY = "currency"
-        static let PRICE = "price"
-        static let QUANTITY = "quantity"
-        static let CREATIVE_NAME = "creative_name"
-        static let CREATIVE_SLOT = "creative_slot"
-        static let ITEM_CATEGORY = "item_category"
-        static let ITEM_CATEGORY2 = "item_category2"
-        static let ITEM_CATEGORY3 = "item_category3"
-        static let ITEM_CATEGORY4 = "item_category4"
-        static let ITEM_CATEGORY5 = "item_category5"
+        /// The id of the item
+        public static let ITEM_ID = "id"
+        /// The name of the item
+        public static let ITEM_NAME = "name"
+        /// The location id of the item
+        public static let LOCATION_ID = "location_id"
+        /// The brand of the item
+        public static let ITEM_BRAND = "brand"
+        /// The currency of the item
+        public static let CURRENCY = "currency"
+        /// The price of the item
+        public static let PRICE = "price"
+        /// The quantity of the item
+        public static let QUANTITY = "quantity"
+        /// The creative name of the item
+        public static let CREATIVE_NAME = "creative_name"
+        /// The creative slot of the item
+        public static let CREATIVE_SLOT = "creative_slot"
+        /// The category of the item
+        public static let ITEM_CATEGORY = "item_category"
+        /// The category2 of the item
+        public static let ITEM_CATEGORY2 = "item_category2"
+        /// The category3 of the item
+        public static let ITEM_CATEGORY3 = "item_category3"
+        /// The category4 of the item
+        public static let ITEM_CATEGORY4 = "item_category4"
+        /// The category5 of the item
+        public static let ITEM_CATEGORY5 = "item_category5"
     }
 }

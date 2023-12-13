@@ -29,8 +29,8 @@ class ClickstreamDBUtiltest: XCTestCase {
                                                 session: Session(uniqueId: UUID().uuidString, sessionIndex: 1),
                                                 systemInfo: SystemInfo(storage: storage),
                                                 netWorkType: NetWorkType.Wifi)
-            let eventJson = clickstreamEvent.toJson()
-            storageEvent = StorageEvent(eventJson: clickstreamEvent.toJson(), eventSize: Int64(eventJson.count))
+            let eventJson = clickstreamEvent.toJsonObject().toJsonString()
+            storageEvent = StorageEvent(eventJson: clickstreamEvent.toJsonObject().toJsonString(), eventSize: Int64(eventJson.count))
         } catch {
             XCTFail("Fail to setup dbUtil error:\(error)")
         }
