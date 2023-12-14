@@ -159,7 +159,8 @@ let item_book: ClickstreamAttribute = [
     ClickstreamAnalytics.Item.ITEM_ID: 123,
     ClickstreamAnalytics.Item.ITEM_NAME: "Nature",
     ClickstreamAnalytics.Item.ITEM_CATEGORY: "book",
-    ClickstreamAnalytics.Item.PRICE: 99.9
+    ClickstreamAnalytics.Item.PRICE: 99.9,
+    "book_publisher": "Nature Research"
 ]
 ClickstreamAnalytics.recordEvent("view_item", attributes, [item_book])
 ```
