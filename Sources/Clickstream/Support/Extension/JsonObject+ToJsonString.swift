@@ -17,4 +17,14 @@ extension JsonObject {
         }
         return ""
     }
+
+    func toPrettierJsonString() -> String {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: self, options: [.sortedKeys, .prettyPrinted])
+            return String(data: jsonData, encoding: .utf8) ?? ""
+        } catch {
+            print("Error serializing dictionary to JSON: \(error.localizedDescription)")
+        }
+        return ""
+    }
 }

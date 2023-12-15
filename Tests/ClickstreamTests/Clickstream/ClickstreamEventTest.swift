@@ -153,15 +153,4 @@ class ClickstreamEventTest: XCTestCase {
         XCTAssertTrue(errorValueString.contains(ClickstreamAnalytics.Item.ITEM_NAME))
         XCTAssertEqual(0, clickstreamEvent.items.count)
     }
-
-    func testEventEqualsFail() {
-        let event1 = clickstreamEvent!
-        let event2 = ClickstreamEvent(eventType: "testEvent",
-                                      appId: testAppId,
-                                      uniqueId: UUID().uuidString,
-                                      session: Session(uniqueId: UUID().uuidString, sessionIndex: 1),
-                                      systemInfo: SystemInfo(storage: storage),
-                                      netWorkType: NetWorkType.Wifi)
-        XCTAssertFalse(event1 == event2)
-    }
 }

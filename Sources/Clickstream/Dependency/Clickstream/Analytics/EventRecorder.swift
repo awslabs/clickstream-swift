@@ -43,13 +43,14 @@ class EventRecorder: AnalyticsEventRecording {
     /// save an clickstream event to storage
     /// - Parameter event: A ClickstreamEvent
     func save(_ event: ClickstreamEvent) throws {
-        let eventJson: String = event.toJson()
+        let eventObject = event.toJsonObject()
+        let eventJson = eventObject.toJsonString()
         let eventSize = eventJson.count
         let storageEvent = StorageEvent(eventJson: eventJson, eventSize: Int64(eventSize))
         try dbUtil.saveEvent(storageEvent)
         if clickstream.configuration.isLogEvents {
             setLogLevel(logLevel: LogLevel.debug)
-            logEventPrettier(event: event)
+            log.debug("Saved event: \(event.eventType)\n\(eventObject.toPrettierJsonString())")
         }
         while try dbUtil.getTotalSize() > Constants.maxDbSize {
             let events = try dbUtil.getEventsWith(limit: 5)
@@ -143,15 +144,6 @@ class EventRecorder: AnalyticsEventRecording {
             eventsJson.append("]")
         }
         return BatchEvent(eventsJson: eventsJson, eventCount: eventCount, lastEventId: lastEventId)
-    }
-
-    func logEventPrettier(event: ClickstreamEvent) {
-        var attributesStr = "attributes:{\n"
-        for (key, value) in event.attributes {
-            attributesStr += "  \"\(key)\": \(value)\n"
-        }
-        attributesStr += "}"
-        log.debug("Event saved, event name: \(event.eventType)\n\(attributesStr)")
     }
 }
 
