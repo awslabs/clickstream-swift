@@ -166,6 +166,9 @@ class EventChecker {
     static func checkItem(currentNumber: Int, item: ClickstreamAttribute) ->
         (eventError: EventError, resultItem: ClickstreamAttribute)
     {
+        if itemKeySet.isEmpty {
+            initItemKeySet()
+        }
         var resultItem: ClickstreamAttribute = [:]
         if currentNumber >= Event.Limit.MAX_NUM_OF_ITEMS {
             let itemJsonString = (item as JsonObject).toJsonString()

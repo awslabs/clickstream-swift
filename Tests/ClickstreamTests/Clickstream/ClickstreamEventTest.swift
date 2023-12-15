@@ -113,6 +113,22 @@ class ClickstreamEventTest: XCTestCase {
         XCTAssertEqual(0, clickstreamEvent.items.count)
     }
 
+    func testAddItemPrestAndCustomAttributeNotExceedTheLimit() {
+        var item: ClickstreamAttribute = [
+            ClickstreamAnalytics.Item.ITEM_ID: 123,
+            ClickstreamAnalytics.Item.ITEM_NAME: "testName1",
+            ClickstreamAnalytics.Item.ITEM_BRAND: "Google",
+            ClickstreamAnalytics.Item.CURRENCY: "CNY",
+            ClickstreamAnalytics.Item.LOCATION_ID: "1"
+        ]
+        for i in 0 ..< 10 {
+            item["custom_attr_\(i)"] = "value_\(i)"
+        }
+        clickstreamEvent.addItem(item)
+        XCTAssertTrue(clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) == nil)
+        XCTAssertEqual(1, clickstreamEvent.items.count)
+    }
+
     func testAddItemErrorForExceedMaxLengthOfAttributeName() {
         let longAttributeKey = String(repeating: "a", count: 51)
         let item: ClickstreamAttribute = [
