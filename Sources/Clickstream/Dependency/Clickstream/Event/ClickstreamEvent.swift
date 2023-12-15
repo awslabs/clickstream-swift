@@ -134,10 +134,6 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         }
         return attribute
     }
-
-    static func == (lhs: ClickstreamEvent, rhs: ClickstreamEvent) -> Bool {
-        lhs.toJsonObject().toJsonString() == rhs.toJsonObject().toJsonString()
-    }
 }
 
 // MARK: - ClickstreamLogger
