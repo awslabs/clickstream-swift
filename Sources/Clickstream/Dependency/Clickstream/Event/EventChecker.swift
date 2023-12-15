@@ -166,6 +166,7 @@ class EventChecker {
     static func checkItem(currentNumber: Int, item: ClickstreamAttribute) ->
         (eventError: EventError, resultItem: ClickstreamAttribute)
     {
+        initItemKeySet()
         var resultItem: ClickstreamAttribute = [:]
         if currentNumber >= Event.Limit.MAX_NUM_OF_ITEMS {
             let itemJsonString = (item as JsonObject).toJsonString()
@@ -253,22 +254,24 @@ class EventChecker {
     }
 
     static func initItemKeySet() {
-        itemKeySet = Set<String>([
-            ClickstreamAnalytics.Item.ITEM_ID,
-            ClickstreamAnalytics.Item.ITEM_NAME,
-            ClickstreamAnalytics.Item.LOCATION_ID,
-            ClickstreamAnalytics.Item.ITEM_BRAND,
-            ClickstreamAnalytics.Item.CURRENCY,
-            ClickstreamAnalytics.Item.PRICE,
-            ClickstreamAnalytics.Item.QUANTITY,
-            ClickstreamAnalytics.Item.CREATIVE_NAME,
-            ClickstreamAnalytics.Item.CREATIVE_SLOT,
-            ClickstreamAnalytics.Item.ITEM_CATEGORY,
-            ClickstreamAnalytics.Item.ITEM_CATEGORY2,
-            ClickstreamAnalytics.Item.ITEM_CATEGORY3,
-            ClickstreamAnalytics.Item.ITEM_CATEGORY4,
-            ClickstreamAnalytics.Item.ITEM_CATEGORY5
-        ])
+        if itemKeySet.isEmpty {
+            itemKeySet = Set<String>([
+                ClickstreamAnalytics.Item.ITEM_ID,
+                ClickstreamAnalytics.Item.ITEM_NAME,
+                ClickstreamAnalytics.Item.LOCATION_ID,
+                ClickstreamAnalytics.Item.ITEM_BRAND,
+                ClickstreamAnalytics.Item.CURRENCY,
+                ClickstreamAnalytics.Item.PRICE,
+                ClickstreamAnalytics.Item.QUANTITY,
+                ClickstreamAnalytics.Item.CREATIVE_NAME,
+                ClickstreamAnalytics.Item.CREATIVE_SLOT,
+                ClickstreamAnalytics.Item.ITEM_CATEGORY,
+                ClickstreamAnalytics.Item.ITEM_CATEGORY2,
+                ClickstreamAnalytics.Item.ITEM_CATEGORY3,
+                ClickstreamAnalytics.Item.ITEM_CATEGORY4,
+                ClickstreamAnalytics.Item.ITEM_CATEGORY5
+            ])
+        }
     }
 }
 
