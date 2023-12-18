@@ -308,10 +308,11 @@ class IntegrationTest: XCTestCase {
 
     func testRecordEventWithItemForObjc() throws {
         let item: NSDictionary = [
-            "id": 123,
-            "name": "Nature",
-            "category": "book",
-            "price": 99.9
+            ClickstreamItemKey.ITEM_ID: 123,
+            ClickstreamItemKey.ITEM_NAME: "Nature",
+            ClickstreamItemKey.ITEM_CATEGORY: "book",
+            ClickstreamItemKey.PRICE: 99.9,
+            "event_category": "recommended"
         ]
         ClickstreamObjc.recordEvent("testEvent",
                                     ["id": 123],
@@ -323,7 +324,8 @@ class IntegrationTest: XCTestCase {
         let eventItem = items[0]
         XCTAssertEqual(123, eventItem["id"] as! Int)
         XCTAssertEqual("Nature", eventItem["name"] as! String)
-        XCTAssertEqual("book", eventItem["category"] as! String)
+        XCTAssertEqual("book", eventItem["item_category"] as! String)
+        XCTAssertEqual("recommended", eventItem["event_category"] as! String)
         XCTAssertEqual(99.9, eventItem["price"] as! Double)
     }
 
