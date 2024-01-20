@@ -28,8 +28,8 @@ jobs:
       - name: Modify SDK for integration test
         run: |
           sed -i '' -e "s#private(set) var bundleSequenceId: Int#private(set) var bundleSequenceId: Int\n    var allEventJson: String = \"\"#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
-          sed -i '' -e "s#toPrettierJsonString())\")#toPrettierJsonString())\")\n            allEventJson.append(\"Saved event /\(event.eventType):/\(eventObject.toJsonString())/\n\")\n            UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
-          sed -i '' -e "s#batchEvent.eventCount) events\")#batchEvent.eventCount) events\")\n            allEventJson.append(\"Saved event /\(event.eventType):/\(eventObject.toJsonString())/\n\")\n            UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
+          sed -i '' -e "s#toPrettierJsonString())\")#toPrettierJsonString())\")\n                allEventJson.append(\"Saved event /\(event.eventType):/\(eventObject.toJsonString())\\n\")\n                UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
+          sed -i '' -e "s#batchEvent.eventCount) events\")#batchEvent.eventCount) events\")\n                allEventJson.append(\"Saved event /\(event.eventType):/\(eventObject.toJsonString())\\n\")\n                UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           cat Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           echo "git diff"
           git diff
