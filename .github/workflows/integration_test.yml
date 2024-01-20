@@ -36,7 +36,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git checkout -b pastboard
-          git push
+          git push --set-upstream origin pastboard
       # - name: Build sample iOS app
       #   run: |
       #     git clone https://github.com/aws-samples/clickstream-sdk-samples
