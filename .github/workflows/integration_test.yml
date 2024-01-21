@@ -47,28 +47,30 @@ jobs:
       #     sed -i "s#implementation 'software.aws.solution:clickstream:0.10.0'#implementation(files(\"libs/clickstream-release.aar\"))\n    implementation(\"com.amplifyframework:core:1.37.2\")\n    implementation(\"com.amazonaws:aws-android-sdk-mobile-client:2.51.0\")\n    implementation(\"com.squareup.okhttp3:okhttp:4.9.1\")#g" app/build.gradle
       #     cat app/build.gradle
       #     ./gradlew assembleDebug
-      # - name: Build Device Farm test file
-      #   run: |
-      #     cd integrationtest
-      #     pip install virtualenv
-      #     virtualenv --help
-      #     virtualenv workspace
-      #     cd workspace
-      #     source bin/activate
-      #     pip install pytest
-      #     pip install Appium-Python-Client
-      #     mkdir tests
-      #     cp ../appium/shopping_test.py tests/
-      #     find tests/
-      #     py.test --collect-only tests/
-      #     find . -name '__pycache__' -type d -exec rm -r {} +
-      #     find . -name '*.pyc' -exec rm -f {} +
-      #     find . -name '*.pyo' -exec rm -f {} +
-      #     find . -name '*~' -exec rm -f {} +
-      #     pip freeze > requirements.txt
-      #     zip -r test_bundle.zip tests/ requirements.txt
-      #     ls
-      #     cd ..
+      - name: Build Device Farm test file
+        run: |
+          cd IntegrationTest
+          pip install virtualenv
+          virtualenv --help
+          virtualenv workspace
+          cd workspace
+          source bin/activate
+          pip install pytest
+          pip install Appium-Python-Client
+          mkdir tests
+          cp ../appium/shopping_test.py tests/
+          find tests/
+          py.test --collect-only tests/
+          cd tests/
+          find . -name '__pycache__' -type d -exec rm -r {} +
+          find . -name '*.pyc' -exec rm -f {} +
+          find . -name '*.pyo' -exec rm -f {} +
+          find . -name '*~' -exec rm -f {} +
+          cd ..
+          pip freeze > requirements.txt
+          zip -r test_bundle.zip tests/ requirements.txt
+          ls
+          cd ..
       - name: Configure AWS Credentials
         if: ${{ env.iam_role_to_assume != '' }}
         uses: aws-actions/configure-aws-credentials@v4
