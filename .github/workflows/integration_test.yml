@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ "*" ]
   push:
-    branches: [ "*" ]
+    branches: [ "integration_test" ]
 
 jobs:
   test:
@@ -40,7 +40,6 @@ jobs:
           git add .
           git commit -m "ci: integration test"
           git push --set-upstream origin $branch
-          git checkout main
       - name: Prepare sample iOS app
         run: |
           git clone https://github.com/aws-samples/clickstream-sdk-samples
@@ -64,7 +63,7 @@ jobs:
         run: |
           echo $temp_branch
           git status
-          git push origin —delete $temp_branch
+          git push origin --delete $temp_branch
       - name: Build Device Farm test file
         run: |
           cd IntegrationTest
