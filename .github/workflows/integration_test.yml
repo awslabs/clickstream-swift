@@ -33,7 +33,7 @@ jobs:
           git diff
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          branch=pastboard-${{ steps.random-string.outputs.random_string }}
+          branch=pastboard-$(openssl rand -hex 5)
           echo $branch
           echo "tempbranch=$branch" >> "$GITHUB_ENV"
           git checkout -b $branch
@@ -60,6 +60,7 @@ jobs:
         if: success() || failure()
         run: |
           git checkout main
+          echo $tempbranch
           git branch -D $tempbranch
           git push origin —delete $tempbranch
       - name: Build Device Farm test file
