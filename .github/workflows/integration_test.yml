@@ -33,7 +33,7 @@ jobs:
           git diff
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          branch = pastboard-$(openssl rand -hex 5)
+          branch=pastboard-${{ steps.random-string.outputs.random_string }}
           echo branch
           echo "tempbranch=$branch" >> "$GITHUB_ENV"
           echo "print tempbranch"
