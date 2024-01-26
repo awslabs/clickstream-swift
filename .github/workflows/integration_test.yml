@@ -33,20 +33,33 @@ jobs:
           git diff
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git checkout -b pastboard
-          git push --set-upstream origin pastboard
-      # - name: Build sample iOS app
-      #   run: |
-      #     git clone https://github.com/aws-samples/clickstream-sdk-samples
-      #     mkdir clickstream-sdk-samples/android/app/libs/
-      #     cp -f clickstream/build/outputs/aar/clickstream-release.aar clickstream-sdk-samples/android/app/libs/
-      #     cd clickstream-sdk-samples/android
-      #     sed -i "s#\"appId\": \"your appId\"#\"appId\": \"${{ env.clickstream_app_id }}\"#g" app/src/main/res/raw/amplifyconfiguration.json
-      #     sed -i "s#\"endpoint\": \"your endpoint\"#\"endpoint\": \"${{ env.clickstream_endpoint }}\"#g" app/src/main/res/raw/amplifyconfiguration.json
-      #     cat app/src/main/res/raw/amplifyconfiguration.json
-      #     sed -i "s#implementation 'software.aws.solution:clickstream:0.10.0'#implementation(files(\"libs/clickstream-release.aar\"))\n    implementation(\"com.amplifyframework:core:1.37.2\")\n    implementation(\"com.amazonaws:aws-android-sdk-mobile-client:2.51.0\")\n    implementation(\"com.squareup.okhttp3:okhttp:4.9.1\")#g" app/build.gradle
-      #     cat app/build.gradle
-      #     ./gradlew assembleDebug
+          echo "tempbranch=pastboard-$(openssl rand -hex 5)" >> "$GITHUB_ENV"
+          echo $tempbranch
+          git checkout -b $tempbranch
+          git push --set-upstream origin $tempbranch
+      - name: Prepare sample iOS app
+        run: |
+          git clone https://github.com/aws-samples/clickstream-sdk-samples
+          cd clickstream-sdk-samples/ios
+          sed -i "s#\"appId\": \"your appId\"#\"appId\": \"${{ env.clickstream_app_id }}\"#g" ModerneShopping/amplifyconfiguration.json
+          sed -i "s#\"endpoint\": \"your endpoint\"#\"endpoint\": \"${{ env.clickstream_endpoint }}\"#g" ModerneShopping/amplifyconfiguration.json
+          cat ModerneShopping/amplifyconfiguration.json
+          sed -i "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
+          cat ModerneShopping/Views/ProductViews/ProductList.swift
+      - name: Build sample iOS app
+      - uses: yukiarrr/ios-build-action@v1.11.2
+        with:
+          project-path: Unity-iPhone.xcodeproj
+          p12-base64: ${{ secrets.P12_BASE64 }}
+          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
+          code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
+          team-id: ${{ secrets.TEAM_ID }}
+          workspace-path: Unity-iPhone.xcworkspace # optional
+      - name: Delete temp branch
+        run: |
+          git checkout main
+          git branch -D $tempbranch
+          git push origin —delete $tempbranch
       - name: Build Device Farm test file
         run: |
           cd IntegrationTest
