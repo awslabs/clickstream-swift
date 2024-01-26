@@ -33,7 +33,10 @@ jobs:
           git diff
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          echo "tempbranch=pastboard-$(openssl rand -hex 5)" >> "$GITHUB_ENV"
+          branch = pastboard-$(openssl rand -hex 5)
+          echo branch
+          echo "tempbranch=$branch" >> "$GITHUB_ENV"
+          echo "print tempbranch"
           echo $tempbranch
           git checkout -b $tempbranch
           git push --set-upstream origin $tempbranch
@@ -56,6 +59,7 @@ jobs:
       #     team-id: ${{ secrets.TEAM_ID }}
       #     workspace-path: Unity-iPhone.xcworkspace # optional
       - name: Delete temp branch
+        if: success() || failure()
         run: |
           git checkout main
           git branch -D $tempbranch
