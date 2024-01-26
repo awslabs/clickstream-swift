@@ -34,12 +34,10 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           branch=pastboard-${{ steps.random-string.outputs.random_string }}
-          echo branch
+          echo $branch
           echo "tempbranch=$branch" >> "$GITHUB_ENV"
-          echo "print tempbranch"
-          echo $tempbranch
-          git checkout -b $tempbranch
-          git push --set-upstream origin $tempbranch
+          git checkout -b $branch
+          git push --set-upstream origin $branch
       - name: Prepare sample iOS app
         run: |
           git clone https://github.com/aws-samples/clickstream-sdk-samples
