@@ -35,17 +35,17 @@ jobs:
           git config user.email "github-actions@github.com"
           branch=pastboard-$(openssl rand -hex 5)
           echo $branch
-          echo "tempbranch=$branch" >> "$GITHUB_ENV"
+          echo "temp_branch=$branch" >> "$GITHUB_ENV"
           git checkout -b $branch
           git push --set-upstream origin $branch
       - name: Prepare sample iOS app
         run: |
           git clone https://github.com/aws-samples/clickstream-sdk-samples
           cd clickstream-sdk-samples/ios
-          sed -i "s#\"appId\": \"your appId\"#\"appId\": \"${{ env.clickstream_app_id }}\"#g" ModerneShopping/amplifyconfiguration.json
-          sed -i "s#\"endpoint\": \"your endpoint\"#\"endpoint\": \"${{ env.clickstream_endpoint }}\"#g" ModerneShopping/amplifyconfiguration.json
+          sed -i '' -e "s#\"appId\": \"your appId\"#\"appId\": \"${{ env.clickstream_app_id }}\"#g" ModerneShopping/amplifyconfiguration.json
+          sed -i '' -e "s#\"endpoint\": \"your endpoint\"#\"endpoint\": \"${{ env.clickstream_endpoint }}\"#g" ModerneShopping/amplifyconfiguration.json
           cat ModerneShopping/amplifyconfiguration.json
-          sed -i "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
+          sed -i '' -e "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
           cat ModerneShopping/Views/ProductViews/ProductList.swift
       # - name: Build sample iOS app
       # - uses: yukiarrr/ios-build-action@v1.11.2
@@ -59,10 +59,9 @@ jobs:
       - name: Delete temp branch
         if: success() || failure()
         run: |
-          git checkout main
-          echo $tempbranch
-          git branch -D $tempbranch
-          git push origin —delete $tempbranch
+          echo $temp_branch
+          git status
+          git push origin —delete $temp_branch
       - name: Build Device Farm test file
         run: |
           cd IntegrationTest
