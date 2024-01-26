@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            token: ${{ secrets.PROJECT_TOKEN }}
+          token: ${{ secrets.PROJECT_TOKEN }}
       - name: Modify SDK for integration test
         run: |
           sed -i '' -e "s#private(set) var bundleSequenceId: Int#private(set) var bundleSequenceId: Int\n    var allEventJson: String = \"\"#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
