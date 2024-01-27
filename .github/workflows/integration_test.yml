@@ -60,12 +60,12 @@ jobs:
           build-destination: generic/platform=iOS
           output-path: ModerneShopping.ipa
       - name: Upload ipa
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: build ipa
           path: |
-            ModerneShopping.app.dSYM.zip
+            /Users/runner/Library/Developer/Xcode/Archives/2024-01-27/
       - name: Delete temp branch
         if: success() || failure()
         run: |
