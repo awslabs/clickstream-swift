@@ -51,14 +51,18 @@ jobs:
           git diff
       - uses: yukiarrr/ios-build-action@v1.11.2
         with:
-          project-path: ModerneShopping.xcodeproj/project.pbxproj
+          project-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj
+          export-method: ad-hoc
           p12-base64: ${{ secrets.P12_BASE64 }}
           mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
           code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
+          output-path: ModerneShopping.ipa
       - name: Delete temp branch
         if: success() || failure()
         run: |
+          pwd
+          ls
           echo $temp_branch
           git status
           git push origin --delete $temp_branch
