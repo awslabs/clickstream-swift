@@ -59,11 +59,17 @@ jobs:
           team-id: ${{ secrets.TEAM_ID }}
           build-destination: generic/platform=iOS
           output-path: ModerneShopping.ipa
+      - name: Upload ipa
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: build ipa
+          path: |
+            ModerneShopping.app.dSYM.zip
       - name: Delete temp branch
         if: success() || failure()
         run: |
           ls
-          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
           echo $temp_branch
           git status
           git push origin --delete $temp_branch
