@@ -63,9 +63,11 @@ jobs:
         if: success() || failure()
         run: |
           cd clickstream-sdk-samples/ios
-          ls
+          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
           echo $temp_branch
           git status
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git push origin --delete $temp_branch
       - name: Build Device Farm test file
         run: |
