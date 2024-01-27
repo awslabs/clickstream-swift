@@ -46,18 +46,16 @@ jobs:
           cd clickstream-sdk-samples/ios
           sed -i '' -e "s#\"appId\": \"your appId\"#\"appId\": \"${{ env.clickstream_app_id }}\"#g" ModerneShopping/amplifyconfiguration.json
           sed -i '' -e "s#\"endpoint\": \"your endpoint\"#\"endpoint\": \"${{ env.clickstream_endpoint }}\"#g" ModerneShopping/amplifyconfiguration.json
-          cat ModerneShopping/amplifyconfiguration.json
           sed -i '' -e "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
-          cat ModerneShopping/Views/ProductViews/ProductList.swift
-      # - name: Build sample iOS app
-      # - uses: yukiarrr/ios-build-action@v1.11.2
-      #   with:
-      #     project-path: Unity-iPhone.xcodeproj
-      #     p12-base64: ${{ secrets.P12_BASE64 }}
-      #     mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
-      #     code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
-      #     team-id: ${{ secrets.TEAM_ID }}
-      #     workspace-path: Unity-iPhone.xcworkspace # optional
+          sed -i '' -e "s#branch = main;#branch = $temp_branch;#g" ModerneShopping.xcodeproj/project.pbxproj
+          git diff
+      - uses: yukiarrr/ios-build-action@v1.11.2
+        with:
+          project-path: ModerneShopping.xcodeproj/project.pbxproj
+          p12-base64: ${{ secrets.P12_BASE64 }}
+          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
+          code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
+          team-id: ${{ secrets.TEAM_ID }}
       - name: Delete temp branch
         if: success() || failure()
         run: |
