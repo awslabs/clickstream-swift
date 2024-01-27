@@ -57,6 +57,7 @@ jobs:
           mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
           code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
+          build-destination: generic/platform=iOS
           output-path: ModerneShopping.ipa
       - name: Delete temp branch
         if: success() || failure()
