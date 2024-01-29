@@ -76,6 +76,8 @@ jobs:
         run: |
           ls
           find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+          cd /Users/runner/Library/Developer/Xcode/Archives/
+          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
           echo $temp_branch
           git status
           git push origin --delete $temp_branch
