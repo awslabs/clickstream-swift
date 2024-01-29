@@ -52,6 +52,7 @@ jobs:
       - name: generate export options
         run: |
           echo "${{ secrets.EXPORT_OPTIONS }}" >> ExportOptions.plist
+          cat ExportOptions.plist
       - uses: yukiarrr/ios-build-action@v1.11.2
         with:
           project-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj
