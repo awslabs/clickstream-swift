@@ -64,11 +64,14 @@ jobs:
         with:
           name: build ipa
           path: |
-            /Users/runner/Library/Developer/Xcode/Archives/2024-01-27/
+            /Users/runner/Library/Developer/Xcode/Archives/2024-01-29/
       - name: Delete temp branch
         if: success() || failure()
         run: |
           ls
+          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+          cd /Users/runner/Library/Developer/Xcode/Archives/2024-01-29/
+          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
           echo $temp_branch
           git status
           git push origin --delete $temp_branch
