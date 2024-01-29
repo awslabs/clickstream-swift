@@ -51,7 +51,7 @@ jobs:
           git diff
       - name: generate export options
         run: |
-          echo "${{ secrets.EXPORT_OPTIONS }}" >> ExportOptions.plist
+          echo "${{ vars.EXPORT_OPTIONS }}" >> ExportOptions.plist
           cat ExportOptions.plist
       - uses: yukiarrr/ios-build-action@v1.11.2
         with:
