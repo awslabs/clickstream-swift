@@ -58,7 +58,6 @@ jobs:
           code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
           build-destination: generic/platform=iOS
-          output-path: ModerneShopping.ipa
       - name: Upload ipa
         uses: actions/upload-artifact@v4
         if: success() || failure()
