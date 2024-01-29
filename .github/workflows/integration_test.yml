@@ -49,45 +49,31 @@ jobs:
           sed -i '' -e "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
           sed -i '' -e "s#branch = main;#branch = $temp_branch;#g" ModerneShopping.xcodeproj/project.pbxproj
           git diff
+      - name: generate export options
+        run: |
+          echo "${{ secrets.EXPORT_OPTIONS }}" >> ExportOptions.plist
       - uses: yukiarrr/ios-build-action@v1.11.2
         with:
           project-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj
           export-method: ad-hoc
+          export-options: ExportOptions.plist
           p12-base64: ${{ secrets.P12_BASE64 }}
           mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
           code-signing-identity: ${{ secrets.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
           build-destination: generic/platform=iOS
-      - name: Export ipa
-        if: success() || failure()
-        run: |
-          pwd
-          echo "${{ secrets.EXPORT_OPTIONS }}" >> ExportOptions.plist
-          ls
-          current_date=$(date "+%Y-%m-%d")
-          echo $current_date
-          cd /Users/runner/Library/Developer/Xcode/Archives/$current_date
-          first_filename=$(ls -1 | head -n 1)
-          echo $first_filename
-          archivePath=/Users/runner/Library/Developer/Xcode/Archives/$current_date/$first_filename
-          echo "$archivePath"
-          cd /Users/runner/work/clickstream-swift/clickstream-swift/
-          xcodebuild -exportArchive -archivePath "$archivePath" -exportPath "output" -exportOptionsPlist ExportOptions.plist
-          cd output
-          ls
+          output-path: ModerneShopping.ipa
       - name: Upload ipa
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: build ipa
           path: |
-            /Users/runner/Library/Developer/Xcode/Archives/
+            /*.ipa
       - name: Delete temp branch
         if: success() || failure()
         run: |
           ls
-          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
-          cd /Users/runner/Library/Developer/Xcode/Archives/
           find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
           echo $temp_branch
           git status
@@ -127,7 +113,7 @@ jobs:
           cd IntegrationTest
           pip install -r requirements.txt
           cd devicefarm
-          cp ../../clickstream-sdk-samples/ios/ModerneShopping.ipa ./
+          cp ../../ModerneShopping.ipa ./
           cp ../workspace/test_bundle.zip ./
           ls
           python -u -c "from automate_device_farm import upload_and_test_ios; upload_and_test_ios('ModerneShopping.ipa', 'test_bundle.zip', '${{ env.device_farm_project_arn }}', '${{ env.device_farm_test_spec_arn }}', '${{ env.device_farm_pool_arn }}')"
