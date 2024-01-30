@@ -56,16 +56,13 @@ jobs:
       - uses: yukiarrr/ios-build-action@v1.11.2
         with:
           project-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj
-          export-method: ad-hoc
+          export-method: "ad-hoc"
           export-options: ExportOptions.plist
           p12-base64: ${{ secrets.P12_BASE64 }}
           certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
           mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
           code-signing-identity: ${{ vars.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
-          build-destination: generic/platform=iOS
-          output-path: ModerneShopping.ipa
-          workspace-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj/project.xcworkspace
       - name: Upload ipa
         uses: actions/upload-artifact@v4
         if: success() || failure()
@@ -77,6 +74,7 @@ jobs:
         if: success() || failure()
         run: |
           ls
+          cd clickstream-sdk-samples/ios/
           find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
           cd /Users/runner/Library/Developer/Xcode/Archives/
           find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
