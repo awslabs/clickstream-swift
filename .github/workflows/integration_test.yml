@@ -53,17 +53,33 @@ jobs:
         run: |
           echo '${{ vars.EXPORT_OPTIONS }}' >> ExportOptions.plist
           cat ExportOptions.plist
+          ls
       - uses: yukiarrr/ios-build-action@v1.11.2
         with:
           project-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj
           export-method: "ad-hoc"
-          export-options: ExportOptions.plist
+          export-options: "ExportOptions.plist"
           p12-base64: ${{ secrets.P12_BASE64 }}
           certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
           mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
           build-destination: "generic/platform=iOS"
           code-signing-identity: ${{ vars.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
+      - name: Export ipa
+        if: success() || failure()
+        run: |
+          ls
+          current_date=$(date "+%Y-%m-%d")
+          echo $current_date
+          cd /Users/runner/Library/Developer/Xcode/Archives/$current_date
+          first_filename=$(ls -1 | head -n 1)
+          echo $first_filename
+          archivePath=/Users/runner/Library/Developer/Xcode/Archives/$current_date/$first_filename
+          echo "$archivePath"
+          cd /Users/runner/work/clickstream-swift/clickstream-swift/
+          xcodebuild -exportArchive -archivePath "$archivePath" -exportPath "output" -exportOptionsPlist ExportOptions.plist
+          cd output
+          ls
       - name: Upload ipa
         uses: actions/upload-artifact@v4
         if: success() || failure()
