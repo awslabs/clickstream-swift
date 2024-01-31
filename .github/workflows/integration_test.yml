@@ -65,6 +65,7 @@ jobs:
           build-destination: "generic/platform=iOS"
           code-signing-identity: ${{ vars.CODE_SIGNING_IDENTITY }}
           team-id: ${{ secrets.TEAM_ID }}
+          configuration: "Debug"
           update-targets: |
             ModerneShopping
       - name: Export ipa
