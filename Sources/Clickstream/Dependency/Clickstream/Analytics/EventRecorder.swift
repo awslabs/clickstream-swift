@@ -28,7 +28,6 @@ class EventRecorder: AnalyticsEventRecording {
     let dbUtil: ClickstreamDBProtocol
     private(set) var queue: OperationQueue
     private(set) var bundleSequenceId: Int
-    var allEventJson: String = ""
 
     init(clickstream: ClickstreamContext) throws {
         self.clickstream = clickstream
@@ -52,8 +51,6 @@ class EventRecorder: AnalyticsEventRecording {
         if clickstream.configuration.isLogEvents {
             setLogLevel(logLevel: LogLevel.debug)
             log.debug("Saved event: \(event.eventType)\n\(eventObject.toPrettierJsonString())")
-            allEventJson.append("Saved event \(event.eventType):\(eventObject.toJsonString())\n")
-            UIPasteboard.general.string = allEventJson
         }
         while try dbUtil.getTotalSize() > Constants.maxDbSize {
             let events = try dbUtil.getEventsWith(limit: 5)
