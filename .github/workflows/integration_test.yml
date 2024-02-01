@@ -83,7 +83,7 @@ jobs:
           xcodebuild -scheme "ModerneShopping" \
           -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive \
           -sdk iphoneos \
-          -configuration Debug \
+          -configuration Release \
           -destination generic/platform=iOS \
           clean archive | xcbeautify
       - name: export ipa
