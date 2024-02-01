@@ -29,9 +29,8 @@ jobs:
         run: |
           sed -i '' -e "s#private(set) var bundleSequenceId: Int#private(set) var bundleSequenceId: Int\n    var allEventJson: String = \"\"#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           sed -i '' -e "s#toPrettierJsonString())\")#toPrettierJsonString())\")\n            allEventJson.append(\"Saved event \\\(event.eventType):\\\(eventObject.toJsonString())\\\n\")\n            UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
-          sed -i '' -e "s#batchEvent.eventCount) events\")#batchEvent.eventCount) events\")\n                allEventJson.append(\"Saved event \\\(event.eventType):\\\(eventObject.toJsonString())\\\n\")\n                UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
+          sed -i '' -e "s#batchEvent.eventCount) events\")#batchEvent.eventCount) events\")\n                allEventJson.append(\"Send \\\(batchEvent.eventCount) events\\\n\")\n                UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           git diff
-          cat Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           branch=pastboard-$(openssl rand -hex 5)
