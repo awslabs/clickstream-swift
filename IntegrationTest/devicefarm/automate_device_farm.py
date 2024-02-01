@@ -94,7 +94,7 @@ def upload_and_test_ios(app_file_path, test_package, project_arn, test_spec_arn,
     print("Finished")
 
 
-def upload_df_file(filename, unique, type_, mime='application/octet-stream'):
+def upload_df_file(config, unique, filename, type_, mime='application/octet-stream'):
     response = client.create_upload(projectArn=config['projectArn'],
                                     name=unique + "_" + os.path.basename(filename),
                                     type=type_,

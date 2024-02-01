@@ -1,7 +1,7 @@
 name: Create Tag And Release
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "*" ]
 
 jobs:
   release:
@@ -21,15 +21,16 @@ jobs:
         run: |
           echo "${{ env.COMMIT_MESSAGE }}"
           version=$(echo "${{ env.COMMIT_MESSAGE }}" | grep -oP 'Swift \K\d+\.\d+\.\d+')
+          echo "release_version=$version" >> "$GITHUB_ENV"
           echo $version
           git config user.name '${{ vars.USER_NAME }}'
           git config user.email '${{ vars.USER_EMAIL }}'
           git tag v$version
-          git push origin v$version
+          # git push origin v$version
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          name: "Clickstream Swift ${{ env.NEW_VERSION }}"
-          tag_name: "${{ env.NEW_VERSION }}"
+          name: "Clickstream Swift ${{ env.release_version }}"
+          tag_name: "${{ env.release_version }}"
           prerelease: true
           generate_release_notes: true
