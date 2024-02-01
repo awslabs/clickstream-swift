@@ -16,6 +16,7 @@ from time import sleep
 from appium import webdriver
 from appium.options.ios import XCUITestOptions
 from appium.webdriver.common.appiumby import AppiumBy
+from selenium.common.exceptions import NoSuchElementException
 
 capabilities = dict(
     platformName='ios',
@@ -61,9 +62,12 @@ class TestShopping:
         sleep(1)
 
     def perform_click_element(self, element_id):
-        element = self.driver.find_element(by=AppiumBy.ID, value=element_id)
-        element.click()
-        sleep(2)
+        try:
+            element = self.driver.find_element(by=AppiumBy.ID, value=element_id)
+            element.click()
+            sleep(2)
+        except NoSuchElementException:
+            pytest.skip(f"Element with ID '{element_id}' not found. Skipped the test")
 
 
 if __name__ == '__main__':

@@ -154,7 +154,8 @@ def download_artifacts(jobs_response, save_path):
                                                                                         allow_redirects=True) as request:
                                     fn.write(request.content)
                                 appium_log_path = unzip_and_copy(artifact_save_path)
-                                logcat_paths.append(appium_log_path)
+                                if appium_log_path is not None:
+                                    logcat_paths.append(appium_log_path)
     return logcat_paths
 
 
@@ -183,4 +184,6 @@ def unzip_and_copy(zip_path):
         modified_content = re.sub(r'\bTestShopping\b', "Appium " + device_name, content)
         with open(result_path, 'w', encoding='utf-8') as file:
             file.write(modified_content)
-    return appium_log_path
+        return appium_log_path
+    else:
+        return None
