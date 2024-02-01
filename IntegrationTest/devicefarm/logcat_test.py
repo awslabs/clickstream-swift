@@ -41,7 +41,8 @@ class TestLogcatIOS:
         # assert launch events
         start_events = [self.recorded_events[0]['event_name'],
                         self.recorded_events[1]['event_name'],
-                        self.recorded_events[2]['event_name']]
+                        self.recorded_events[2]['event_name'],
+                        self.recorded_events[3]['event_name']]
         assert '_first_open' in start_events
         assert '_app_start' in start_events
         assert '_session_start' in start_events
@@ -202,12 +203,16 @@ def get_recorded_events(path):
     with open(path, 'r') as file:
         log_lines = file.readlines()
     events = []
+    first_event_pattern = re.compile(r'app_event_log:Saved event (\w+):(.*)$')
     event_pattern = re.compile(r' Saved event (\w+):(.*)$')
 
     current_event_name = ''
 
     for line in log_lines:
+        first_event_match = first_event_pattern.search(line)
         event_match = event_pattern.search(line)
+        if first_event_match:
+            event_match = first_event_match
         if event_match:
             event_name, event_json = event_match.groups()
             if event_name == '_app_start' and (
