@@ -60,7 +60,6 @@ jobs:
           export-method: "ad-hoc"
           export-options: "ExportOptions.plist"
           p12-base64: ${{ secrets.P12_BASE64 }}
-          certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
           mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
           build-destination: "generic/platform=iOS"
           code-signing-identity: ${{ vars.CODE_SIGNING_IDENTITY }}
