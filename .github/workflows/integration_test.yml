@@ -79,6 +79,7 @@ jobs:
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
       - name: build archive
         run: |
+          cd clickstream-sdk-samples/ios/
           xcodebuild -scheme "ModerneShopping" \
           -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive \
           -sdk iphoneos \
