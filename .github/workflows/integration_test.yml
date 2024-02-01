@@ -2,9 +2,7 @@ name: Integration Test
 
 on:
   pull_request:
-    branches: [ "*" ]
-  push:
-    branches: [ "integration_test" ]
+    branches: [ "main" ]
 
 jobs:
   test:
@@ -49,7 +47,7 @@ jobs:
           sed -i '' -e "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
           sed -i '' -e "s#branch = main;#branch = $temp_branch;#g" ModerneShopping.xcodeproj/project.pbxproj
           git diff
-      - name: generate export options
+      - name: Generate export options
         run: |
           echo '${{ vars.EXPORT_OPTIONS }}' >> ExportOptions.plist
           cat ExportOptions.plist
