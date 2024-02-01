@@ -89,7 +89,7 @@ jobs:
       - name: export ipa
         run: |
           EXPORT_OPTS_PATH=ExportOptions.plist
-          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive -exportOptionsPlist $EXPORT_OPTS_PATH -exportPath output
+          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive -exportOptionsPlist $EXPORT_OPTS_PATH -exportPath output -allowProvisioningUpdates
           cd output
           ls
       - uses: yukiarrr/ios-build-action@v1.11.2
