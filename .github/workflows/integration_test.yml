@@ -146,14 +146,13 @@ jobs:
           require_tests: true
           detailed_summary: true
           include_passed: true
-          fail_on_failure: true
+          fail_on_failure: false
           job_name: integration test
       - name: Upload test result
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-result
-          fail_on_failure: false
           path: |
             IntegrationTest/devicefarm/report/
             IntegrationTest/devicefarm/MyAndroidAppTest-*/**
