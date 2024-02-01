@@ -77,7 +77,7 @@ jobs:
           # apply provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-      - name: build archive
+      - name: Build archive
         run: |
           cd clickstream-sdk-samples/ios/
           xcodebuild -scheme "ModerneShopping" \
@@ -86,58 +86,15 @@ jobs:
           -configuration Release \
           -destination generic/platform=iOS \
           clean archive | xcbeautify
-      - name: export ipa
+      - name: Export ipa
         run: |
           EXPORT_OPTS_PATH=ExportOptions.plist
           xcodebuild -exportArchive -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive -exportOptionsPlist $EXPORT_OPTS_PATH -exportPath output
           cd output
           ls
-      - uses: yukiarrr/ios-build-action@v1.11.2
-        with:
-          project-path: clickstream-sdk-samples/ios/ModerneShopping.xcodeproj
-          export-method: "ad-hoc"
-          export-options: "ExportOptions.plist"
-          p12-base64: ${{ secrets.P12_BASE64 }}
-          certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
-          mobileprovision-base64: ${{ secrets.MOBILEPROVISION_BASE64 }}
-          build-destination: "generic/platform=iOS"
-          code-signing-identity: ${{ vars.CODE_SIGNING_IDENTITY }}
-          team-id: ${{ secrets.TEAM_ID }}
-          update-targets: |
-            ModerneShopping
-      - name: Export ipa
-        if: success() || failure()
-        run: |
-          ls
-          current_date=$(date "+%Y-%m-%d")
-          echo $current_date
-          cd /Users/runner/Library/Developer/Xcode/Archives/$current_date
-          first_filename=$(ls -1 | head -n 1)
-          echo $first_filename
-          archivePath=/Users/runner/Library/Developer/Xcode/Archives/$current_date/$first_filename
-          echo "$archivePath"
-          cd /Users/runner/work/clickstream-swift/clickstream-swift/
-          xcodebuild -exportArchive -archivePath "$archivePath" -exportPath "output" -exportOptionsPlist ExportOptions.plist
-          cd output
-          ls
-      - name: Upload ipa
-        uses: actions/upload-artifact@v4
-        if: success() || failure()
-        with:
-          name: build ipa
-          path: |
-            /*.ipa
       - name: Delete temp branch
         if: success() || failure()
         run: |
-          ls
-          cd clickstream-sdk-samples/ios/
-          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
-          cd /Users/runner/Library/Developer/Xcode/Archives/
-          find . -type f -o -type d | grep -v '/\.' | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
-          cd /Users
-          cd ..
-          ls
           echo $temp_branch
           git status
           git push origin --delete $temp_branch
@@ -176,7 +133,7 @@ jobs:
           cd IntegrationTest
           pip install -r requirements.txt
           cd devicefarm
-          cp ../../ModerneShopping.ipa ./
+          cp ../../output/ModerneShopping.ipa ./
           cp ../workspace/test_bundle.zip ./
           ls
           python -u -c "from automate_device_farm import upload_and_test_ios; upload_and_test_ios('ModerneShopping.ipa', 'test_bundle.zip', '${{ env.device_farm_project_arn }}', '${{ env.device_farm_test_spec_arn }}', '${{ env.device_farm_pool_arn }}')"
