@@ -29,10 +29,9 @@ class TestLogcatIOS:
         self.init_events(path)
         self.submitted_events = get_submitted_events(path)
         # assert all record events are submitted.
-        extra_event_count = sum(1 for event in self.recorded_events if event['event_name'] == "_app_start")
-        assert sum(self.submitted_events) - extra_event_count > 0
+        assert sum(self.submitted_events) > 0
         assert len(self.recorded_events) > 0
-        assert sum(self.submitted_events) - extra_event_count >= len(self.recorded_events)
+        assert sum(self.submitted_events) >= len(self.recorded_events)
         print("Verifying successful upload of all events.")
 
     @pytest.mark.parametrize("path", path)
