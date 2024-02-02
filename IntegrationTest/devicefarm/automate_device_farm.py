@@ -35,7 +35,7 @@ def get_config(app_file_path, test_package, project_arn, test_spec_arn, pool_arn
         # Since we care about the most popular devices, we'll use a curated pool.
         "testSpecArn": test_spec_arn,
         "poolArn": pool_arn,
-        "namePrefix": "MyAndroidAppTest",
+        "namePrefix": "MyiOSAppTest",
         # This is our test package. This tutorial won't go into how to make these.
         "testPackage": test_package
     }
