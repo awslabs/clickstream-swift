@@ -78,13 +78,12 @@ jobs:
       - name: Build archive
         run: |
           cd clickstream-sdk-samples/ios/
-          set -o pipefail
           xcodebuild -scheme "ModerneShopping" \
           -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive \
           -sdk iphoneos \
           -configuration Release \
           -destination generic/platform=iOS \
-          clean archive 2>&1 | xcbeautify
+          clean archive | xcpretty
       - name: Export ipa
         run: |
           EXPORT_OPTS_PATH=ExportOptions.plist
