@@ -83,7 +83,7 @@ jobs:
           -sdk iphoneos \
           -configuration Release \
           -destination generic/platform=iOS \
-          clean archive 2>&1 | xcbeautify -quiet
+          clean archive 2>&1 | xcbeautify
       - name: Export ipa
         run: |
           EXPORT_OPTS_PATH=ExportOptions.plist
