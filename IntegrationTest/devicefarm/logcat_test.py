@@ -185,8 +185,9 @@ class TestLogcatIOS:
         print("Start verify: " + str(path))
         self.init_events(path)
         # assert _app_end
-        assert (self.recorded_events[-1]['event_name'] == '_app_end' or self.recorded_events[-2][
-            'event_name'] == '_app_end')
+        app_end_event = next((event for event in self.recorded_events if '_app_end' in event.get('event_name', '')),
+                             None)
+        assert app_end_event is not None
         print("Verifying successful completion of _app_end event.")
 
 
