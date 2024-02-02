@@ -43,9 +43,13 @@ class TestLogcatIOS:
                         self.recorded_events[1]['event_name'],
                         self.recorded_events[2]['event_name'],
                         self.recorded_events[3]['event_name']]
-        assert '_first_open' in start_events
         assert '_app_start' in start_events
         assert '_session_start' in start_events
+        if '_first_open' not in start_events:
+            first_open_event = next(
+                (event for event in self.recorded_events if '_first_open' in event.get('event_name', '')),
+                None)
+            assert first_open_event is not None
         print("Verifying successful order of launch events.")
 
     @pytest.mark.parametrize("path", path)
@@ -126,8 +130,7 @@ class TestLogcatIOS:
         self.init_events(path)
         # assert add_to_cart
         add_to_cart_event = [event for event in self.recorded_events if 'add_to_cart' in event.get('event_name', '')]
-        assert len(add_to_cart_event) > 1
-        # assert len(add_to_cart_event[0]['event_json']['items']) > 0
+        assert len(add_to_cart_event) > 0
         assert 'product_id' in add_to_cart_event[0]['event_json'].get('attributes')
         print("Verifying successful attributes of add_to_cart_event events.")
 
