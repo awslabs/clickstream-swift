@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  e2e-test:
     runs-on: macos-13-xl
     permissions:
       contents: write
