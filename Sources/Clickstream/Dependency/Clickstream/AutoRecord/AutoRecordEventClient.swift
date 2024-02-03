@@ -64,12 +64,11 @@ class AutoRecordEventClient {
         if lastEngageTime > 0 {
             event.addAttribute(lastEngageTime, forKey: Event.ReservedAttribute.ENGAGEMENT_TIMESTAMP)
         }
-        recordEvent(event)
-
-        isEntrances = false
         lastScreenName = screenName
         lastScreenPath = screenPath
         lastScreenUniqueId = screenUniqueId
+        recordEvent(event)
+        isEntrances = false
         lastScreenStartTimestamp = eventTimestamp
         UserDefaultsUtil.savePreviousScreenViewTimestamp(storage: clickstream.storage, timestamp: eventTimestamp)
     }
