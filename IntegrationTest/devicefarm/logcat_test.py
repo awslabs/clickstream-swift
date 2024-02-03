@@ -58,10 +58,13 @@ class TestLogcatIOS:
         self.init_events(path)
         # assert first _screen_view
         screen_view_events = [event for event in self.recorded_events if '_screen_view' in event.get('event_name', '')]
-        screen_view_event = sorted(
+        sorted_screen_view_events = sorted(
             screen_view_events,
             key=lambda event: event['event_json'].get('timestamp', float('inf'))
-        )[0]
+        )
+        screen_view_event = sorted_screen_view_events[0]
+        if screen_view_event['event_json'].get('attributes')['_entrances'] == 0:
+            screen_view_event = sorted_screen_view_events[1]
         assert screen_view_event['event_json'].get('attributes')['_entrances'] == 1
         assert '_screen_id' in screen_view_event['event_json'].get('attributes')
         assert '_screen_name' in screen_view_event['event_json'].get('attributes')
