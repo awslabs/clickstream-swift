@@ -29,23 +29,19 @@ jobs:
           sed -i '' -e "s#toPrettierJsonString())\")#toPrettierJsonString())\")\n            allEventJson.append(\"Saved event \\\(event.eventType):\\\(eventObject.toJsonString())\\\n\")\n            UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           sed -i '' -e "s#batchEvent.eventCount) events\")#batchEvent.eventCount) events\")\n                allEventJson.append(\"Send \\\(batchEvent.eventCount) events\\\n\")\n                UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           git diff
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          branch=pastboard-$(openssl rand -hex 5)
-          echo $branch
-          echo "temp_branch=$branch" >> "$GITHUB_ENV"
-          git checkout -b $branch
-          git add .
-          git commit -m "ci: integration test"
-          git push --set-upstream origin $branch
       - name: Prepare sample iOS app
         run: |
+          cd ..
           git clone https://github.com/aws-samples/clickstream-sdk-samples
           cd clickstream-sdk-samples/ios
           sed -i '' -e "s#\"appId\": \"your appId\"#\"appId\": \"${{ env.clickstream_app_id }}\"#g" ModerneShopping/amplifyconfiguration.json
           sed -i '' -e "s#\"endpoint\": \"your endpoint\"#\"endpoint\": \"${{ env.clickstream_endpoint }}\"#g" ModerneShopping/amplifyconfiguration.json
           sed -i '' -e "s#if index==0 || index==1 {}#if index==0 || index==1 {\n                                cart.addToCart(addedProduct: product, quantity: 1)\n                            }#g" ModerneShopping/Views/ProductViews/ProductList.swift
-          sed -i '' -e "s#branch = main;#branch = $temp_branch;#g" ModerneShopping.xcodeproj/project.pbxproj
+          sed -i '' -e "s#3A1001882A1DDF4300DF72CB /\* XCRemoteSwiftPackageReference \"clickstream-swift\" \*\/,#3A67FCB62B6F26C60098082A /\* XCLocalSwiftPackageReference \"../../clickstream-swift\" \*\/,#g" ModerneShopping.xcodeproj/project.pbxproj
+          perl -0777 -pi -e 's#/\* Begin XCRemoteSwiftPackageReference section \*/\n(\t+)3A1001882A1DDF4300DF72CB /\* XCRemoteSwiftPackageReference \"clickstream-swift\" \*/ = {\n(\t+)isa = XCRemoteSwiftPackageReference;\n(\t+)repositoryURL = \"https://github.com/awslabs/clickstream-swift.git\";\n(\t+)requirement = {\n(\t+)branch = main;\n(\t+)kind = branch;\n(\t+)};\n(\t+)};#/\* Begin XCLocalSwiftPackageReference section \*/\n\t\t3A67FCB62B6F26C60098082A /\* XCLocalSwiftPackageReference \"../../clickstream-swift\" \*/ = {\n$2isa = XCLocalSwiftPackageReference;\n$3relativePath = \"../../clickstream-swift\";\n$1};\n/\* End XCLocalSwiftPackageReference section \*/\n\n/* Begin XCRemoteSwiftPackageReference section \*/#' ModerneShopping.xcodeproj/project.pbxproj
+          perl -0777 -pi -e 's#isa = XCSwiftPackageProductDependency;\n(\t+)package = 3A1001882A1DDF4300DF72CB /\* XCRemoteSwiftPackageReference \"clickstream-swift\" \*/;#isa = XCSwiftPackageProductDependency;#' ModerneShopping.xcodeproj/project.pbxproj
+          perl -0777 -pi -e 's#\n    {\n      "identity" : "clickstream-swift",\n      "kind" : "remoteSourceControl",\n      "location" : "https://github.com/awslabs/clickstream-swift.git",\n      "state" : {\n        "branch" : "main",\n        "revision" : "2bd29626068a6dff158f41f9d81295a6eaa59be5"\n      }\n    },##' ModerneShopping.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+          perl -0777 -pi -e 's#objectVersion = 54;#objectVersion = 60;#' ModerneShopping.xcodeproj/project.pbxproj
           git diff
       - name: Generate export options
         run: |
@@ -77,7 +73,11 @@ jobs:
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
       - name: Build archive
         run: |
-          cd clickstream-sdk-samples/ios/
+          sudo xcode-select -s '/Applications/Xcode_15.2.app/Contents/Developer'
+          xcode-select --print-path
+          cd ../clickstream-sdk-samples/ios/
+          xcodebuild -resolvePackageDependencies
+          echo "start build app"
           xcodebuild -scheme "ModerneShopping" \
           -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive \
           -sdk iphoneos \
@@ -90,12 +90,6 @@ jobs:
           xcodebuild -exportArchive -archivePath $RUNNER_TEMP/ModerneShopping.xcarchive -exportOptionsPlist $EXPORT_OPTS_PATH -exportPath output
           cd output
           ls
-      - name: Delete temp branch
-        if: success() || failure()
-        run: |
-          echo $temp_branch
-          git status
-          git push origin --delete $temp_branch
       - name: Build Device Farm test file
         run: |
           cd IntegrationTest
