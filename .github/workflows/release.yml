@@ -12,7 +12,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
@@ -22,17 +22,33 @@ jobs:
           chmod +x release.sh
           ./release.sh ${{ env.NEW_VERSION }}
           git diff
-          git config user.name '${{ vars.USER_NAME }}'
-          git config user.email '${{ vars.USER_EMAIL }}'
-          git add .
-          git commit -m 'release: clickstream Swift ${{ env.NEW_VERSION }}'
-          git push
-          git tag ${{ env.NEW_VERSION }}
-          git push origin ${{ env.NEW_VERSION }}
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v1
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+      - name: Create Pull Request
+        id: create-pr
+        uses: peter-evans/create-pull-request@v5
         with:
-          name: "Clickstream Swift ${{ env.NEW_VERSION }}"
-          tag_name: "${{ env.NEW_VERSION }}"
-          prerelease: true
-          generate_release_notes: true
+          token: ${{ secrets.PROJECT_TOKEN }}
+          commit-message: 'release: clickstream Swift ${{ env.NEW_VERSION }}'
+          title: 'release: clickstream Swift ${{ env.NEW_VERSION }}'
+          author: github-actions <github-actions@github.com>
+          committer: github-actions <github-actions@github.com>
+          signoff: true
+          body: |
+            ## Description
+            1. release: clickstream Swift ${{ env.NEW_VERSION }}
+
+            ## General Checklist
+            <!-- Check or cross out if not relevant -->
+
+            - [x] Added new tests to cover change, if needed
+            - [x] Build succeeds using Swift Package Manager
+            - [x] All unit tests pass
+            - [x] Documentation update for the change if required
+            - [x] PR title conforms to conventional commit style
+            - [x] If breaking change, documentation/changelog update with migration instructions
+
+            By submitting this pull request, I confirm that my contribution is made under the terms of the Apache 2.0 license.
+
+          labels: release
+          branch: release_${{ env.NEW_VERSION }}
