@@ -98,6 +98,19 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(2, eventCount)
     }
 
+    func testRecordCustomScreenViewEvent() throws {
+        ClickstreamAnalytics.recordEvent(ClickstreamAnalytics.EventName.SCREEN_VIEW, [
+            ClickstreamAnalytics.Attr.SCREEN_NAME: "HomeView",
+            ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID: "23ac31df"
+        ])
+        Thread.sleep(forTimeInterval: 0.2)
+        let event = try getEventForName(ClickstreamAnalytics.EventName.SCREEN_VIEW)
+        let attributes = event["attributes"] as! [String: Any]
+        XCTAssertEqual("HomeView", attributes[ClickstreamAnalytics.Attr.SCREEN_NAME] as! String)
+        XCTAssertEqual("23ac31df", attributes[ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID] as! String)
+        XCTAssertEqual(1, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+    }
+
     func testFlushEvents() throws {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
@@ -329,6 +342,18 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(99.9, eventItem["price"] as! Double)
     }
 
+    func testRecordCustomScreenViewEventForObjc() throws {
+        ClickstreamObjc.recordEvent(EventName.SCREEN_VIEW,
+                                    [Attr.SCREEN_NAME: "HomeView",
+                                     Attr.SCREEN_UNIQUE_ID: "23ac31df"])
+        Thread.sleep(forTimeInterval: 0.2)
+        let event = try getEventForName(ClickstreamAnalytics.EventName.SCREEN_VIEW)
+        let attributes = event["attributes"] as! [String: Any]
+        XCTAssertEqual("HomeView", attributes[ClickstreamAnalytics.Attr.SCREEN_NAME] as! String)
+        XCTAssertEqual("23ac31df", attributes[ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID] as! String)
+        XCTAssertEqual(1, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+    }
+
     func testGlobalAttributeForObjc() throws {
         let attribute: NSDictionary = [
             "Channel": "SMS",
@@ -402,10 +427,14 @@ class IntegrationTest: XCTestCase {
     }
 
     private func getTestEvent() throws -> [String: Any] {
+        try getEventForName("testEvent")
+    }
+
+    private func getEventForName(_ name: String) throws -> [String: Any] {
         var testEvent: [String: Any] = JsonObject()
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
         for event in eventArray {
-            if event["event_type"] as! String == "testEvent" {
+            if event["event_type"] as! String == name {
                 testEvent = event
                 break
             }

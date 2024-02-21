@@ -17,7 +17,7 @@ protocol AnalyticsClientBehaviour {
 
     func checkEventName(_ eventName: String) -> Bool
     func createEvent(withEventType eventType: String) -> ClickstreamEvent
-    func record(_ event: ClickstreamEvent) async throws
+    func record(_ event: ClickstreamEvent) throws
     func submitEvents(isBackgroundMode: Bool)
 }
 
@@ -131,14 +131,16 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         return true
     }
 
-    func record(_ event: ClickstreamEvent) async throws {
+    func record(_ event: ClickstreamEvent) throws {
         for (key, attribute) in globalAttributes {
             event.addGlobalAttribute(attribute, forKey: key)
         }
         if let autoRecordClient {
-            if autoRecordClient.lastScreenName != nil, autoRecordClient.lastScreenUniqueId != nil {
+            if autoRecordClient.lastScreenName != nil {
                 event.addGlobalAttribute(autoRecordClient.lastScreenName!,
                                          forKey: Event.ReservedAttribute.SCREEN_NAME)
+            }
+            if autoRecordClient.lastScreenUniqueId != nil {
                 event.addGlobalAttribute(autoRecordClient.lastScreenUniqueId!,
                                          forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
             }
@@ -157,7 +159,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
                 let event = createEvent(withEventType: Event.PresetEvent.CLICKSTREAM_ERROR)
                 event.addAttribute(eventError.errorCode, forKey: Event.ReservedAttribute.ERROR_CODE)
                 event.addAttribute(eventError.errorMessage, forKey: Event.ReservedAttribute.ERROR_MESSAGE)
-                try await record(event)
+                try record(event)
             } catch {
                 log.error("Failed to record event with error:\(error)")
             }

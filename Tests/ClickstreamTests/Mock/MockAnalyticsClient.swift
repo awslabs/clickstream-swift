@@ -127,7 +127,7 @@ class MockAnalyticsClient: AnalyticsClientBehaviour {
     var lastRecordedEvent: ClickstreamEvent?
     var recordedEvents: [ClickstreamEvent] = []
 
-    func record(_ event: ClickstreamEvent) async throws {
+    func record(_ event: ClickstreamEvent) throws {
         recordCount += 1
         lastRecordedEvent = event
         recordedEvents.append(event)

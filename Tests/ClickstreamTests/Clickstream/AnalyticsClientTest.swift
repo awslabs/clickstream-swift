@@ -274,7 +274,7 @@ class AnalyticsClientTest: XCTestCase {
         analyticsClient.addGlobalAttribute(1, forKey: "metric_1")
 
         do {
-            try await analyticsClient.record(event)
+            try analyticsClient.record(event)
             XCTAssertEqual(eventRecorder.saveCount, 1)
             guard let savedEvent = eventRecorder.lastSavedEvent else {
                 XCTFail("Expected saved event")
@@ -300,7 +300,7 @@ class AnalyticsClientTest: XCTestCase {
         analyticsClient.addUserAttribute(1, forKey: "metric_1")
 
         do {
-            try await analyticsClient.record(event)
+            try analyticsClient.record(event)
             XCTAssertEqual(eventRecorder.saveCount, 1)
             guard let savedEvent = eventRecorder.lastSavedEvent else {
                 XCTFail("Expected saved event")

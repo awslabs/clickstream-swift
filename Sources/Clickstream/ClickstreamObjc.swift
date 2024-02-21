@@ -108,6 +108,20 @@ import Foundation
     }
 }
 
+/// ClickstreamAnalytics preset events
+@objcMembers public class EventName: NSObject {
+    /// Preset event screen view
+    public static let SCREEN_VIEW = "_screen_view"
+}
+
+/// ClickstreamANalytics preset attributes
+@objcMembers public class Attr: NSObject {
+    /// Preset attribute screen name
+    public static let SCREEN_NAME = "_screen_name"
+    /// Preset attribute screen unique id
+    public static let SCREEN_UNIQUE_ID = "_screen_unique_id"
+}
+
 /// ClickstreamAnalytics preset item keys for objective-c
 /// In addition to the item attributes defined below, you can add up to 10 custom attributes to an item.
 @objcMembers public class ClickstreamItemKey: NSObject {

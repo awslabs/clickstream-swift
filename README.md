@@ -165,6 +165,24 @@ let item_book: ClickstreamAttribute = [
 ClickstreamAnalytics.recordEvent("view_item", attributes, [item_book])
 ```
 
+#### Record Screen View events manually
+
+By default, SDK will automatically track the preset `_screen_view` event when ViewController triggers `viewDidAppear`.
+
+You can also manually record screen view events whether or not automatic screen view tracking is enabled, add the following code to record a screen view event with two attributes.
+
+* `SCREEN_NAME` Required. Your screen's name.
+* `SCREEN_UNIQUE_ID` Optional. Set the hashValue of your ViewController or UIView. If you do not set, SDK will set a default value based on the current ViewController's hashValue.
+
+```swift
+import Clickstream
+
+ClickstreamAnalytics.recordEvent(ClickstreamAnalytics.EventName.SCREEN_VIEW, [
+    ClickstreamAnalytics.Attr.SCREEN_NAME: "HomeView",
+    ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID: homeView.hashValue
+])
+```
+
 #### Add global attribute
 
 ```swift
