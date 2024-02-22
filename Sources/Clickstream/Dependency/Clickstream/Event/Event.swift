@@ -102,5 +102,6 @@ enum Event {
         static let ITEM_CUSTOM_ATTRIBUTE_SIZE_EXCEED = 4_003
         static let ITEM_CUSTOM_ATTRIBUTE_KEY_LENGTH_EXCEED = 4_004
         static let ITEM_CUSTOM_ATTRIBUTE_KEY_INVALID = 4_005
+        static let SCREEN_VIEW_MISSING_SCREEN_NAME = 5_001
     }
 }

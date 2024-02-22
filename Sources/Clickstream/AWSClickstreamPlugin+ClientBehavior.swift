@@ -45,13 +45,17 @@ extension AWSClickstreamPlugin {
             if let attributes = event.attribute {
                 clickstreamEvent.addAttribute(attributes)
             }
+            if event.name == Event.PresetEvent.SCREEN_VIEW {
+                clickstream.sessionClient.onManualScreenView(clickstreamEvent)
+                return
+            }
             if let items = event.items {
                 clickstreamEvent.addItems(items)
             }
 
             Task {
                 do {
-                    try await analyticsClient.record(clickstreamEvent)
+                    try analyticsClient.record(clickstreamEvent)
                 } catch {
                     log.error("Record event error:\(error)")
                 }

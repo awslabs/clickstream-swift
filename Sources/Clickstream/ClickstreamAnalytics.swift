@@ -89,6 +89,17 @@ public enum ClickstreamAnalytics {
         Amplify.Analytics.enable()
     }
 
+    /// ClickstreamAnalytics preset events
+    public enum EventName {
+        public static let SCREEN_VIEW = "_screen_view"
+    }
+
+    /// ClickstreamANalytics preset attributes
+    public enum Attr {
+        public static let SCREEN_NAME = "_screen_name"
+        public static let SCREEN_UNIQUE_ID = "_screen_unique_id"
+    }
+
     /// ClickstreamAnalytics preset item attributes
     /// In addition to the item attributes defined below, you can add up to 10 custom attributes to an item.
     public enum Item {

@@ -12,6 +12,7 @@ protocol SessionClientBehaviour: AnyObject {
     func startActivityTracking()
     func initialSession()
     func storeSession()
+    func onManualScreenView(_ event: ClickstreamEvent)
 }
 
 class SessionClient: SessionClientBehaviour {
@@ -70,6 +71,10 @@ class SessionClient: SessionClientBehaviour {
         autoRecordClient.recordUserEngagement()
         autoRecordClient.recordAppEnd()
         clickstream.analyticsClient.submitEvents(isBackgroundMode: true)
+    }
+
+    func onManualScreenView(_ event: ClickstreamEvent) {
+        autoRecordClient.recordViewScreenManually(event)
     }
 
     private func respond(to newState: ApplicationState) {
