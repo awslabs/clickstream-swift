@@ -185,6 +185,36 @@ class SessionClientTests: XCTestCase {
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
     }
+    
+    func testReopenAppAfterSessionTimeoutWillRecordScreenView() {
+        clickstream.configuration.sessionTimeoutDuration = 0
+        activityTracker.callback?(.runningInForeground)
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        activityTracker.callback?(.runningInBackground)
+        activityTracker.callback?(.runningInForeground)
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(8, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_END, events[4].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[5].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[6].eventType)
+        
+        XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[7].eventType)
+        XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_NAME])
+        XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_ID])
+        XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_UNIQUEID])
+        XCTAssertNil(events[7].attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_NAME])
+        XCTAssertNil(events[7].attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_ID])
+        XCTAssertNil(events[7].attributes[Event.ReservedAttribute.PREVIOUS_SCREEN_UNIQUEID])
+        XCTAssertEqual(1, events[7].attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+    }
 
     func testLastScreenStartTimeStampUpdatedAfterReturnToForeground() {
         activityTracker.callback?(.runningInForeground)

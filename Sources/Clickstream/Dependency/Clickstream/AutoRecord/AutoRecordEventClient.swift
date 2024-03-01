@@ -76,6 +76,18 @@ class AutoRecordEventClient {
         }
     }
 
+    func recordScreenViewAfterSessionStart() {
+        if lastScreenName != nil {
+            let currentScreenName = lastScreenName!
+            let currentScreenUniqueId = lastScreenUniqueId ?? ""
+            let currentScreenId = lastScreenPath ?? ""
+            lastScreenName = nil
+            lastScreenUniqueId = nil
+            lastScreenPath = nil
+            onViewDidAppear(screenName: currentScreenName, screenPath: currentScreenId, screenHashValue: currentScreenUniqueId)
+        }
+    }
+
     func recordScreenViewEvent(_ event: ClickstreamEvent, _ screenName: String,
                                _ screenPath: String?, _ screenUniqueId: String?)
     {
