@@ -185,7 +185,7 @@ class SessionClientTests: XCTestCase {
         XCTAssertNotNil(appStartEvent.attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertFalse(appStartEvent.attributes[Event.ReservedAttribute.IS_FIRST_TIME] as! Bool)
     }
-    
+
     func testReopenAppAfterSessionTimeoutWillRecordScreenView() {
         clickstream.configuration.sessionTimeoutDuration = 0
         activityTracker.callback?(.runningInForeground)
@@ -205,7 +205,7 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.APP_END, events[4].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[5].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[6].eventType)
-        
+
         XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[7].eventType)
         XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_ID])

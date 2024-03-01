@@ -84,7 +84,8 @@ class AutoRecordEventClient {
             lastScreenName = nil
             lastScreenUniqueId = nil
             lastScreenPath = nil
-            onViewDidAppear(screenName: currentScreenName, screenPath: currentScreenId, screenHashValue: currentScreenUniqueId)
+            onViewDidAppear(screenName: currentScreenName, screenPath: currentScreenId,
+                            screenHashValue: currentScreenUniqueId)
         }
     }
 
