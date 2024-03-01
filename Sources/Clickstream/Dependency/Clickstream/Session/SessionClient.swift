@@ -44,6 +44,7 @@ class SessionClient: SessionClientBehaviour {
         if session!.isNewSession {
             autoRecordClient.recordSessionStartEvent()
             autoRecordClient.setIsEntrances()
+            autoRecordClient.recordScreenViewAfterSessionStart()
         }
     }
 

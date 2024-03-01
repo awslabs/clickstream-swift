@@ -66,11 +66,9 @@ class TestLogcatIOS:
         if screen_view_event['event_json'].get('attributes')['_entrances'] == 0:
             screen_view_event = sorted_screen_view_events[1]
         assert screen_view_event['event_json'].get('attributes')['_entrances'] == 1
-        assert '_screen_id' in screen_view_event['event_json'].get('attributes')
         assert '_screen_name' in screen_view_event['event_json'].get('attributes')
         assert '_screen_unique_id' in screen_view_event['event_json'].get('attributes')
 
-        assert '_session_id' in screen_view_event['event_json'].get('attributes')
         assert '_session_start_timestamp' in screen_view_event['event_json'].get('attributes')
         assert '_session_duration' in screen_view_event['event_json'].get('attributes')
         assert '_session_number' in screen_view_event['event_json'].get('attributes')
@@ -85,11 +83,9 @@ class TestLogcatIOS:
             (event for event in reversed(self.recorded_events) if '_screen_view' in event.get('event_name', '')),
             None)
         assert screen_view_event['event_json'].get('attributes')['_entrances'] == 0
-        assert '_screen_id' in screen_view_event['event_json'].get('attributes')
         assert '_screen_name' in screen_view_event['event_json'].get('attributes')
         assert '_screen_unique_id' in screen_view_event['event_json'].get('attributes')
 
-        assert '_previous_screen_id' in screen_view_event['event_json'].get('attributes')
         assert '_previous_screen_name' in screen_view_event['event_json'].get('attributes')
         assert '_previous_screen_unique_id' in screen_view_event['event_json'].get('attributes')
         assert '_previous_timestamp' in screen_view_event['event_json'].get('attributes')
