@@ -42,7 +42,7 @@ extension AWSClickstreamPlugin {
                                               eventRecorder: eventRecorder,
                                               sessionClient: sessionClient)
         clickstream.analyticsClient = analyticsClient
-        
+
         let networkMonitor = NWPathMonitor()
         clickstream.networkMonitor = networkMonitor
         sessionClient.startActivityTracking()

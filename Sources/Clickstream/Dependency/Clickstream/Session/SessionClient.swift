@@ -24,8 +24,8 @@ class SessionClient: SessionClientBehaviour {
 
     init(activityTracker: ActivityTrackerBehaviour? = nil, clickstream: ClickstreamContext) {
         self.clickstream = clickstream
-        session = Session.getCurrentSession(clickstream: clickstream)
-        autoRecordClient = AutoRecordEventClient(clickstream: clickstream)
+        self.session = Session.getCurrentSession(clickstream: clickstream)
+        self.autoRecordClient = AutoRecordEventClient(clickstream: clickstream)
         self.activityTracker = activityTracker ?? ActivityTracker()
     }
 

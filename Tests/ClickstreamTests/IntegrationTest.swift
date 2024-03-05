@@ -204,7 +204,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.setUserId("12345")
         Thread.sleep(forTimeInterval: 0.1)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        let profileSetEvent = eventArray[eventArray.count-1]
+        let profileSetEvent = eventArray[eventArray.count - 1]
         XCTAssertEqual(profileSetEvent["event_type"] as! String, Event.PresetEvent.PROFILE_SET)
         XCTAssertEqual(((profileSetEvent["user"] as! JsonObject)[Event.ReservedAttribute.USER_ID]
                 as! JsonObject)["value"] as! String, "12345")
@@ -219,7 +219,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.1)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        let profileSetEvent = eventArray[eventArray.count-1]
+        let profileSetEvent = eventArray[eventArray.count - 1]
         XCTAssertEqual(profileSetEvent["event_type"] as! String, Event.PresetEvent.PROFILE_SET)
         let user = (profileSetEvent["user"] as! JsonObject)
         XCTAssertEqual((user["_user_age"] as! JsonObject)["value"] as! Int, 21)
@@ -238,7 +238,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.1)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        let profileSetEvent = eventArray[eventArray.count-1]
+        let profileSetEvent = eventArray[eventArray.count - 1]
         XCTAssertEqual(profileSetEvent["event_type"] as! String, Event.PresetEvent.PROFILE_SET)
         let eventTime = profileSetEvent["timestamp"] as! Int64
         let user = (profileSetEvent["user"] as! JsonObject)
