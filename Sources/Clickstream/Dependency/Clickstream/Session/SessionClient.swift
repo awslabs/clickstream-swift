@@ -21,7 +21,6 @@ class SessionClient: SessionClientBehaviour {
     private let sessionClientQueue = DispatchQueue(label: Constants.queue,
                                                    attributes: .concurrent)
     let autoRecordClient: AutoRecordEventClient
-    private var isFirstEnterForeground = true
 
     init(activityTracker: ActivityTrackerBehaviour? = nil, clickstream: ClickstreamContext) {
         self.clickstream = clickstream
@@ -31,9 +30,6 @@ class SessionClient: SessionClientBehaviour {
     }
 
     func startActivityTracking() {
-        autoRecordClient.handleFirstOpen()
-        autoRecordClient.handleAppStart()
-        handleSesionStart()
         activityTracker.beginActivityTracking { [weak self] newState in
             guard let self else { return }
             self.sessionClientQueue.sync(flags: .barrier) {
@@ -53,12 +49,10 @@ class SessionClient: SessionClientBehaviour {
 
     private func handleAppEnterForeground() {
         log.debug("Application entered the foreground.")
-        if !isFirstEnterForeground {
-            autoRecordClient.handleAppStart()
-        }
+        autoRecordClient.handleFirstOpen()
+        autoRecordClient.handleAppStart()
         autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970)
         handleSesionStart()
-        isFirstEnterForeground = false
     }
 
     private func handleSesionStart() {

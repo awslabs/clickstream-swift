@@ -186,6 +186,7 @@ class SessionClientTests: XCTestCase {
         window.rootViewController = viewController
         window.makeKeyAndVisible()
         activityTracker.callback?(.runningInBackground)
+        Thread.sleep(forTimeInterval: 0.01)
         activityTracker.callback?(.runningInForeground)
         Thread.sleep(forTimeInterval: 0.1)
         let events = eventRecorder.savedEvents
@@ -197,8 +198,8 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.APP_END, events[4].eventType)
         XCTAssertEqual(Event.PresetEvent.APP_START, events[5].eventType)
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[6].eventType)
-
         XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[7].eventType)
+
         XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_NAME])
         XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_ID])
         XCTAssertNotNil(events[7].attributes[Event.ReservedAttribute.SCREEN_UNIQUEID])
@@ -248,6 +249,6 @@ class SessionClientTests: XCTestCase {
         Thread.sleep(forTimeInterval: 0.1)
         activityTracker.callback?(.runningInBackground)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(0, events.count)
     }
 }
