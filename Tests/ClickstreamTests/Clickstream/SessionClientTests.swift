@@ -34,19 +34,13 @@ class SessionClientTests: XCTestCase {
 
         eventRecorder = MockEventRecorder()
 
-        let sessionProvider: () -> Session? = { [weak sessionClient] in
-            guard let sessionClient else {
-                fatalError("SessionClient was deallocated")
-            }
-            return sessionClient.getCurrentSession()
-        }
-
         analyticsClient = try AnalyticsClient(
             clickstream: clickstream,
             eventRecorder: eventRecorder,
-            sessionProvider: sessionProvider
+            sessionClient: sessionClient
         )
         clickstream.analyticsClient = analyticsClient
+        sessionClient.startActivityTracking()
     }
 
     override func tearDown() {
@@ -65,9 +59,8 @@ class SessionClientTests: XCTestCase {
     }
 
     func testRunningInForeground() {
-        XCTAssertTrue(sessionClient.getCurrentSession() == nil)
         activityTracker.callback?(.runningInForeground)
-        let session = sessionClient.getCurrentSession()!
+        let session = sessionClient.getCurrentSession()
         XCTAssertTrue(session.isNewSession)
         XCTAssertTrue(session.sessionIndex == 1)
         XCTAssertNotNil(session.sessionId)
@@ -82,11 +75,10 @@ class SessionClientTests: XCTestCase {
     }
 
     func testGoBackground() {
-        XCTAssertTrue(sessionClient.getCurrentSession() == nil)
         activityTracker.callback?(.runningInForeground)
         Thread.sleep(forTimeInterval: 0.1)
         activityTracker.callback?(.runningInBackground)
-        let session = sessionClient.getCurrentSession()!
+        let session = sessionClient.getCurrentSession()
         XCTAssertTrue(session.pauseTime != nil)
         let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
         XCTAssertTrue(storedSession != nil)
@@ -111,7 +103,7 @@ class SessionClientTests: XCTestCase {
         sessionClient.autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970 - 1_100)
         activityTracker.callback?(.runningInBackground)
 
-        let session = sessionClient.getCurrentSession()!
+        let session = sessionClient.getCurrentSession()
         XCTAssertTrue(session.pauseTime != nil)
         let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
         XCTAssertTrue(storedSession != nil)
@@ -130,11 +122,11 @@ class SessionClientTests: XCTestCase {
 
     func testReturnToForeground() {
         activityTracker.callback?(.runningInForeground)
-        let session1 = sessionClient.getCurrentSession()!
+        let session1 = sessionClient.getCurrentSession()
         XCTAssertTrue(session1.isNewSession)
         activityTracker.callback?(.runningInBackground)
         activityTracker.callback?(.runningInForeground)
-        let session2 = sessionClient.getCurrentSession()!
+        let session2 = sessionClient.getCurrentSession()
         XCTAssertTrue(session1.sessionId == session2.sessionId)
         XCTAssertFalse(session2.isNewSession)
     }
@@ -142,11 +134,11 @@ class SessionClientTests: XCTestCase {
     func testReturnToForegroundWithSessionTimeout() {
         clickstream.configuration.sessionTimeoutDuration = 0
         activityTracker.callback?(.runningInForeground)
-        let session1 = sessionClient.getCurrentSession()!
+        let session1 = sessionClient.getCurrentSession()
         XCTAssertTrue(session1.isNewSession)
         activityTracker.callback?(.runningInBackground)
         activityTracker.callback?(.runningInForeground)
-        let session2 = sessionClient.getCurrentSession()!
+        let session2 = sessionClient.getCurrentSession()
         XCTAssertTrue(session1.sessionIndex != session2.sessionIndex)
         XCTAssertTrue(session2.isNewSession)
         XCTAssertTrue(session2.sessionIndex == 2)
@@ -216,6 +208,28 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(1, events[7].attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
     }
 
+    func testEventsHaveTheSameSessionId() {
+        clickstream.configuration.sessionTimeoutDuration = 0
+        activityTracker.callback?(.runningInForeground)
+        let viewController = MockViewControllerA()
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = viewController
+        window.makeKeyAndVisible()
+        activityTracker.callback?(.runningInBackground)
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        var sessionIdSet = Set<String>()
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+        XCTAssertEqual(Event.PresetEvent.SCREEN_VIEW, events[3].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_END, events[4].eventType)
+        for event in events {
+            sessionIdSet.insert(event.session?.sessionId ?? "")
+        }
+        XCTAssertEqual(1, sessionIdSet.count)
+    }
+
     func testLastScreenStartTimeStampUpdatedAfterReturnToForeground() {
         activityTracker.callback?(.runningInForeground)
         let viewController = MockViewControllerA()
@@ -232,7 +246,8 @@ class SessionClientTests: XCTestCase {
         clickstream.isEnable = false
         activityTracker.callback?(.runningInForeground)
         Thread.sleep(forTimeInterval: 0.1)
+        activityTracker.callback?(.runningInBackground)
         let events = eventRecorder.savedEvents
-        XCTAssertEqual(0, events.count)
+        XCTAssertEqual(3, events.count)
     }
 }

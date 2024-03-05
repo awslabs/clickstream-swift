@@ -10,27 +10,30 @@ import Foundation
 
 protocol SessionClientBehaviour: AnyObject {
     func startActivityTracking()
-    func initialSession()
     func storeSession()
     func onManualScreenView(_ event: ClickstreamEvent)
 }
 
 class SessionClient: SessionClientBehaviour {
-    private var session: Session?
+    private var session: Session
     private let clickstream: ClickstreamContext
     private let activityTracker: ActivityTrackerBehaviour
     private let sessionClientQueue = DispatchQueue(label: Constants.queue,
                                                    attributes: .concurrent)
     let autoRecordClient: AutoRecordEventClient
+    private var isFirstEnterForeground = true
 
     init(activityTracker: ActivityTrackerBehaviour? = nil, clickstream: ClickstreamContext) {
         self.clickstream = clickstream
+        session = Session.getCurrentSession(clickstream: clickstream)
+        autoRecordClient = AutoRecordEventClient(clickstream: clickstream)
         self.activityTracker = activityTracker ?? ActivityTracker()
-        self.autoRecordClient = AutoRecordEventClient(clickstream: clickstream)
-        startActivityTracking()
     }
 
     func startActivityTracking() {
+        autoRecordClient.handleFirstOpen()
+        autoRecordClient.handleAppStart()
+        handleSesionStart()
         activityTracker.beginActivityTracking { [weak self] newState in
             guard let self else { return }
             self.sessionClientQueue.sync(flags: .barrier) {
@@ -39,31 +42,33 @@ class SessionClient: SessionClientBehaviour {
         }
     }
 
-    func initialSession() {
-        session = Session.getCurrentSession(clickstream: clickstream)
-        if session!.isNewSession {
-            autoRecordClient.recordSessionStartEvent()
-            autoRecordClient.setIsEntrances()
-            autoRecordClient.recordScreenViewAfterSessionStart()
-        }
-    }
-
     func storeSession() {
-        if session != nil {
-            session?.pause()
-            UserDefaultsUtil.saveSession(storage: clickstream.storage, session: session!)
-        }
+        session.pause()
+        UserDefaultsUtil.saveSession(storage: clickstream.storage, session: session)
     }
 
-    func getCurrentSession() -> Session? {
+    func getCurrentSession() -> Session {
         session
     }
 
     private func handleAppEnterForeground() {
         log.debug("Application entered the foreground.")
-        autoRecordClient.handleAppStart()
+        if !isFirstEnterForeground {
+            autoRecordClient.handleAppStart()
+        }
         autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970)
-        initialSession()
+        handleSesionStart()
+        isFirstEnterForeground = false
+    }
+
+    private func handleSesionStart() {
+        session = Session.getCurrentSession(clickstream: clickstream, previousSession: session)
+        if session.isNewSession, !session.isRecorded {
+            autoRecordClient.recordSessionStartEvent()
+            autoRecordClient.setIsEntrances()
+            autoRecordClient.recordScreenViewAfterSessionStart()
+            session.isRecorded = true
+        }
     }
 
     private func handleAppEnterBackground() {

@@ -28,17 +28,11 @@ class ClickstreamPluginTestBase: XCTestCase {
 
         let sessionClient = SessionClient(clickstream: clickstream)
         clickstream.sessionClient = sessionClient
-        let sessionProvider: () -> Session? = { [weak sessionClient] in
-            guard let sessionClient else {
-                fatalError("SessionClient was deallocated")
-            }
-            return sessionClient.getCurrentSession()
-        }
 
         let eventRecorder = try EventRecorder(clickstream: clickstream)
         let analyticsClient = try AnalyticsClient(clickstream: clickstream,
                                                   eventRecorder: eventRecorder,
-                                                  sessionProvider: sessionProvider)
+                                                  sessionClient: sessionClient )
         analyticsPlugin.analyticsClient = analyticsClient
         clickstream.analyticsClient = analyticsClient
         clickstream.networkMonitor = mockNetworkMonitor

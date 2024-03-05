@@ -12,6 +12,7 @@ class Session: Codable {
     let startTime: Int64
     let sessionIndex: Int
     private(set) var pauseTime: Int64?
+    var isRecorded = false
 
     init(uniqueId: String, sessionIndex: Int) {
         self.sessionId = Self.generateSessionId(uniqueId: uniqueId)
@@ -27,19 +28,22 @@ class Session: Codable {
         self.sessionIndex = sessionIndex
     }
 
-    static func getCurrentSession(clickstream: ClickstreamContext) -> Session {
-        let storedSession = UserDefaultsUtil.getSession(storage: clickstream.storage)
-        var sessionIndex = 1
-        if storedSession != nil {
-            if Date().millisecondsSince1970 - storedSession!.pauseTime!
+    static func getCurrentSession(clickstream: ClickstreamContext, previousSession: Session? = nil) -> Session {
+        var session = previousSession
+        if session == nil {
+            session = UserDefaultsUtil.getSession(storage: clickstream.storage)
+        }
+        if session != nil {
+            if session!.isNewSession || Date().millisecondsSince1970 - session!.pauseTime!
                 < clickstream.configuration.sessionTimeoutDuration
             {
-                return storedSession!
+                return session!
             } else {
-                sessionIndex = storedSession!.sessionIndex + 1
+                return Session(uniqueId: clickstream.userUniqueId, sessionIndex: session!.sessionIndex + 1)
             }
+        } else {
+            return Session(uniqueId: clickstream.userUniqueId, sessionIndex: 1)
         }
-        return Session(uniqueId: clickstream.userUniqueId, sessionIndex: sessionIndex)
     }
 
     var isNewSession: Bool {

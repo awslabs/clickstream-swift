@@ -69,7 +69,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     func testRecordEventWithItem() throws {
@@ -95,7 +95,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     func testRecordCustomScreenViewEvent() throws {
@@ -204,7 +204,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.setUserId("12345")
         Thread.sleep(forTimeInterval: 0.1)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        let profileSetEvent = eventArray[eventArray.count - 1]
+        let profileSetEvent = eventArray[eventArray.count-1]
         XCTAssertEqual(profileSetEvent["event_type"] as! String, Event.PresetEvent.PROFILE_SET)
         XCTAssertEqual(((profileSetEvent["user"] as! JsonObject)[Event.ReservedAttribute.USER_ID]
                 as! JsonObject)["value"] as! String, "12345")
@@ -219,7 +219,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.1)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        let profileSetEvent = eventArray[eventArray.count - 1]
+        let profileSetEvent = eventArray[eventArray.count-1]
         XCTAssertEqual(profileSetEvent["event_type"] as! String, Event.PresetEvent.PROFILE_SET)
         let user = (profileSetEvent["user"] as! JsonObject)
         XCTAssertEqual((user["_user_age"] as! JsonObject)["value"] as! Int, 21)
@@ -238,7 +238,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.1)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        let profileSetEvent = eventArray[eventArray.count - 1]
+        let profileSetEvent = eventArray[eventArray.count-1]
         XCTAssertEqual(profileSetEvent["event_type"] as! String, Event.PresetEvent.PROFILE_SET)
         let eventTime = profileSetEvent["timestamp"] as! Int64
         let user = (profileSetEvent["user"] as! JsonObject)
@@ -258,7 +258,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     func testModifyConfiguration() throws {
@@ -271,7 +271,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     func testDisableSDKWillNotRecordCustomEvents() throws {
@@ -279,7 +279,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(0, eventCount-3)
     }
 
     func testDisableSDKWillNotRecordExceptionEvents() throws {
@@ -288,7 +288,7 @@ class IntegrationTest: XCTestCase {
         AutoRecordEventClient.handleException(exception)
         Thread.sleep(forTimeInterval: 0.5)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        XCTAssertEqual(1, eventArray.count)
+        XCTAssertEqual(0, eventArray.count-3)
     }
 
     func testDisableAndEnableSDKTwice() throws {
@@ -300,7 +300,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     // MARK: - Objc test
@@ -316,7 +316,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamObjc.recordEvent("testEvent", attribute)
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(3, eventCount)
+        XCTAssertEqual(2, eventCount-3)
     }
 
     func testRecordEventWithItemForObjc() throws {
@@ -400,7 +400,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     func testDisableAndEnableSDKForObjc() throws {
@@ -410,14 +410,14 @@ class IntegrationTest: XCTestCase {
         ClickstreamObjc.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount-3)
     }
 
     func testAppException() throws {
         let exception = NSException(name: NSExceptionName("TestException"), reason: "Testing", userInfo: nil)
         AutoRecordEventClient.handleException(exception)
         Thread.sleep(forTimeInterval: 0.5)
-        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[1]
+        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[3]
         XCTAssertTrue(event["event_type"] as! String == Event.PresetEvent.APP_EXCEPTION)
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertTrue(attributes[Event.ReservedAttribute.EXCEPTION_NAME] as! String == exception.name.rawValue)

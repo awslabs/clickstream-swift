@@ -48,8 +48,10 @@ class AutoRecordEventClient {
         if !clickstream.configuration.isTrackScreenViewEvents {
             return
         }
-        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
-        recordScreenViewEvent(event, screenName, screenPath, screenUniqueId)
+        if clickstream.analyticsClient != nil {
+            let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.SCREEN_VIEW)
+            recordScreenViewEvent(event, screenName, screenPath, screenUniqueId)
+        }
     }
 
     func recordViewScreenManually(_ event: ClickstreamEvent) {
@@ -176,17 +178,18 @@ class AutoRecordEventClient {
         }
     }
 
-    func handleAppStart() {
-        if isFirstTime {
-            checkAppVersionUpdate(clickstream: clickstream)
-            checkOSVersionUpdate(clickstream: clickstream)
-        }
+    func handleFirstOpen() {
+        checkAppVersionUpdate(clickstream: clickstream)
+        checkOSVersionUpdate(clickstream: clickstream)
         if isFirstOpen {
             let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.FIRST_OPEN)
             recordEvent(event)
             UserDefaultsUtil.saveIsFirstOpen(storage: clickstream.storage, isFirstOpen: "false")
             isFirstOpen = false
         }
+    }
+
+    func handleAppStart() {
         let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.APP_START)
         event.addAttribute(isFirstTime, forKey: Event.ReservedAttribute.IS_FIRST_TIME)
         recordEvent(event)
@@ -229,7 +232,7 @@ class AutoRecordEventClient {
 
     func recordEvent(_ event: ClickstreamEvent) {
         do {
-            try clickstream.analyticsClient.record(event)
+            try clickstream.analyticsClient?.record(event)
         } catch {
             log.error("Failed to record event with error:\(error)")
         }

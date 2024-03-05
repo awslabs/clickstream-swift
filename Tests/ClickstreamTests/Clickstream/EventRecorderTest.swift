@@ -22,6 +22,7 @@ class EventRecorderTest: XCTestCase {
     var clickstream: ClickstreamContext!
     var server: HttpServer!
     var activityTracker: MockActivityTracker!
+    var sessionClient: SessionClient!
 
     override func setUp() async throws {
         do {
@@ -56,18 +57,12 @@ class EventRecorderTest: XCTestCase {
             dbUtil = eventRecorder.dbUtil
 
             activityTracker = MockActivityTracker()
-            let sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)
+            sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)
             clickstream.sessionClient = sessionClient
-            let sessionProvider: () -> Session? = { [weak sessionClient] in
-                guard let sessionClient else {
-                    fatalError("SessionClient was deallocated")
-                }
-                return sessionClient.getCurrentSession()
-            }
             let analyticsClient = try AnalyticsClient(
                 clickstream: clickstream,
                 eventRecorder: eventRecorder,
-                sessionProvider: sessionProvider
+                sessionClient: sessionClient
             )
             clickstream.analyticsClient = analyticsClient
             clickstream.networkMonitor = MockNetworkMonitor()
@@ -408,6 +403,7 @@ class EventRecorderTest: XCTestCase {
     }
 
     func testBackgroundModeAutoSendRequest() throws {
+        sessionClient.startActivityTracking()
         activityTracker.callback?(.runningInForeground)
         try eventRecorder.save(clickstreamEvent)
         activityTracker.callback?(.runningInBackground)

@@ -37,20 +37,15 @@ extension AWSClickstreamPlugin {
 
         let sessionClient = SessionClient(clickstream: clickstream)
         clickstream.sessionClient = sessionClient
-        let sessionProvider: () -> Session? = { [weak sessionClient] in
-            guard let sessionClient else {
-                fatalError("SessionClient was deallocated")
-            }
-            return sessionClient.getCurrentSession()
-        }
         let eventRecorder = try EventRecorder(clickstream: clickstream)
         analyticsClient = try AnalyticsClient(clickstream: clickstream,
                                               eventRecorder: eventRecorder,
-                                              sessionProvider: sessionProvider)
+                                              sessionClient: sessionClient)
         clickstream.analyticsClient = analyticsClient
+        
         let networkMonitor = NWPathMonitor()
         clickstream.networkMonitor = networkMonitor
-        sessionClient.initialSession()
+        sessionClient.startActivityTracking()
         var autoFlushEventsTimer: DispatchSourceTimer?
         if configuration.sendEventsInterval != 0 {
             let timeInterval = TimeInterval(Double(configuration.sendEventsInterval) / 1_000)
@@ -66,7 +61,7 @@ extension AWSClickstreamPlugin {
             autoFlushEventsTimer: autoFlushEventsTimer,
             networkMonitor: networkMonitor
         )
-        log.debug("init the sdk success")
+        log.debug("initialize Clickstream SDK successful")
     }
 
     // MARK: Internal

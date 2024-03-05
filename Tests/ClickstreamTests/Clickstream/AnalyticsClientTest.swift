@@ -24,15 +24,16 @@ class AnalyticsClientTest: XCTestCase {
                                                                    isTrackAppExceptionEvents: false,
                                                                    isCompressEvents: false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
+        let sessionClient = SessionClient(clickstream: clickstream)
+        clickstream.sessionClient = sessionClient
+
         clickstream.networkMonitor = MockNetworkMonitor()
         eventRecorder = MockEventRecorder()
-        session = Session(uniqueId: "uniqueId", sessionIndex: 1)
+        session = sessionClient.getCurrentSession()
         analyticsClient = try AnalyticsClient(
             clickstream: clickstream,
             eventRecorder: eventRecorder,
-            sessionProvider: {
-                self.session
-            }
+            sessionClient: sessionClient
         )
     }
 
