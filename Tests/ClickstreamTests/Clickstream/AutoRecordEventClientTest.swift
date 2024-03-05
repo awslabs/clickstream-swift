@@ -35,7 +35,7 @@ class AutoRecordEventClientTest: XCTestCase {
         let analyticsClient = try AnalyticsClient(
             clickstream: clickstream,
             eventRecorder: eventRecorder,
-            sessionProvider: { nil }
+            sessionClient: sessionClient
         )
         clickstream.analyticsClient = analyticsClient
 
@@ -78,6 +78,7 @@ class AutoRecordEventClientTest: XCTestCase {
     }
 
     func testOneScreenView() {
+        sessionClient.startActivityTracking()
         activityTracker.callback?(.runningInForeground)
         autoRecordEventClient.setIsEntrances()
         let viewController = MockViewControllerA()

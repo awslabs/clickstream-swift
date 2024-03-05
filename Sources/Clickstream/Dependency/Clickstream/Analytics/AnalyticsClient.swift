@@ -21,29 +21,27 @@ protocol AnalyticsClientBehaviour {
     func submitEvents(isBackgroundMode: Bool)
 }
 
-typealias SessionProvider = () -> Session?
-
 class AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var eventRecorder: AnalyticsEventRecording
-    private let sessionProvider: SessionProvider
+    private let sessionClient: SessionClient
     private(set) lazy var globalAttributes: [String: AttributeValue] = [:]
     private(set) var allUserAttributes: [String: Any] = [:]
     private(set) var simpleUserAttributes: [String: Any] = [:]
     private let clickstream: ClickstreamContext
     private(set) var userId: String?
-    var autoRecordClient: AutoRecordEventClient?
+    var autoRecordClient: AutoRecordEventClient
 
     init(clickstream: ClickstreamContext,
          eventRecorder: AnalyticsEventRecording,
-         sessionProvider: @escaping SessionProvider) throws
+         sessionClient: SessionClient) throws
     {
         self.clickstream = clickstream
         self.eventRecorder = eventRecorder
-        self.sessionProvider = sessionProvider
+        self.sessionClient = sessionClient
         self.userId = UserDefaultsUtil.getCurrentUserId(storage: clickstream.storage)
         self.allUserAttributes = UserDefaultsUtil.getUserAttributes(storage: clickstream.storage)
+        self.autoRecordClient = sessionClient.autoRecordClient
         self.simpleUserAttributes = getSimpleUserAttributes()
-        self.autoRecordClient = (clickstream.sessionClient as? SessionClient)?.autoRecordClient
     }
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
@@ -116,7 +114,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         let event = ClickstreamEvent(eventType: eventType,
                                      appId: clickstream.configuration.appId,
                                      uniqueId: clickstream.userUniqueId,
-                                     session: sessionProvider(),
+                                     session: sessionClient.getCurrentSession(),
                                      systemInfo: clickstream.systemInfo,
                                      netWorkType: clickstream.networkMonitor.netWorkType)
         return event
@@ -135,15 +133,13 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         for (key, attribute) in globalAttributes {
             event.addGlobalAttribute(attribute, forKey: key)
         }
-        if let autoRecordClient {
-            if autoRecordClient.lastScreenName != nil {
-                event.addGlobalAttribute(autoRecordClient.lastScreenName!,
-                                         forKey: Event.ReservedAttribute.SCREEN_NAME)
-            }
-            if autoRecordClient.lastScreenUniqueId != nil {
-                event.addGlobalAttribute(autoRecordClient.lastScreenUniqueId!,
-                                         forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
-            }
+        if autoRecordClient.lastScreenName != nil {
+            event.addGlobalAttribute(autoRecordClient.lastScreenName!,
+                                     forKey: Event.ReservedAttribute.SCREEN_NAME)
+        }
+        if autoRecordClient.lastScreenUniqueId != nil {
+            event.addGlobalAttribute(autoRecordClient.lastScreenUniqueId!,
+                                     forKey: Event.ReservedAttribute.SCREEN_UNIQUEID)
         }
         if event.eventType == Event.PresetEvent.PROFILE_SET {
             event.setUserAttribute(allUserAttributes)

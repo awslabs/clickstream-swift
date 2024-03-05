@@ -69,7 +69,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testRecordEventWithItem() throws {
@@ -95,7 +95,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testRecordCustomScreenViewEvent() throws {
@@ -108,7 +108,7 @@ class IntegrationTest: XCTestCase {
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertEqual("HomeView", attributes[ClickstreamAnalytics.Attr.SCREEN_NAME] as! String)
         XCTAssertEqual("23ac31df", attributes[ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID] as! String)
-        XCTAssertEqual(1, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+        XCTAssertEqual(0, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
     }
 
     func testFlushEvents() throws {
@@ -258,7 +258,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testModifyConfiguration() throws {
@@ -271,7 +271,7 @@ class IntegrationTest: XCTestCase {
         ])
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testDisableSDKWillNotRecordCustomEvents() throws {
@@ -279,7 +279,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(1, eventCount)
+        XCTAssertEqual(0, eventCount)
     }
 
     func testDisableSDKWillNotRecordExceptionEvents() throws {
@@ -288,7 +288,7 @@ class IntegrationTest: XCTestCase {
         AutoRecordEventClient.handleException(exception)
         Thread.sleep(forTimeInterval: 0.5)
         let eventArray = try eventRecorder.getBatchEvent().eventsJson.jsonArray()
-        XCTAssertEqual(1, eventArray.count)
+        XCTAssertEqual(0, eventArray.count)
     }
 
     func testDisableAndEnableSDKTwice() throws {
@@ -300,7 +300,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     // MARK: - Objc test
@@ -316,7 +316,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamObjc.recordEvent("testEvent", attribute)
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(3, eventCount)
+        XCTAssertEqual(2, eventCount)
     }
 
     func testRecordEventWithItemForObjc() throws {
@@ -351,7 +351,7 @@ class IntegrationTest: XCTestCase {
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertEqual("HomeView", attributes[ClickstreamAnalytics.Attr.SCREEN_NAME] as! String)
         XCTAssertEqual("23ac31df", attributes[ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID] as! String)
-        XCTAssertEqual(1, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+        XCTAssertEqual(0, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
     }
 
     func testGlobalAttributeForObjc() throws {
@@ -400,7 +400,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.2)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testDisableAndEnableSDKForObjc() throws {
@@ -410,14 +410,14 @@ class IntegrationTest: XCTestCase {
         ClickstreamObjc.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
-        XCTAssertEqual(2, eventCount)
+        XCTAssertEqual(1, eventCount)
     }
 
     func testAppException() throws {
         let exception = NSException(name: NSExceptionName("TestException"), reason: "Testing", userInfo: nil)
         AutoRecordEventClient.handleException(exception)
         Thread.sleep(forTimeInterval: 0.5)
-        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[1]
+        let event = try eventRecorder.getBatchEvent().eventsJson.jsonArray()[0]
         XCTAssertTrue(event["event_type"] as! String == Event.PresetEvent.APP_EXCEPTION)
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertTrue(attributes[Event.ReservedAttribute.EXCEPTION_NAME] as! String == exception.name.rawValue)
