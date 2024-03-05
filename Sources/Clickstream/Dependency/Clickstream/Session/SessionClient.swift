@@ -50,13 +50,13 @@ class SessionClient: SessionClientBehaviour {
     private func handleAppEnterForeground() {
         log.debug("Application entered the foreground.")
         autoRecordClient.handleFirstOpen()
+        session = Session.getCurrentSession(clickstream: clickstream, previousSession: session)
         autoRecordClient.handleAppStart()
         autoRecordClient.updateLastScreenStartTimestamp(Date().millisecondsSince1970)
         handleSesionStart()
     }
 
     private func handleSesionStart() {
-        session = Session.getCurrentSession(clickstream: clickstream, previousSession: session)
         if session.isNewSession, !session.isRecorded {
             autoRecordClient.recordSessionStartEvent()
             autoRecordClient.setIsEntrances()
