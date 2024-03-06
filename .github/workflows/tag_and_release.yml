@@ -25,7 +25,7 @@ jobs:
           echo $version
           git config user.name '${{ vars.USER_NAME }}'
           git config user.email '${{ vars.USER_EMAIL }}'
-          git tag v$version
+          git tag $version
           git push origin v$version
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
