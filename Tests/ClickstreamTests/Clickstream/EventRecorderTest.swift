@@ -16,6 +16,7 @@ class EventRecorderTest: XCTestCase {
     let testFailEndpoint = "http://localhost:8080/collect/fail"
     let testSuccessWithDelayEndpoint = "http://localhost:8080/collect/success/delay"
     let testHashCodeEndpoint = "http://localhost:8080/collect/hashcode"
+    let testUploadTimestampEndpoint = "http://localhost:8080/collect/timestamp"
     var dbUtil: ClickstreamDBProtocol!
     var clickstreamEvent: ClickstreamEvent!
     var eventRecorder: EventRecorder!
@@ -424,6 +425,22 @@ class EventRecorderTest: XCTestCase {
             return .badRequest(.text("Fail"))
         }
         let result = NetRequest.uploadEventWithURLSession(eventsJson: eventJson, configuration: clickstream.configuration, bundleSequenceId: 1)
+        XCTAssertTrue(result)
+    }
+
+    func testVerifyUploadTimestampInRequestParameter() {
+        clickstream.configuration.endpoint = testUploadTimestampEndpoint
+        server["/collect/timestamp"] = { request in
+            let queryParams = request.queryParams
+            // swift lambda for get the upload_timestamp value in queryParams dictionary
+            let uploadTimestamp = queryParams.first(where: { $0.0 == "upload_timestamp" })?.1
+            let requestUploadTimestamp = Int64(uploadTimestamp!)!
+            if Date().millisecondsSince1970 - requestUploadTimestamp < 5_000 {
+                return .ok(.text("Success"))
+            }
+            return .badRequest(.text("Fail"))
+        }
+        let result = NetRequest.uploadEventWithURLSession(eventsJson: "[]", configuration: clickstream.configuration, bundleSequenceId: 1)
         XCTAssertTrue(result)
     }
 }
