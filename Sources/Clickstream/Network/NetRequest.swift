@@ -33,6 +33,7 @@ enum NetRequest {
             URLQueryItem(name: "appId", value: configuration.appId),
             URLQueryItem(name: "compression", value: compression),
             URLQueryItem(name: "event_bundle_sequence_id", value: String(describing: bundleSequenceId)),
+            URLQueryItem(name: "upload_timestamp", value: String(describing: Date().millisecondsSince1970)),
             URLQueryItem(name: "hashCode", value: requestData.hashCode())
         ]
 
