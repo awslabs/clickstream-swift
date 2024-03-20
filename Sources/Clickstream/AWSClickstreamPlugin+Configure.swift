@@ -62,6 +62,7 @@ extension AWSClickstreamPlugin {
             networkMonitor: networkMonitor
         )
         log.debug("initialize Clickstream SDK successful")
+        sessionClient.handleAppStart()
     }
 
     // MARK: Internal

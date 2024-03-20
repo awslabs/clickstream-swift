@@ -51,6 +51,9 @@ class IntegrationTest: XCTestCase {
         } catch {
             XCTFail("Error setting up Amplify: \(error)")
         }
+        let eventCount = try eventRecorder.dbUtil.getEventCount()
+        XCTAssertEqual(3, eventCount)
+        try eventRecorder.dbUtil.deleteAllEvents()
     }
 
     override func tearDown() async throws {
@@ -108,7 +111,7 @@ class IntegrationTest: XCTestCase {
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertEqual("HomeView", attributes[ClickstreamAnalytics.Attr.SCREEN_NAME] as! String)
         XCTAssertEqual("23ac31df", attributes[ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID] as! String)
-        XCTAssertEqual(0, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+        XCTAssertEqual(1, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
     }
 
     func testFlushEvents() throws {
@@ -351,7 +354,7 @@ class IntegrationTest: XCTestCase {
         let attributes = event["attributes"] as! [String: Any]
         XCTAssertEqual("HomeView", attributes[ClickstreamAnalytics.Attr.SCREEN_NAME] as! String)
         XCTAssertEqual("23ac31df", attributes[ClickstreamAnalytics.Attr.SCREEN_UNIQUE_ID] as! String)
-        XCTAssertEqual(0, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
+        XCTAssertEqual(1, attributes[Event.ReservedAttribute.ENTRANCES] as! Int)
     }
 
     func testGlobalAttributeForObjc() throws {

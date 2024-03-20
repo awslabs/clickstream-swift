@@ -15,6 +15,7 @@ class AutoRecordEventClient {
     private var isEntrances = false
     private var isFirstOpen: Bool
     private var isFirstTime = true
+    private var isAppEndCalled = false
     private var lastEngageTime: Int64 = 0
     private(set) var lastScreenName: String?
     private var lastScreenPath: String?
@@ -190,15 +191,18 @@ class AutoRecordEventClient {
     }
 
     func handleAppStart() {
-        let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.APP_START)
-        event.addAttribute(isFirstTime, forKey: Event.ReservedAttribute.IS_FIRST_TIME)
-        recordEvent(event)
+        if isFirstTime || isAppEndCalled {
+            let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.APP_START)
+            event.addAttribute(isFirstTime, forKey: Event.ReservedAttribute.IS_FIRST_TIME)
+            recordEvent(event)
+        }
         isFirstTime = false
     }
 
     func recordAppEnd() {
         let event = clickstream.analyticsClient.createEvent(withEventType: Event.PresetEvent.APP_END)
         recordEvent(event)
+        isAppEndCalled = true
     }
 
     func recordSessionStartEvent() {

@@ -38,6 +38,12 @@ class SessionClient: SessionClientBehaviour {
         }
     }
 
+    func handleAppStart() {
+        autoRecordClient.handleFirstOpen()
+        autoRecordClient.handleAppStart()
+        handleSesionStart()
+    }
+
     func storeSession() {
         session.pause()
         UserDefaultsUtil.saveSession(storage: clickstream.storage, session: session)

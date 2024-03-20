@@ -74,6 +74,23 @@ class SessionClientTests: XCTestCase {
         XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
     }
 
+    func testRunningInForegroundAfterHandleAppStart() {
+        sessionClient.handleAppStart()
+        activityTracker.callback?(.runningInForeground)
+        let session = sessionClient.getCurrentSession()
+        XCTAssertTrue(session.isNewSession)
+        XCTAssertTrue(session.sessionIndex == 1)
+        XCTAssertNotNil(session.sessionId)
+        XCTAssertNotNil(session.startTime)
+
+        Thread.sleep(forTimeInterval: 0.1)
+        let events = eventRecorder.savedEvents
+        XCTAssertEqual(3, events.count)
+        XCTAssertEqual(Event.PresetEvent.FIRST_OPEN, events[0].eventType)
+        XCTAssertEqual(Event.PresetEvent.APP_START, events[1].eventType)
+        XCTAssertEqual(Event.PresetEvent.SESSION_START, events[2].eventType)
+    }
+
     func testGoBackground() {
         activityTracker.callback?(.runningInForeground)
         Thread.sleep(forTimeInterval: 0.1)
