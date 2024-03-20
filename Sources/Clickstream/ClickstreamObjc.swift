@@ -34,10 +34,11 @@ import Foundation
         ClickstreamAnalytics.recordEvent(eventName, getAttributes(attributes))
     }
 
-    /// The method to record event with attributes
+    /// The method to record event with attributes and items
     /// - Parameters:
     ///   - eventName: the event name
     ///   - attributes: the event attributes which type is NSDictionary
+    ///   - items: the event items which type is NSDictionary
     public static func recordEvent(_ eventName: String, _ attributes: NSDictionary, _ items: [NSDictionary] = []) {
         ClickstreamAnalytics.recordEvent(eventName, getAttributes(attributes), getItems(items))
     }
