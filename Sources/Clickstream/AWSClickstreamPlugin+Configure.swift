@@ -117,6 +117,13 @@ extension AWSClickstreamPlugin {
         } else if amplifyConfigure.isCompressEvents != nil {
             defaultConfiguration.isCompressEvents = amplifyConfigure.isCompressEvents
         }
+
+        mergeDefaultConfiguration(defaultConfiguration)
+        configuration = defaultConfiguration
+    }
+
+    /// Internal method to merge the default configurations
+    func mergeDefaultConfiguration(_ defaultConfiguration: ClickstreamConfiguration) {
         if let isTrackScreenViewEvents = configuration.isTrackScreenViewEvents {
             defaultConfiguration.isTrackScreenViewEvents = isTrackScreenViewEvents
         }
@@ -135,7 +142,6 @@ extension AWSClickstreamPlugin {
         if configuration.globalAttributes != nil {
             defaultConfiguration.globalAttributes = configuration.globalAttributes
         }
-        configuration = defaultConfiguration
     }
 
     /// Internal method to add global attributes

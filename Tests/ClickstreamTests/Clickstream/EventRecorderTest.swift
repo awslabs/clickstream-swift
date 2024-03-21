@@ -41,7 +41,7 @@ class EventRecorderTest: XCTestCase {
             }
             try! server.start()
             let appId = testAppId + String(describing: Date().millisecondsSince1970)
-            
+
             let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
                 .withAppId(appId)
                 .withEndpoint(testSuccessEndpoint)

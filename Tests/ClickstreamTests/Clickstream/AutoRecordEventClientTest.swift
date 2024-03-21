@@ -22,7 +22,7 @@ class AutoRecordEventClientTest: XCTestCase {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         let mockNetworkMonitor = MockNetworkMonitor()
         activityTracker = MockActivityTracker()
-        
+
         let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
             .withAppId(testAppId)
             .withEndpoint(testEndpoint)

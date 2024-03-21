@@ -258,15 +258,15 @@ class SessionClientTests: XCTestCase {
         let state1 = ApplicationState.Resolver.resolve(currentState: ApplicationState.terminated,
                                                       event: ActivityEvent.applicationWillMoveToForeground)
         XCTAssertEqual(ApplicationState.terminated, state1)
-        
+
         let state2 = ApplicationState.Resolver.resolve(currentState: ApplicationState.runningInBackground,
                                                       event: ActivityEvent.applicationWillTerminate)
         XCTAssertEqual(ApplicationState.terminated, state2)
-        
+
         let state3 = ApplicationState.Resolver.resolve(currentState: ApplicationState.runningInBackground,
                                                       event: ActivityEvent.applicationDidMoveToBackground)
         XCTAssertEqual(ApplicationState.runningInBackground, state3)
-        
+
         let state4 = ApplicationState.Resolver.resolve(currentState: ApplicationState.runningInForeground,
                                                       event: ActivityEvent.applicationWillMoveToForeground)
         XCTAssertEqual(ApplicationState.runningInForeground, state4)

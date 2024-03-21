@@ -19,7 +19,7 @@ class ClickstreamPluginTestBase: XCTestCase {
     override func setUp() async throws {
         mockNetworkMonitor = MockNetworkMonitor()
         analyticsPlugin = AWSClickstreamPlugin()
-        
+
         let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
             .withAppId(testAppId)
             .withEndpoint(testEndpoint)
