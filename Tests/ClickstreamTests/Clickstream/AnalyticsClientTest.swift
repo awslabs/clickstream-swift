@@ -18,11 +18,12 @@ class AnalyticsClientTest: XCTestCase {
 
     override func setUp() async throws {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
-        let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
-                                                                   endpoint: testEndpoint,
-                                                                   sendEventsInterval: 10_000,
-                                                                   isTrackAppExceptionEvents: false,
-                                                                   isCompressEvents: false)
+        let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
+            .withAppId(testAppId)
+            .withEndpoint(testEndpoint)
+            .withSendEventInterval(10_000)
+            .withTrackAppExceptionEvents(false)
+            .withCompressEvents(false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
         let sessionClient = SessionClient(clickstream: clickstream)
         clickstream.sessionClient = sessionClient

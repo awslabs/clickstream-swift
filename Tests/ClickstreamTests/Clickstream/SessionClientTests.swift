@@ -22,11 +22,13 @@ class SessionClientTests: XCTestCase {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         activityTracker = MockActivityTracker()
         mockNetworkMonitor = MockNetworkMonitor()
-        let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
-                                                                   endpoint: testEndpoint,
-                                                                   sendEventsInterval: 10_000,
-                                                                   isTrackAppExceptionEvents: false,
-                                                                   isCompressEvents: false)
+
+        let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
+            .withAppId(testAppId)
+            .withEndpoint(testEndpoint)
+            .withSendEventInterval(10_000)
+            .withTrackAppExceptionEvents(false)
+            .withCompressEvents(false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
         clickstream.networkMonitor = mockNetworkMonitor
         sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)
@@ -250,5 +252,23 @@ class SessionClientTests: XCTestCase {
         activityTracker.callback?(.runningInBackground)
         let events = eventRecorder.savedEvents
         XCTAssertEqual(0, events.count)
+    }
+
+    func testActivityTrackerApplicationState() {
+        let state1 = ApplicationState.Resolver.resolve(currentState: ApplicationState.terminated,
+                                                      event: ActivityEvent.applicationWillMoveToForeground)
+        XCTAssertEqual(ApplicationState.terminated, state1)
+        
+        let state2 = ApplicationState.Resolver.resolve(currentState: ApplicationState.runningInBackground,
+                                                      event: ActivityEvent.applicationWillTerminate)
+        XCTAssertEqual(ApplicationState.terminated, state2)
+        
+        let state3 = ApplicationState.Resolver.resolve(currentState: ApplicationState.runningInBackground,
+                                                      event: ActivityEvent.applicationDidMoveToBackground)
+        XCTAssertEqual(ApplicationState.runningInBackground, state3)
+        
+        let state4 = ApplicationState.Resolver.resolve(currentState: ApplicationState.runningInForeground,
+                                                      event: ActivityEvent.applicationWillMoveToForeground)
+        XCTAssertEqual(ApplicationState.runningInForeground, state4)
     }
 }

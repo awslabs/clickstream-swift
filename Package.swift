@@ -30,7 +30,8 @@ let package = Package(
         ),
         .testTarget(
             name: "ClickstreamTests",
-            dependencies: ["Clickstream", .product(name: "Swifter", package: "swifter")]
+            dependencies: ["Clickstream", .product(name: "Swifter", package: "swifter")],
+            resources: [.process("amplifyconfiguration.json")]
         )
     ]
 )

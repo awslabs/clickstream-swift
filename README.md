@@ -20,7 +20,7 @@ The Clickstream SDK supports iOS 13+.
 
 Clickstream requires Xcode 13.4 or higher to build.
 
-**1.Add Package**
+### 1.Add Package
 
 We use **Swift Package Manager** to distribute Clickstream Swift SDK, open your project in Xcode and select **File > Add Pckages**.
 
@@ -30,7 +30,7 @@ Enter the Clickstream Library for Swift GitHub repo URL (`https://github.com/aws
 
 ![](images/add_package_url.png)
 
-**2.Parameter configuration**
+### 2.Parameter configuration
 
 Downlod your `amplifyconfiguration.json` file from your Clickstream solution control plane, and paste it to your project root folder:
 
@@ -62,15 +62,15 @@ Your `appId` and `endpoint` are already set up in it, here's an explanation of e
 - **autoFlushEventsInterval**: event sending interval, the default is `10s`
 - **isTrackAppExceptionEvents**: whether auto track exception event in app, default is `false`
 
-**3.Initialize the SDK**
+### 3.Initialize the SDK
 
 Once you have configured the parameters, you need to initialize it in your app delegate's `application(_:didFinishLaunchingWithOptions:)` lifecycle method:
 
+#### 3.1 Initialize the SDK with default configuration
 ```swift
 import Clickstream
 ...
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    // Override point for customization after application launch.
     do {
         try ClickstreamAnalytics.initSDK()
     } catch {
@@ -80,6 +80,34 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
+#### 3.2 Initialize the SDK with global attributes and custom configuration
+
+```swift
+import Clickstream
+...
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    do {
+        let configuration = ClickstreamConfiguration()
+            .withAppId("your appId")
+            .withEndpoint("https://example.com/collect")
+            .withLogEvents(true)
+            .withGlobalAttributes([
+                "_traffic_source_name": "Summer promotion",
+                "_traffic_source_medium": "Search engine"
+            ])
+        try ClickstreamAnalytics.initSDK(configuration)
+    } catch {
+        assertionFailure("Fail to initialize ClickstreamAnalytics: \(error)")
+    }
+    return true
+}
+```
+
+By default, we will use the configurations in `amplifyconfiguration.json` file. If you add a custom configuration, the added configuration items will override the default values. 
+
+You can also add all the configuration parameters you need in the `initSDK` method without using the `amplifyconfiguration.json` file.
+
+#### 3.3 SwiftUI configuration
 If your project is developed with SwiftUI, you need to create an application delegate and attach it to your `App` through `UIApplicationDelegateAdaptor`. 
 
 ```swift
@@ -94,24 +122,24 @@ struct YourApp: App {
 }
 ```
 
-You also need to disable swzzling by setting `configuration.isTrackScreenViewEvents = false`, see the next configuration steps.
+You also need to disable swzzling by setting `configuration.withTrackScreenViewEvents(false)`, see the next configuration steps.
 
-**4.Configure the SDK**
+### 4. Update Configuration
 
 ```swift
 import Clickstream
 
-// config the sdk after initialize.
+// configure the sdk after initialize.
 do {
-    var configuration = try ClickstreamAnalytics.getClickstreamConfiguration()
-    configuration.appId = "appId"
-    configuration.endpoint = "https://example.com/collect"
-    configuration.authCookie = "your authentication cookie"
-    configuration.sessionTimeoutDuration = 1800000
-    configuration.isTrackScreenViewEvents = true
-    configuration.isTrackUserEngagementEvents = true
-    configuration.isLogEvents = true
-    configuration.isCompressEvents = true
+    let configuration = try ClickstreamAnalytics.getClickstreamConfiguration()
+    configuration.withAppId("your appId")
+        .withEndpoint("https://example.com/collect")
+        .withLogEvents(true)
+        .withCompressEvents(true)
+        .withSessionTimeoutDuration(1800000)
+        .withTrackAppExceptionEvents(true)
+        .withTrackScreenViewEvents(true)
+        .withTrackUserEngagementEvents(true)
 } catch {
     print("Failed to config ClickstreamAnalytics: \(error)")
 }
@@ -136,7 +164,7 @@ let attributes: ClickstreamAttribute = [
 ]
 ClickstreamAnalytics.recordEvent("testEvent", attributes)
 
-// for record an event directly
+// for record an event with event name
 ClickstreamAnalytics.recordEvent("button_click")
 ```
 

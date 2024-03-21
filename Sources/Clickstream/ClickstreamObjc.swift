@@ -20,6 +20,11 @@ import Foundation
         try ClickstreamAnalytics.initSDK()
     }
 
+    /// Init the Clickstream sdk
+    public static func initSDK(_ configuration: ClickstreamConfiguration) throws {
+        try ClickstreamAnalytics.initSDK(configuration)
+    }
+
     /// Use this method to record event
     /// - Parameter eventName: the event name
     public static func recordEvent(_ eventName: String) {
@@ -67,7 +72,7 @@ import Foundation
 
     /// Get Clickstream configuration, please config it after initialize sdk
     /// - Returns: ClickstreamContextConfiguration to modify the configuration of clickstream sdk
-    public static func getClickstreamConfiguration() throws -> ClickstreamContextConfiguration {
+    public static func getClickstreamConfiguration() throws -> ClickstreamConfiguration {
         try ClickstreamAnalytics.getClickstreamConfiguration()
     }
 

@@ -6,13 +6,14 @@
 //
 
 import Amplify
+import Foundation
 
 /// ClickstreamAnalytics api for swift
 public enum ClickstreamAnalytics {
     /// Init ClickstreamAnalytics
-    public static func initSDK() throws {
-        try Amplify.add(plugin: AWSClickstreamPlugin())
-        try Amplify.configure()
+    public static func initSDK(_ configuration: ClickstreamConfiguration? = nil) throws {
+        try Amplify.add(plugin: AWSClickstreamPlugin(configuration))
+        try Amplify.configure(getAmplifyConfigurationSafely())
     }
 
     /// Use this method to record event
@@ -70,7 +71,7 @@ public enum ClickstreamAnalytics {
 
     /// Get Clickstream configuration, please config it after initialize sdk
     /// - Returns: ClickstreamContextConfiguration to modify the configuration of clickstream sdk
-    public static func getClickstreamConfiguration() throws -> ClickstreamContextConfiguration {
+    public static func getClickstreamConfiguration() throws -> ClickstreamConfiguration {
         let plugin = try Amplify.Analytics.getPlugin(for: "awsClickstreamPlugin")
         // swiftlint:disable force_cast
         return (plugin as! AWSClickstreamPlugin).getEscapeHatch().configuration
@@ -87,6 +88,28 @@ public enum ClickstreamAnalytics {
     /// - Parameter userId: current userId, nil for logout
     public static func enable() {
         Amplify.Analytics.enable()
+    }
+
+    static func getAmplifyConfigurationSafely(_ bundle: Bundle = Bundle.main) -> AmplifyConfiguration {
+        var amplifyConfiguraion: AmplifyConfiguration!
+        do {
+            guard let path = bundle.path(forResource: "amplifyconfiguration", ofType: "json") else {
+                throw ConfigurationError.invalidAmplifyConfigurationFile("Could not load default `amplifyconfiguration.json` file", "please check if you added the correct configuration file")
+            }
+            let url = URL(fileURLWithPath: path)
+            amplifyConfiguraion = try AmplifyConfiguration(configurationFile: url)
+        } catch {
+            log.debug("Could not load default `amplifyconfiguration.json` file")
+            let plugins: [String: JSONValue] = [
+                "awsClickstreamPlugin": [
+                    "appId": JSONValue.string(""),
+                    "endpoint": JSONValue.string(""),
+                ],
+            ]
+            let analyticsConfiguration = AnalyticsCategoryConfiguration(plugins: plugins)
+            amplifyConfiguraion = AmplifyConfiguration(analytics: analyticsConfiguration)
+        }
+        return amplifyConfiguraion
     }
 
     /// ClickstreamAnalytics preset events
@@ -133,3 +156,5 @@ public enum ClickstreamAnalytics {
         public static let ITEM_CATEGORY5 = "item_category5"
     }
 }
+
+extension ClickstreamAnalytics: ClickstreamLogger {}
