@@ -25,6 +25,7 @@ jobs:
           token: ${{ secrets.PROJECT_TOKEN }}
       - name: Modify SDK for integration test
         run: |
+          sed -i '' -e "s#isLogEvents: Bool = false#isLogEvents: Bool = true#g" Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift
           sed -i '' -e "s#private(set) var bundleSequenceId: Int#private(set) var bundleSequenceId: Int\n    var allEventJson: String = \"\"#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           sed -i '' -e "s#toPrettierJsonString())\")#toPrettierJsonString())\")\n            allEventJson.append(\"Saved event \\\(event.eventType):\\\(eventObject.toJsonString())\\\n\")\n            UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
           sed -i '' -e "s#batchEvent.eventCount) events\")#batchEvent.eventCount) events\")\n                allEventJson.append(\"Send \\\(batchEvent.eventCount) events\\\n\")\n                UIPasteboard.general.string = allEventJson#g" Sources/Clickstream/Dependency/Clickstream/Analytics/EventRecorder.swift
