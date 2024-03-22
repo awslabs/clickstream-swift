@@ -58,6 +58,7 @@ extension AWSClickstreamPlugin {
         )
         initGlobalAttributes()
         log.debug("initialize Clickstream SDK successful")
+        sessionClient.handleAppStart()
     }
 
     // MARK: Internal
