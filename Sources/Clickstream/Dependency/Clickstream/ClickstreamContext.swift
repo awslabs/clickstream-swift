@@ -120,7 +120,7 @@ extension UserDefaults: UserDefaultsBehaviour {
         return self
     }
 
-    public func withGlobalAttributes(_ globalAttributes: ClickstreamAttribute) -> ClickstreamConfiguration {
+    public func withInitialGlobalAttributes(_ globalAttributes: ClickstreamAttribute) -> ClickstreamConfiguration {
         self.globalAttributes = globalAttributes
         return self
     }

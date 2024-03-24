@@ -91,7 +91,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
             .withAppId("your appId")
             .withEndpoint("https://example.com/collect")
             .withLogEvents(true)
-            .withGlobalAttributes([
+            .withInitialGlobalAttributes([
                 "_traffic_source_name": "Summer promotion",
                 "_traffic_source_medium": "Search engine"
             ])

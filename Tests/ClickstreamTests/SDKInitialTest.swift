@@ -43,7 +43,7 @@ class SDKInitialTest: XCTestCase {
             .withTrackScreenViewEvents(false)
             .withTrackUserEngagementEvents(false)
             .withAuthCookie("testAuthCookie")
-            .withGlobalAttributes([
+            .withInitialGlobalAttributes([
                 "channel": "AppStore",
                 "level": 5.1,
                 "class": 5,
@@ -103,7 +103,7 @@ class SDKInitialTest: XCTestCase {
         let configure = ClickstreamConfiguration.getDefaultConfiguration()
             .withAppId("testAppId")
             .withEndpoint("https://example.com/collect")
-            .withGlobalAttributes([
+            .withInitialGlobalAttributes([
                 "channel": "AppStore",
                 "Score": 90.1,
                 "class": 5,
