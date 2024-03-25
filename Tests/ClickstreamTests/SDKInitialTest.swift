@@ -26,7 +26,7 @@ class SDKInitialTest: XCTestCase {
     }
 
     func testInitSDKWithOnlyAmplifyJSONFile() throws {
-        let amplifyConfigure = ClickstreamAnalytics.getAmplifyConfigurationSafely(Bundle.module)
+        let amplifyConfigure = try ClickstreamAnalytics.getAmplifyConfigurationSafely(Bundle.module)
         try Amplify.add(plugin: AWSClickstreamPlugin())
         try Amplify.configure(amplifyConfigure)
     }
@@ -64,7 +64,7 @@ class SDKInitialTest: XCTestCase {
             .withTrackScreenViewEvents(false)
             .withTrackUserEngagementEvents(false)
             .withAuthCookie("testAuthCookie")
-        let amplifyConfigure = ClickstreamAnalytics.getAmplifyConfigurationSafely(Bundle.module)
+        let amplifyConfigure = try ClickstreamAnalytics.getAmplifyConfigurationSafely(Bundle.module)
         try Amplify.add(plugin: AWSClickstreamPlugin(configure))
         try Amplify.configure(amplifyConfigure)
         let resultConfig = try ClickstreamAnalytics.getClickstreamConfiguration()
@@ -84,7 +84,7 @@ class SDKInitialTest: XCTestCase {
             .withTrackScreenViewEvents(false)
             .withTrackUserEngagementEvents(false)
             .withAuthCookie("testAuthCookie")
-        let amplifyConfigure = ClickstreamAnalytics.getAmplifyConfigurationSafely(Bundle.module)
+        let amplifyConfigure = try ClickstreamAnalytics.getAmplifyConfigurationSafely(Bundle.module)
         try Amplify.add(plugin: AWSClickstreamPlugin(configure))
         try Amplify.configure(amplifyConfigure)
         let resultConfig = try ClickstreamAnalytics.getClickstreamConfiguration()

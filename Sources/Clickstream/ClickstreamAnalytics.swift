@@ -90,17 +90,8 @@ public enum ClickstreamAnalytics {
         Amplify.Analytics.enable()
     }
 
-    static func getAmplifyConfigurationSafely(_ bundle: Bundle = Bundle.main) -> AmplifyConfiguration {
-        var amplifyConfiguraion: AmplifyConfiguration!
-        do {
-            guard let path = bundle.path(forResource: "amplifyconfiguration", ofType: "json") else {
-                throw ConfigurationError.invalidAmplifyConfigurationFile(
-                    "Could not load default `amplifyconfiguration.json` file",
-                    "please check if you added the correct configuration file")
-            }
-            let url = URL(fileURLWithPath: path)
-            amplifyConfiguraion = try AmplifyConfiguration(configurationFile: url)
-        } catch {
+    static func getAmplifyConfigurationSafely(_ bundle: Bundle = Bundle.main) throws -> AmplifyConfiguration {
+        guard let path = bundle.path(forResource: "amplifyconfiguration", ofType: "json") else {
             log.debug("Could not load default `amplifyconfiguration.json` file")
             let plugins: [String: JSONValue] = [
                 "awsClickstreamPlugin": [
@@ -109,9 +100,10 @@ public enum ClickstreamAnalytics {
                 ]
             ]
             let analyticsConfiguration = AnalyticsCategoryConfiguration(plugins: plugins)
-            amplifyConfiguraion = AmplifyConfiguration(analytics: analyticsConfiguration)
+            return AmplifyConfiguration(analytics: analyticsConfiguration)
         }
-        return amplifyConfiguraion
+        let url = URL(fileURLWithPath: path)
+        return try AmplifyConfiguration(configurationFile: url)
     }
 
     /// ClickstreamAnalytics preset events

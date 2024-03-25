@@ -122,7 +122,7 @@ struct YourApp: App {
 }
 ```
 
-You also need to disable swzzling by setting `configuration.withTrackScreenViewEvents(false)`, see the next configuration steps.
+Clickstream Swift SDK depends on method swizzling to automatically record screen views. SwiftUI apps must [record screen view events manually](#record-screen-view-events-manually), and disable automatic tracking of screen view events by setting `configuration.withTrackScreenViewEvents(false)` when the SDK is initialized.
 
 ### 4. Update Configuration
 
