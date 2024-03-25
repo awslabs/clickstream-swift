@@ -22,11 +22,13 @@ class AutoRecordEventClientTest: XCTestCase {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         let mockNetworkMonitor = MockNetworkMonitor()
         activityTracker = MockActivityTracker()
-        let contextConfiguration = ClickstreamContextConfiguration(appId: testAppId,
-                                                                   endpoint: testEndpoint,
-                                                                   sendEventsInterval: 10_000,
-                                                                   isTrackAppExceptionEvents: true,
-                                                                   isCompressEvents: false)
+
+        let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
+            .withAppId(testAppId)
+            .withEndpoint(testEndpoint)
+            .withSendEventInterval(10_000)
+            .withTrackAppExceptionEvents(true)
+            .withCompressEvents(false)
         clickstream = try ClickstreamContext(with: contextConfiguration)
         clickstream.networkMonitor = mockNetworkMonitor
         sessionClient = SessionClient(activityTracker: activityTracker, clickstream: clickstream)

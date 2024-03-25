@@ -29,23 +29,18 @@ class IntegrationTest: XCTestCase {
             HttpResponse.badRequest(.text("request fail"))
         }
         try! server.start()
-        analyticsPlugin = AWSClickstreamPlugin()
-        let appId = JSONValue(stringLiteral: "testAppId" + String(describing: Date().millisecondsSince1970))
         await Amplify.reset()
-        let plugins: [String: JSONValue] = [
-            "awsClickstreamPlugin": [
-                "appId": appId,
-                "endpoint": "http://localhost:8080/collect",
-                "isCompressEvents": false,
-                "autoFlushEventsInterval": 10_000,
-                "isTrackAppExceptionEvents": false
-            ]
-        ]
-        let analyticsConfiguration = AnalyticsCategoryConfiguration(plugins: plugins)
-        let config = AmplifyConfiguration(analytics: analyticsConfiguration)
+        let appId = "testAppId" + String(describing: Date().millisecondsSince1970)
+        let configure = ClickstreamConfiguration.getDefaultConfiguration()
+            .withAppId(appId)
+            .withEndpoint("http://localhost:8080/collect")
+            .withCompressEvents(false)
+            .withTrackAppExceptionEvents(false)
+            .withSendEventInterval(10_000)
+        analyticsPlugin = AWSClickstreamPlugin(configure)
         do {
             try Amplify.add(plugin: analyticsPlugin)
-            try Amplify.configure(config)
+            try Amplify.configure(ClickstreamAnalytics.getAmplifyConfigurationSafely())
             analyticsClient = analyticsPlugin!.analyticsClient as? AnalyticsClient
             eventRecorder = analyticsClient.eventRecorder as? EventRecorder
         } catch {

@@ -18,3 +18,9 @@ extension String {
         return ""
     }
 }
+
+extension String? {
+    func isNilOrEmpty() -> Bool {
+        self?.isEmpty ?? true
+    }
+}

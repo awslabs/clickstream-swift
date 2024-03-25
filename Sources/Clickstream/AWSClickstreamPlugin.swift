@@ -28,6 +28,10 @@ final class AWSClickstreamPlugin: AnalyticsCategoryPlugin {
         "awsClickstreamPlugin"
     }
 
+    var configuration: ClickstreamConfiguration
+
     /// Instantiates an instance of the AWSClickstreamPlugin
-    init() {}
+    init(_ configuration: ClickstreamConfiguration? = nil) {
+        self.configuration = configuration ?? ClickstreamConfiguration()
+    }
 }

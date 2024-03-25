@@ -14,15 +14,11 @@ struct AWSClickstreamConfiguration {
     static let isTrackAppExceptionKey = "isTrackAppExceptionEvents"
     static let isCompressEventsKey = "isCompressEvents"
 
-    static let defaultSendEventsInterval = 10_000
-    static let defaulTrackAppException = true
-    static let defaulCompressEvents = true
-
     let appId: String
     let endpoint: String
     let sendEventsInterval: Int
-    let isTrackAppExceptionEvents: Bool
-    let isCompressEvents: Bool
+    let isTrackAppExceptionEvents: Bool!
+    let isCompressEvents: Bool!
 
     init(_ configuration: JSONValue) throws {
         guard case let .object(configObject) = configuration else {
@@ -48,8 +44,8 @@ struct AWSClickstreamConfiguration {
     init(appId: String,
          endpoint: String,
          sendEventsInterval: Int,
-         isTrackAppExceptionEvents: Bool,
-         isCompressEvents: Bool)
+         isTrackAppExceptionEvents: Bool!,
+         isCompressEvents: Bool!)
     {
         self.appId = appId
         self.endpoint = endpoint
@@ -73,13 +69,6 @@ struct AWSClickstreamConfiguration {
             )
         }
 
-        if appIdValue.isEmpty {
-            throw PluginError.pluginConfigurationError(
-                "appId is specified but is empty",
-                "appId should not be empty"
-            )
-        }
-
         return appIdValue
     }
 
@@ -98,19 +87,12 @@ struct AWSClickstreamConfiguration {
             )
         }
 
-        if endpointValue.isEmpty {
-            throw PluginError.pluginConfigurationError(
-                "endpoint is specified but is empty",
-                "endpoint should not be empty"
-            )
-        }
-
         return endpointValue
     }
 
     private static func getSendEventsInterval(_ configuration: [String: JSONValue]) throws -> Int {
         guard let sendEventsInterval = configuration[sendEventsIntervalKey] else {
-            return AWSClickstreamConfiguration.defaultSendEventsInterval
+            return 0
         }
 
         guard case let .number(sendEventsIntervalValue) = sendEventsInterval else {
@@ -130,9 +112,9 @@ struct AWSClickstreamConfiguration {
         return Int(sendEventsIntervalValue)
     }
 
-    private static func getIsTrackAppExceptionEvents(_ configuration: [String: JSONValue]) throws -> Bool {
+    private static func getIsTrackAppExceptionEvents(_ configuration: [String: JSONValue]) throws -> Bool! {
         guard let isTrackAppException = configuration[isTrackAppExceptionKey] else {
-            return AWSClickstreamConfiguration.defaulTrackAppException
+            return nil
         }
 
         guard case let .boolean(isTrackAppExceptionValue) = isTrackAppException else {
@@ -145,9 +127,9 @@ struct AWSClickstreamConfiguration {
         return isTrackAppExceptionValue
     }
 
-    private static func getIsCompressEvents(_ configuration: [String: JSONValue]) throws -> Bool {
+    private static func getIsCompressEvents(_ configuration: [String: JSONValue]) throws -> Bool! {
         guard let isCompressEvents = configuration[isCompressEventsKey] else {
-            return AWSClickstreamConfiguration.defaulCompressEvents
+            return nil
         }
 
         guard case let .boolean(isCompressEventsValue) = isCompressEvents else {

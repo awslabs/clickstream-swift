@@ -41,11 +41,13 @@ class EventRecorderTest: XCTestCase {
             }
             try! server.start()
             let appId = testAppId + String(describing: Date().millisecondsSince1970)
-            let contextConfiguration = ClickstreamContextConfiguration(appId: appId,
-                                                                       endpoint: testSuccessEndpoint,
-                                                                       sendEventsInterval: 10_000,
-                                                                       isTrackAppExceptionEvents: false,
-                                                                       isCompressEvents: false)
+
+            let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
+                .withAppId(appId)
+                .withEndpoint(testSuccessEndpoint)
+                .withSendEventInterval(10_000)
+                .withTrackAppExceptionEvents(false)
+                .withCompressEvents(false)
             contextConfiguration.isLogEvents = false
             clickstream = try ClickstreamContext(with: contextConfiguration)
             clickstreamEvent = ClickstreamEvent(eventType: "testEvent",

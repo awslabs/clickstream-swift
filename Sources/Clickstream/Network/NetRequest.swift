@@ -11,7 +11,7 @@ import Foundation
 enum NetRequest {
     static func uploadEventWithURLSession(
         eventsJson: String,
-        configuration: ClickstreamContextConfiguration,
+        configuration: ClickstreamConfiguration,
         bundleSequenceId: Int) -> Bool
     {
         var requestData = eventsJson

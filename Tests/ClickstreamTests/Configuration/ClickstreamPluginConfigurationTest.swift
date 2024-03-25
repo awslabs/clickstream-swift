@@ -29,9 +29,9 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
             XCTAssertNotNil(config)
             XCTAssertEqual(config.appId, testAppId)
             XCTAssertEqual(config.endpoint, testEndpoint)
-            XCTAssertEqual(config.sendEventsInterval, AWSClickstreamConfiguration.defaultSendEventsInterval)
-            XCTAssertEqual(config.isTrackAppExceptionEvents, AWSClickstreamConfiguration.defaulTrackAppException)
-            XCTAssertEqual(config.isCompressEvents, AWSClickstreamConfiguration.defaulCompressEvents)
+            XCTAssertEqual(config.sendEventsInterval, 0)
+            XCTAssertNil(config.isTrackAppExceptionEvents)
+            XCTAssertNil(config.isCompressEvents)
         } catch {
             XCTFail("Failed to instantiate clicstream plugin configuration")
         }
@@ -62,16 +62,6 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
         assertInitPluginError(errString: errString, configJson: configJson)
     }
 
-    func testConfigureWithEmptyStringAppId() {
-        let configJson = JSONValue(
-            dictionaryLiteral:
-            (AWSClickstreamConfiguration.appIdKey, ""),
-            (AWSClickstreamConfiguration.endpointKey, endpoint)
-        )
-        let errString = "appId is specified but is empty"
-        assertInitPluginError(errString: errString, configJson: configJson)
-    }
-
     func testConfigureWithNoEndpoint() {
         let configJson = JSONValue(
             dictionaryLiteral:
@@ -91,16 +81,6 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
         assertInitPluginError(errString: errString, configJson: configJson)
     }
 
-    func testConfigureWithEmptyStringEndpoint() {
-        let configJson = JSONValue(
-            dictionaryLiteral:
-            (AWSClickstreamConfiguration.appIdKey, appId),
-            (AWSClickstreamConfiguration.endpointKey, "")
-        )
-        let errString = "endpoint is specified but is empty"
-        assertInitPluginError(errString: errString, configJson: configJson)
-    }
-
     func testConfigureSuccessWithCustomSendEventsInterval() {
         let configJson = JSONValue(
             dictionaryLiteral:
@@ -114,8 +94,8 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
             XCTAssertEqual(config.appId, testAppId)
             XCTAssertEqual(config.endpoint, testEndpoint)
             XCTAssertEqual(config.sendEventsInterval, testSendEventsInterval)
-            XCTAssertEqual(config.isTrackAppExceptionEvents, AWSClickstreamConfiguration.defaulTrackAppException)
-            XCTAssertEqual(config.isCompressEvents, AWSClickstreamConfiguration.defaulCompressEvents)
+            XCTAssertNil(config.isTrackAppExceptionEvents)
+            XCTAssertNil(config.isCompressEvents)
         } catch {
             XCTFail("Failed to instantiate clicstream plugin configuration")
         }
@@ -155,9 +135,9 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
             XCTAssertNotNil(config)
             XCTAssertEqual(config.appId, testAppId)
             XCTAssertEqual(config.endpoint, testEndpoint)
-            XCTAssertEqual(config.sendEventsInterval, AWSClickstreamConfiguration.defaultSendEventsInterval)
+            XCTAssertEqual(config.sendEventsInterval, 0)
             XCTAssertEqual(config.isTrackAppExceptionEvents, false)
-            XCTAssertEqual(config.isCompressEvents, AWSClickstreamConfiguration.defaulCompressEvents)
+            XCTAssertNil(config.isCompressEvents)
         } catch {
             XCTFail("Failed to instantiate clicstream plugin configuration")
         }
@@ -186,7 +166,7 @@ class ClickstreamPluginConfigurationTest: XCTestCase {
             XCTAssertNotNil(config)
             XCTAssertEqual(config.appId, testAppId)
             XCTAssertEqual(config.endpoint, testEndpoint)
-            XCTAssertEqual(config.sendEventsInterval, AWSClickstreamConfiguration.defaultSendEventsInterval)
+            XCTAssertEqual(config.sendEventsInterval, 0)
             XCTAssertEqual(config.isCompressEvents, false)
         } catch {
             XCTFail("Failed to instantiate clicstream plugin configuration")
