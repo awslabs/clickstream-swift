@@ -124,7 +124,7 @@ class IntegrationTest: XCTestCase {
 
     func testAddGlobalAttribute() throws {
         ClickstreamAnalytics.addGlobalAttributes([
-            "channel": "AppStore",
+            ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "App Store",
             "level": 5.1,
             "class": 5,
             "isOpenNotification": true
@@ -134,7 +134,7 @@ class IntegrationTest: XCTestCase {
 
         let testEvent = try getTestEvent()
         let eventAttribute = testEvent["attributes"] as! [String: Any]
-        XCTAssertEqual("AppStore", eventAttribute["channel"] as! String)
+        XCTAssertEqual("AppStore", eventAttribute[ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL] as! String)
         XCTAssertEqual(5.1, eventAttribute["level"] as! Double)
         XCTAssertEqual(5, eventAttribute["class"] as! Int)
         XCTAssertEqual(true, eventAttribute["isOpenNotification"] as! Bool)
@@ -169,18 +169,18 @@ class IntegrationTest: XCTestCase {
 
     func testDeleteGlobalAttribute() throws {
         ClickstreamAnalytics.addGlobalAttributes([
-            "channel": "AppStore",
+            ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "App Store",
             "level": 5.1,
             "class": 5,
             "isOpenNotification": true
         ])
-        ClickstreamAnalytics.deleteGlobalAttributes("channel")
+        ClickstreamAnalytics.deleteGlobalAttributes(ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL)
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
 
         let testEvent = try getTestEvent()
         let eventAttribute = testEvent["attributes"] as! [String: Any]
-        XCTAssertNil(eventAttribute["channel"])
+        XCTAssertNil(eventAttribute[ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL])
         XCTAssertEqual(5.1, eventAttribute["level"] as! Double)
         XCTAssertEqual(5, eventAttribute["class"] as! Int)
         XCTAssertEqual(true, eventAttribute["isOpenNotification"] as! Bool)
