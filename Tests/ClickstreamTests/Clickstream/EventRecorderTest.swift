@@ -359,7 +359,7 @@ class EventRecorderTest: XCTestCase {
 
         eventRecorder.submitEvents()
         XCTAssertEqual(1, eventRecorder.queue.operationCount)
-        Thread.sleep(forTimeInterval: 0.5)
+        Thread.sleep(forTimeInterval: 0.8)
         let totalEvent = try dbUtil.getEventCount()
         XCTAssertEqual(0, totalEvent)
         XCTAssertTrue(eventRecorder.bundleSequenceId == 3)

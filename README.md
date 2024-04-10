@@ -82,6 +82,8 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 #### 3.2 Initialize the SDK with global attributes and custom configuration
 
+The following example code shows how to add traffic source fields as global attributes when initializing the SDK.
+
 ```swift
 import Clickstream
 ...
@@ -92,8 +94,15 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
             .withEndpoint("https://example.com/collect")
             .withLogEvents(true)
             .withInitialGlobalAttributes([
-                "_traffic_source_name": "Summer promotion",
-                "_traffic_source_medium": "Search engine"
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_SOURCE: "amazon",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_MEDIUM: "cpc",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CAMPAIGN: "summer_promotion",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CAMPAIGN_ID: "summer_promotion_01",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_TERM: "running_shoes",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CONTENT: "banner_ad_1",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CLID: "amazon_ad_123",
+                ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CLID_PLATFORM: "amazon_ads",
+                ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "App Store"
             ])
         try ClickstreamAnalytics.initSDK(configuration)
     } catch {
