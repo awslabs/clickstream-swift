@@ -134,6 +134,28 @@ import Foundation
     public static let SCREEN_NAME = "_screen_name"
     /// Preset attribute screen unique id
     public static let SCREEN_UNIQUE_ID = "_screen_unique_id"
+    /// Preset attribute traffic  source  source
+    public static let TRAFFIC_SOURCE_SOURCE = "_traffic_source_source"
+    /// Preset attribute traffic  source  medium
+    public static let TRAFFIC_SOURCE_MEDIUM = "_traffic_source_medium"
+    /// Preset attribute traffic  source  campaign
+    public static let TRAFFIC_SOURCE_CAMPAIGN = "_traffic_source_campaign"
+    /// Preset attribute traffic  source  campaign id
+    public static let TRAFFIC_SOURCE_CAMPAIGN_ID = "_traffic_source_campaign_id"
+    /// Preset attribute traffic  source  term
+    public static let TRAFFIC_SOURCE_TERM = "_traffic_source_term"
+    /// Preset attribute traffic  source  content
+    public static let TRAFFIC_SOURCE_CONTENT = "_traffic_source_content"
+    /// Preset attribute traffic  source  clid
+    public static let TRAFFIC_SOURCE_CLID = "_traffic_source_clid"
+    /// Preset attribute traffic  source  clid platform
+    public static let TRAFFIC_SOURCE_CLID_PLATFORM = "_traffic_source_clid_platform"
+    /// Preset attribute app install channel
+    public static let APP_INSTALL_CHANNEL = "_app_install_channel"
+    /// Preset attribute event value
+    public static let VALUE = "_value"
+    /// Preset attribute event currency
+    public static let CURRENCY = "_currency"
 }
 
 /// ClickstreamAnalytics preset item keys for objective-c

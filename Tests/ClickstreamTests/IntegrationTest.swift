@@ -77,7 +77,11 @@ class IntegrationTest: XCTestCase {
             ClickstreamAnalytics.Item.ITEM_CATEGORY: "book",
             ClickstreamAnalytics.Item.PRICE: 99.9
         ]
-        ClickstreamAnalytics.recordEvent("testEvent", ["id": 123], [item_book])
+        ClickstreamAnalytics.recordEvent("testEvent",
+                                         ["id": 123,
+                                          ClickstreamAnalytics.Attr.VALUE: 99.9,
+                                          ClickstreamAnalytics.Attr.CURRENCY: "USD"],
+                                         [item_book])
         Thread.sleep(forTimeInterval: 0.2)
         let testEvent = try getTestEvent()
         let items = testEvent["items"] as! [JsonObject]
@@ -134,6 +138,33 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(5.1, eventAttribute["level"] as! Double)
         XCTAssertEqual(5, eventAttribute["class"] as! Int)
         XCTAssertEqual(true, eventAttribute["isOpenNotification"] as! Bool)
+    }
+
+    func testAddGlobalAttributeForTrafficSource() throws {
+        ClickstreamAnalytics.addGlobalAttributes([
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_SOURCE: "amazon",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_MEDIUM: "cpc",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CAMPAIGN: "summer_promotion",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CAMPAIGN_ID: "summer_promotion_01",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_TERM: "running_shoes",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CONTENT: "banner_ad_1",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CLID: "amazon_ad_123",
+            ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CLID_PLATFORM: "amazon_ads",
+            ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "App Store"
+        ])
+        ClickstreamAnalytics.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
+        let testEvent = try getTestEvent()
+        let eventAttribute = testEvent["attributes"] as! [String: Any]
+        XCTAssertEqual("amazon", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_SOURCE] as! String)
+        XCTAssertEqual("cpc", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_MEDIUM] as! String)
+        XCTAssertEqual("summer_promotion", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CAMPAIGN] as! String)
+        XCTAssertEqual("summer_promotion_01", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CAMPAIGN_ID] as! String)
+        XCTAssertEqual("running_shoes", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_TERM] as! String)
+        XCTAssertEqual("banner_ad_1", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CONTENT] as! String)
+        XCTAssertEqual("amazon_ad_123", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CLID] as! String)
+        XCTAssertEqual("amazon_ads", eventAttribute[ClickstreamAnalytics.Attr.TRAFFIC_SOURCE_CLID_PLATFORM] as! String)
+        XCTAssertEqual("App Store", eventAttribute[ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL] as! String)
     }
 
     func testDeleteGlobalAttribute() throws {
@@ -326,7 +357,9 @@ class IntegrationTest: XCTestCase {
             "event_category": "recommended"
         ]
         ClickstreamObjc.recordEvent("testEvent",
-                                    ["id": 123],
+                                    ["id": 123,
+                                     Attr.VALUE: 99.9,
+                                     Attr.CURRENCY: "USD"],
                                     [item])
         Thread.sleep(forTimeInterval: 0.2)
         let testEvent = try getTestEvent()
@@ -369,6 +402,34 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(5, eventAttribute["level"] as! Int)
         XCTAssertEqual(90.1, eventAttribute["Score"] as! Double)
         XCTAssertEqual(true, eventAttribute["Successful"] as! Bool)
+    }
+
+    func testAddTrafficSourceForObjc() throws {
+        let attribute: NSDictionary = [
+            Attr.TRAFFIC_SOURCE_SOURCE: "amazon",
+            Attr.TRAFFIC_SOURCE_MEDIUM: "cpc",
+            Attr.TRAFFIC_SOURCE_CAMPAIGN: "summer_promotion",
+            Attr.TRAFFIC_SOURCE_CAMPAIGN_ID: "summer_promotion_01",
+            Attr.TRAFFIC_SOURCE_TERM: "running_shoes",
+            Attr.TRAFFIC_SOURCE_CONTENT: "banner_ad_1",
+            Attr.TRAFFIC_SOURCE_CLID: "amazon_ad_123",
+            Attr.TRAFFIC_SOURCE_CLID_PLATFORM: "amazon_ads",
+            Attr.APP_INSTALL_CHANNEL: "App Store"
+        ]
+        ClickstreamObjc.addGlobalAttributes(attribute)
+        ClickstreamObjc.recordEvent("testEvent")
+        Thread.sleep(forTimeInterval: 0.1)
+        let testEvent = try getTestEvent()
+        let eventAttribute = testEvent["attributes"] as! [String: Any]
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_SOURCE])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_MEDIUM])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_CAMPAIGN])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_CAMPAIGN_ID])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_TERM])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_CONTENT])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_CLID])
+        XCTAssertNotNil(eventAttribute[Attr.TRAFFIC_SOURCE_CLID_PLATFORM])
+        XCTAssertNotNil(eventAttribute[Attr.APP_INSTALL_CHANNEL])
     }
 
     func testUserAttributeForObjc() throws {
