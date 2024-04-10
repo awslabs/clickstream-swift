@@ -134,7 +134,7 @@ class IntegrationTest: XCTestCase {
 
         let testEvent = try getTestEvent()
         let eventAttribute = testEvent["attributes"] as! [String: Any]
-        XCTAssertEqual("AppStore", eventAttribute[ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL] as! String)
+        XCTAssertEqual("App Store", eventAttribute[ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL] as! String)
         XCTAssertEqual(5.1, eventAttribute["level"] as! Double)
         XCTAssertEqual(5, eventAttribute["class"] as! Int)
         XCTAssertEqual(true, eventAttribute["isOpenNotification"] as! Bool)
