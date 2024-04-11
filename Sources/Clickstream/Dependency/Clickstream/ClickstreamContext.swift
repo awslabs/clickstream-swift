@@ -124,6 +124,11 @@ extension UserDefaults: UserDefaultsBehaviour {
         self.globalAttributes = globalAttributes
         return self
     }
+    
+    public func withInitialGlobalAttributesObjc(_ globalAttributes: NSDictionary) -> ClickstreamConfiguration {
+        self.globalAttributes = ClickstreamObjc.getAttributes(globalAttributes)
+        return self
+    }
 }
 
 struct ClickstreamContextStorage {

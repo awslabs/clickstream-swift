@@ -226,7 +226,7 @@ ClickstreamAnalytics.recordEvent(ClickstreamAnalytics.EventName.SCREEN_VIEW, [
 import Clickstream
 
 let globalAttribute: ClickstreamAttribute = [
-    "channel": "apple",
+    ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "apple",
     "class": 6,
     "level": 5.1,
     "isOpenNotification": true,
