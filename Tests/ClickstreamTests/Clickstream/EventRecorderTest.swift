@@ -40,7 +40,7 @@ class EventRecorderTest: XCTestCase {
                 return HttpResponse.ok(.text("request success"))
             }
             try! server.start()
-            let appId = testAppId + String(describing: Date().millisecondsSince1970)
+            let appId = testAppId + UUID().uuidString
 
             let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
                 .withAppId(appId)

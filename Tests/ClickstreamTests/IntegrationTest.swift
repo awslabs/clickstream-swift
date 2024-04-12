@@ -30,7 +30,7 @@ class IntegrationTest: XCTestCase {
         }
         try! server.start()
         await Amplify.reset()
-        let appId = "testAppId" + String(describing: Date().millisecondsSince1970)
+        let appId = "testAppId" + UUID().uuidString
         let configure = ClickstreamConfiguration.getDefaultConfiguration()
             .withAppId(appId)
             .withEndpoint("http://localhost:8080/collect")

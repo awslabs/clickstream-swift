@@ -17,7 +17,7 @@ class ClickstreamDBUtiltest: XCTestCase {
 
     override func setUp() {
         do {
-            let appId = testAppId + String(describing: Date().millisecondsSince1970)
+            let appId = testAppId + UUID().uuidString
             dbAdapter = try BaseDBAdapter(prefixPath: EventRecorder.Constants.dbPathPrefix,
                                           databaseName: appId)
             dbUtil = ClickstreamDBUtil(dbAdapter: dbAdapter)
