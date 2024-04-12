@@ -21,7 +21,7 @@ class ClickstreamPluginTestBase: XCTestCase {
         analyticsPlugin = AWSClickstreamPlugin()
 
         let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
-            .withAppId(testAppId)
+            .withAppId(testAppId + UUID().uuidString)
             .withEndpoint(testEndpoint)
             .withSendEventInterval(10_000)
             .withTrackAppExceptionEvents(false)
@@ -34,7 +34,7 @@ class ClickstreamPluginTestBase: XCTestCase {
         let eventRecorder = try EventRecorder(clickstream: clickstream)
         let analyticsClient = try AnalyticsClient(clickstream: clickstream,
                                                   eventRecorder: eventRecorder,
-                                                  sessionClient: sessionClient )
+                                                  sessionClient: sessionClient)
         analyticsPlugin.analyticsClient = analyticsClient
         clickstream.analyticsClient = analyticsClient
         clickstream.networkMonitor = mockNetworkMonitor
