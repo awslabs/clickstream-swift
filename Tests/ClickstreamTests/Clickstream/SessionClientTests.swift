@@ -24,7 +24,7 @@ class SessionClientTests: XCTestCase {
         mockNetworkMonitor = MockNetworkMonitor()
 
         let contextConfiguration = ClickstreamConfiguration.getDefaultConfiguration()
-            .withAppId(testAppId)
+            .withAppId(testAppId + UUID().uuidString)
             .withEndpoint(testEndpoint)
             .withSendEventInterval(10_000)
             .withTrackAppExceptionEvents(false)

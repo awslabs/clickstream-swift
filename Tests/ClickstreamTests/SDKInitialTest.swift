@@ -44,11 +44,25 @@ class SDKInitialTest: XCTestCase {
             .withTrackUserEngagementEvents(false)
             .withAuthCookie("testAuthCookie")
             .withInitialGlobalAttributes([
-                "channel": "AppStore",
+                ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "AppStore",
                 "level": 5.1,
                 "class": 5,
                 "isOpenNotification": true
             ])
+        try ClickstreamAnalytics.initSDK(configure)
+    }
+
+    func testInitSDKWithGlobalAttributeForObjc() throws {
+        let globalAttribute: NSDictionary = [
+            ClickstreamAnalytics.Attr.APP_INSTALL_CHANNEL: "SMS",
+            "Successful": true,
+            "Score": 90.1,
+            "level": 5
+        ]
+        let configure = ClickstreamConfiguration()
+            .withAppId("testAppId")
+            .withEndpoint("https://example.com/collect")
+            .withInitialGlobalAttributesObjc(globalAttribute)
         try ClickstreamAnalytics.initSDK(configure)
     }
 

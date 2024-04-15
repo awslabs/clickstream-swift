@@ -30,7 +30,7 @@ class IntegrationTest: XCTestCase {
         }
         try! server.start()
         await Amplify.reset()
-        let appId = "testAppId" + String(describing: Date().millisecondsSince1970)
+        let appId = "testAppId" + UUID().uuidString
         let configure = ClickstreamConfiguration.getDefaultConfiguration()
             .withAppId(appId)
             .withEndpoint("http://localhost:8080/collect")
@@ -117,7 +117,7 @@ class IntegrationTest: XCTestCase {
         ClickstreamAnalytics.recordEvent("testEvent")
         Thread.sleep(forTimeInterval: 0.1)
         ClickstreamAnalytics.flushEvents()
-        Thread.sleep(forTimeInterval: 0.2)
+        Thread.sleep(forTimeInterval: 0.5)
         let eventCount = try eventRecorder.dbUtil.getEventCount()
         XCTAssertEqual(0, eventCount)
     }

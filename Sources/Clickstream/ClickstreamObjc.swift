@@ -103,7 +103,7 @@ import Foundation
         ClickstreamAnalytics.enable()
     }
 
-    private static func getAttributes(_ attributes: NSDictionary) -> ClickstreamAttribute {
+    static func getAttributes(_ attributes: NSDictionary) -> ClickstreamAttribute {
         var result: ClickstreamAttribute = [:]
         for case let (key as String, value) in attributes {
             if value is String {
