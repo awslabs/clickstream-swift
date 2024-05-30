@@ -28,6 +28,7 @@ class EventCheckerTest: XCTestCase {
 
     func testDoubleIsFinite() {
         XCTAssertTrue(EventChecker.checkFinite(123.31))
+        XCTAssertTrue(EventChecker.checkFinite(355/113.0))
         XCTAssertTrue(EventChecker.checkFinite(0))
         XCTAssertTrue(EventChecker.checkFinite(Double.pi))
         XCTAssertTrue(EventChecker.checkFinite(Double.leastNormalMagnitude))
