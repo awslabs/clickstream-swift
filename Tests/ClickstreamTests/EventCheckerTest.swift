@@ -25,4 +25,27 @@ class EventCheckerTest: XCTestCase {
         XCTAssertFalse(EventChecker.checkEventType(eventType: "9Abc").errorCode == noError)
         XCTAssertTrue(EventChecker.checkEventType(eventType: "A9bc").errorCode == noError)
     }
+
+    func testDoubleIsFinite() {
+        XCTAssertTrue(EventChecker.checkFinite(123.31))
+        XCTAssertTrue(EventChecker.checkFinite(0))
+        XCTAssertTrue(EventChecker.checkFinite(Double.pi))
+        XCTAssertTrue(EventChecker.checkFinite(Double.leastNormalMagnitude))
+        XCTAssertTrue(EventChecker.checkFinite(Double.leastNonzeroMagnitude))
+        XCTAssertTrue(EventChecker.checkFinite(Double.ulpOfOne))
+        XCTAssertFalse(EventChecker.checkFinite(Double.nan))
+        XCTAssertFalse(EventChecker.checkFinite(Double.infinity))
+        XCTAssertFalse(EventChecker.checkFinite(-Double.infinity))
+        XCTAssertFalse(EventChecker.checkFinite(Double.signalingNaN))
+    }
+
+    func testDecimalIsFinite() {
+        XCTAssertTrue(EventChecker.checkFinite(Decimal.pi))
+        XCTAssertTrue(EventChecker.checkFinite(Decimal.leastNormalMagnitude))
+        XCTAssertTrue(EventChecker.checkFinite(Decimal.leastNonzeroMagnitude))
+        XCTAssertTrue(EventChecker.checkFinite(Decimal.greatestFiniteMagnitude))
+        XCTAssertTrue(EventChecker.checkFinite(Decimal.leastFiniteMagnitude))
+        XCTAssertFalse(EventChecker.checkFinite(Decimal.nan))
+        XCTAssertFalse(EventChecker.checkFinite(Decimal.quietNaN))
+    }
 }

@@ -63,6 +63,24 @@ class ClickstreamEventTest: XCTestCase {
         XCTAssertTrue(errorValueString.contains("testKey"))
     }
 
+    func testAddAttributeErrorForDoubleValueisNotFinite() {
+        clickstreamEvent.addAttribute(Double.infinity, forKey: "testKey")
+        XCTAssertNil(clickstreamEvent.attribute(forKey: "testKey"))
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_NOT_FINITE, errorCode)
+        XCTAssertTrue(errorValueString.contains("testKey"))
+    }
+
+    func testAddAttributeErrorForDecimalValueisNotFinite() {
+        clickstreamEvent.addAttribute(Decimal.nan, forKey: "testKey")
+        XCTAssertNil(clickstreamEvent.attribute(forKey: "testKey"))
+        let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
+        let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_NOT_FINITE, errorCode)
+        XCTAssertTrue(errorValueString.contains("testKey"))
+    }
+
     func testAddItemWithCustomAttributeScuccess() {
         let item: ClickstreamAttribute = [
             ClickstreamAnalytics.Item.ITEM_ID: 123,
