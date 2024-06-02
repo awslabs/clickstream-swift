@@ -84,11 +84,11 @@ class EventChecker {
             }
         } else if !checkFinite(value) {
             errorMsg = """
-            the value for attribute : \(key), is not finite\
+            the value for attribute : \(key), is infinite\
              and the attribute will not be recorded
             """
-            let errorString = "the value for attribute name: \(key) is not finite"
-            error.errorCode = Event.ErrorCode.ATTRIBUTE_VALUE_NOT_FINITE
+            let errorString = "the value for attribute name: \(key) is infinite"
+            error.errorCode = Event.ErrorCode.ATTRIBUTE_VALUE_INFINITE
             error.errorMessage = getErrorMessage(errorString)
         }
         if errorMsg != nil {

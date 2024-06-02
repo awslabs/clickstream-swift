@@ -68,7 +68,7 @@ class ClickstreamEventTest: XCTestCase {
         XCTAssertNil(clickstreamEvent.attribute(forKey: "testKey"))
         let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
         let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
-        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_NOT_FINITE, errorCode)
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_INFINITE, errorCode)
         XCTAssertTrue(errorValueString.contains("testKey"))
     }
 
@@ -77,7 +77,7 @@ class ClickstreamEventTest: XCTestCase {
         XCTAssertNil(clickstreamEvent.attribute(forKey: "testKey"))
         let errorCode = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_CODE) as! Int
         let errorValueString = clickstreamEvent.attribute(forKey: Event.ReservedAttribute.ERROR_MESSAGE) as! String
-        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_NOT_FINITE, errorCode)
+        XCTAssertEqual(Event.ErrorCode.ATTRIBUTE_VALUE_INFINITE, errorCode)
         XCTAssertTrue(errorValueString.contains("testKey"))
     }
 
