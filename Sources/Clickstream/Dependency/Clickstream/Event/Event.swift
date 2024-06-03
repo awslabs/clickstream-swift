@@ -93,6 +93,7 @@ enum Event {
         static let ATTRIBUTE_NAME_INVALID = 2_002
         static let ATTRIBUTE_VALUE_LENGTH_EXCEED = 2_003
         static let ATTRIBUTE_SIZE_EXCEED = 2_004
+        static let ATTRIBUTE_VALUE_INFINITE = 2_005
         static let USER_ATTRIBUTE_SIZE_EXCEED = 3_001
         static let USER_ATTRIBUTE_NAME_LENGTH_EXCEED = 3_002
         static let USER_ATTRIBUTE_NAME_INVALID = 3_003

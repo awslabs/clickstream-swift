@@ -82,11 +82,33 @@ class EventChecker {
                 error.errorCode = Event.ErrorCode.ATTRIBUTE_VALUE_LENGTH_EXCEED
                 error.errorMessage = getErrorMessage(errorString)
             }
+        } else if !checkFinite(value) {
+            errorMsg = """
+            the value for attribute : \(key), is infinite\
+             and the attribute will not be recorded
+            """
+            let errorString = "the value for attribute name: \(key) is infinite"
+            error.errorCode = Event.ErrorCode.ATTRIBUTE_VALUE_INFINITE
+            error.errorMessage = getErrorMessage(errorString)
         }
         if errorMsg != nil {
             log.warn(errorMsg!)
         }
         return error
+    }
+
+    /// Check the Dboule or Decimal whether is finite
+    /// - Parameters:
+    ///   - value: attribute value
+    /// - Returns: the isFinite boolean result
+    static func checkFinite(_ value: Any) -> Bool {
+        if let value = value as? Double, !value.isFinite {
+            return false
+        }
+        if let value = value as? Decimal, !value.isFinite {
+            return false
+        }
+        return true
     }
 
     /// Check the user attribute error.
