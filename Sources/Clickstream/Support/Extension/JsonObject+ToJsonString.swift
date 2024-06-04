@@ -9,11 +9,15 @@ import Foundation
 
 extension JsonObject {
     func toJsonString() -> String {
+        if !JSONSerialization.isValidJSONObject(self) {
+            log.error("Invalid JSON object: \(self)")
+            return ""
+        }
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: self, options: [.sortedKeys])
             return String(data: jsonData, encoding: .utf8) ?? ""
         } catch {
-            print("Error serializing dictionary to JSON: \(error.localizedDescription)")
+            log.error("Error serializing dictionary to JSON: \(error.localizedDescription)")
         }
         return ""
     }
@@ -23,8 +27,10 @@ extension JsonObject {
             let jsonData = try JSONSerialization.data(withJSONObject: self, options: [.sortedKeys, .prettyPrinted])
             return String(data: jsonData, encoding: .utf8) ?? ""
         } catch {
-            print("Error serializing dictionary to JSON: \(error.localizedDescription)")
+            log.error("Error serializing dictionary to JSON: \(error.localizedDescription)")
         }
         return ""
     }
 }
+
+extension JsonObject: ClickstreamLogger {}
