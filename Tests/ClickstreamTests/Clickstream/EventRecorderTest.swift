@@ -183,6 +183,12 @@ class EventRecorderTest: XCTestCase {
         XCTAssertEqual("carl", (userAttributes["_user_name"] as! JsonObject)["value"] as! String)
     }
 
+    func testRecordEventWithInvalidAttribute() throws {
+        clickstreamEvent.addGlobalAttribute(Decimal.nan, forKey: "invalidDecimal")
+        try eventRecorder.save(clickstreamEvent)
+        XCTAssertEqual(0, try dbUtil.getEventCount())
+    }
+
     func testSaveMultiEvent() throws {
         for _ in 0 ..< 5 {
             try eventRecorder.save(clickstreamEvent)

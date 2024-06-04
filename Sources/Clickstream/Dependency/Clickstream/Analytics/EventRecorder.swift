@@ -45,6 +45,7 @@ class EventRecorder: AnalyticsEventRecording {
     func save(_ event: ClickstreamEvent) throws {
         let eventObject = event.toJsonObject()
         let eventJson = eventObject.toJsonString()
+        if eventJson == "" { return }
         let eventSize = eventJson.count
         let storageEvent = StorageEvent(eventJson: eventJson, eventSize: Int64(eventSize))
         try dbUtil.saveEvent(storageEvent)
