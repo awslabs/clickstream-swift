@@ -109,7 +109,9 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         if !items.isEmpty {
             event["items"] = items
         }
-        event["user"] = userAttributes
+        if !userAttributes.isEmpty {
+            event["user"] = userAttributes
+        }
         event["attributes"] = getAttributeObject(from: attributes)
         return event
     }

@@ -256,6 +256,7 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual((user["score"] as! JsonObject)["value"] as! Double, 85.2)
         XCTAssertEqual((user["_user_name"] as! JsonObject)["value"] as! String, "carl")
         XCTAssertNotNil(user[Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP])
+        XCTAssertNotNil((user[Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP] as! JsonObject)["value"])
     }
 
     func testProfileSetTimestamp() throws {
