@@ -132,7 +132,7 @@ class EventRecorderTest: XCTestCase {
         XCTAssertNotNil(event["app_version"])
         XCTAssertNotNil(event["app_package_name"])
         XCTAssertNotNil(event["app_title"])
-        XCTAssertNotNil(event["user"])
+        XCTAssertNil(event["user"])
         XCTAssertNotNil(event["attributes"])
         XCTAssertNil(event["noneExistAttribute"])
     }

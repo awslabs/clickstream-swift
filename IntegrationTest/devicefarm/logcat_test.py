@@ -196,7 +196,7 @@ class TestLogcatIOS:
 def get_submitted_events(path):
     submitted_events = []
     with open(path, 'r') as file:
-        pattern = re.compile(r' Send (\d+) events')
+        pattern = re.compile(r'^Send (\d+) events')
         for line in file:
             match = pattern.search(line)
             if match:
@@ -209,7 +209,7 @@ def get_recorded_events(path):
         log_lines = file.readlines()
     events = []
     first_event_pattern = re.compile(r'app_event_log:Saved event (\w+):(.*)$')
-    event_pattern = re.compile(r' Saved event (\w+):(.*)$')
+    event_pattern = re.compile(r'^Saved event (\w+):(.*)$')
 
     current_event_name = ''
 
