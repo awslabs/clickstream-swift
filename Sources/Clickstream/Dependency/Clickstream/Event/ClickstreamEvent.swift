@@ -21,6 +21,7 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
     private(set) lazy var attributes: [String: AttributeValue] = [:]
     private(set) lazy var items: [ClickstreamAttribute] = []
     private(set) lazy var userAttributes: [String: Any] = [:]
+    let attributeLock = NSLock()
     let systemInfo: SystemInfo
     let netWorkType: String
 
@@ -72,7 +73,11 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
     }
 
     func setUserAttribute(_ attributes: [String: Any]) {
-        userAttributes = attributes
+        attributeLock.lock()
+        for attr in attributes {
+            userAttributes[attr.key] = attr.value
+        }
+        attributeLock.unlock()
     }
 
     func attribute(forKey key: String) -> AttributeValue? {
@@ -109,9 +114,11 @@ class ClickstreamEvent: AnalyticsPropertiesModel {
         if !items.isEmpty {
             event["items"] = items
         }
+        attributeLock.lock()
         if !userAttributes.isEmpty {
             event["user"] = userAttributes
         }
+        attributeLock.unlock()
         event["attributes"] = getAttributeObject(from: attributes)
         return event
     }

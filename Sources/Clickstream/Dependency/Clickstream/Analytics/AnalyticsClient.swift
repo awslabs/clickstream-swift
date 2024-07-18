@@ -29,6 +29,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     private(set) var simpleUserAttributes: [String: Any] = [:]
     private let clickstream: ClickstreamContext
     private(set) var userId: String?
+    let attributeLock = NSLock()
     var autoRecordClient: AutoRecordEventClient
 
     init(clickstream: ClickstreamContext,
@@ -45,6 +46,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func addGlobalAttribute(_ attribute: AttributeValue, forKey key: String) {
+        attributeLock.lock()
         let eventError = EventChecker.checkAttribute(
             currentNumber: globalAttributes.count,
             key: key,
@@ -54,9 +56,11 @@ class AnalyticsClient: AnalyticsClientBehaviour {
         } else {
             globalAttributes[key] = attribute
         }
+        attributeLock.unlock()
     }
 
     func addUserAttribute(_ attribute: AttributeValue, forKey key: String) {
+        attributeLock.lock()
         let eventError = EventChecker.checkUserAttribute(currentNumber: allUserAttributes.count,
                                                          key: key,
                                                          value: attribute)
@@ -72,14 +76,19 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             userAttribute["set_timestamp"] = Date().millisecondsSince1970
             allUserAttributes[key] = userAttribute
         }
+        attributeLock.unlock()
     }
 
     func removeGlobalAttribute(forKey key: String) {
+        attributeLock.lock()
         globalAttributes[key] = nil
+        attributeLock.unlock()
     }
 
     func removeUserAttribute(forKey key: String) {
+        attributeLock.lock()
         allUserAttributes[key] = nil
+        attributeLock.unlock()
     }
 
     func updateUserId(_ id: String?) {
@@ -87,7 +96,9 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             userId = id
             UserDefaultsUtil.saveCurrentUserId(storage: clickstream.storage, userId: userId)
             if let newUserId = id, !newUserId.isEmpty {
+                attributeLock.lock()
                 allUserAttributes = JsonObject()
+                attributeLock.unlock()
                 let userInfo = UserDefaultsUtil.getNewUserInfo(storage: clickstream.storage, userId: newUserId)
                 // swiftlint:disable force_cast
                 clickstream.userUniqueId = userInfo["user_unique_id"] as! String
@@ -105,7 +116,9 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func updateUserAttributes() {
+        attributeLock.lock()
         UserDefaultsUtil.updateUserAttributes(storage: clickstream.storage, userAttributes: allUserAttributes)
+        attributeLock.unlock()
     }
 
     // MARK: - Event recording
@@ -130,6 +143,9 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func record(_ event: ClickstreamEvent) throws {
+        if event.eventType != Event.PresetEvent.CLICKSTREAM_ERROR{
+            attributeLock.lock()
+        }
         for (key, attribute) in globalAttributes {
             event.addGlobalAttribute(attribute, forKey: key)
         }
@@ -147,6 +163,9 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             event.setUserAttribute(simpleUserAttributes)
         }
         try eventRecorder.save(event)
+        if event.eventType != Event.PresetEvent.CLICKSTREAM_ERROR{
+            attributeLock.unlock()
+        }
     }
 
     func recordEventError(_ eventError: EventChecker.EventError) {
@@ -167,6 +186,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
     }
 
     func getSimpleUserAttributes() -> [String: Any] {
+        attributeLock.lock()
         simpleUserAttributes = [:]
         simpleUserAttributes[Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP]
             = allUserAttributes[Event.ReservedAttribute.USER_FIRST_TOUCH_TIMESTAMP]
@@ -174,6 +194,7 @@ class AnalyticsClient: AnalyticsClientBehaviour {
             simpleUserAttributes[Event.ReservedAttribute.USER_ID]
                 = allUserAttributes[Event.ReservedAttribute.USER_ID]
         }
+        attributeLock.unlock()
         return simpleUserAttributes
     }
 }
