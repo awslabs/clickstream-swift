@@ -333,6 +333,26 @@ class IntegrationTest: XCTestCase {
         XCTAssertEqual(1, eventCount)
     }
 
+    func testModifyUserAttributesInMulitThread() throws {
+        for number in 1 ... 100 {
+            Task {
+                ClickstreamAnalytics.addUserAttributes([
+                    "_user_age": 21,
+                    "isFirstOpen": true,
+                    "score": 85.2,
+                    "_user_name": "name\(number)"
+                ])
+            }
+            Task {
+                ClickstreamAnalytics.setUserId("userId\(number)")
+            }
+            Task {
+                ClickstreamAnalytics.recordEvent("testEvent\(number)")
+            }
+        }
+        Thread.sleep(forTimeInterval: 1)
+    }
+
     // MARK: - Objc test
 
     func testRecordEventForObjc() throws {
