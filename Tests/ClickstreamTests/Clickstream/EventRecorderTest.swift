@@ -183,6 +183,20 @@ class EventRecorderTest: XCTestCase {
         XCTAssertEqual("carl", (userAttributes["_user_name"] as! JsonObject)["value"] as! String)
     }
 
+    func testModifyGlobalUserAttributesWillNotAffectTheEventUserAttributes() throws {
+        var userInfo = JsonObject()
+        let currentTimeStamp = Date().millisecondsSince1970
+        var userNameInfo = JsonObject()
+        userNameInfo["value"] = "carl"
+        userNameInfo["set_timestamp"] = currentTimeStamp
+        userInfo["_user_name"] = userNameInfo
+        clickstreamEvent.setUserAttribute(userInfo)
+        userInfo = JsonObject()
+        userNameInfo["value"] = "mike"
+        userInfo["_user_name"] = userNameInfo
+        XCTAssertEqual((clickstreamEvent.userAttributes["_user_name"] as! JsonObject)["value"] as! String, "carl")
+    }
+
     func testRecordEventWithInvalidAttribute() throws {
         clickstreamEvent.addGlobalAttribute(Decimal.nan, forKey: "invalidDecimal")
         try eventRecorder.save(clickstreamEvent)
