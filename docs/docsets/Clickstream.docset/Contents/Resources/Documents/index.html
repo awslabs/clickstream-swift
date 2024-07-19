@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Clickstream  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+    <a title="Clickstream  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">Clickstream Docs</a></p>
+        <p class="header-right"><a href="https://github.com/awslabs/clickstream-swift"><img src="img/gh.png" alt="GitHub"/>View on GitHub</a></p>
+        <div class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">Clickstream</a>
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/Attr.html">Attr</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/ClickstreamConfiguration.html">ClickstreamConfiguration</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/ClickstreamItemKey.html">ClickstreamItemKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/ClickstreamObjc.html">ClickstreamObjc</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/EventName.html">EventName</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/ClickstreamAnalytics.html">ClickstreamAnalytics</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/ClickstreamAnalytics/EventName.html">– EventName</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/ClickstreamAnalytics/Attr.html">– Attr</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/ClickstreamAnalytics/Item.html">– Item</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Extensions.html#/c:@SA@NSDecimal">Decimal</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:s5Int64V">Int64</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Typealiases.html#/s:11Clickstream0A9Attributea">ClickstreamAttribute</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='aws-solution-clickstream-analytics-sdk-for-swift' class='heading'>AWS Solution Clickstream Analytics SDK for Swift</h1>
+<h2 id='introduction' class='heading'>Introduction</h2>
+
+<p>Clickstream Swift SDK can help you easily collect and report in-app events from iOS devices to AWS. This SDK is part of an AWS solution - <a href="https://github.com/awslabs/clickstream-analytics-on-aws">Clickstream Analytics on AWS</a>, which provisions data pipeline to ingest and process event data into AWS services such as S3, Redshift.</p>
+
+<p>The SDK relies on the Amplify for Swift Core Library and is developed according to the Amplify Swift SDK plug-in specification. In addition, we&rsquo;ve added features that automatically collect common user events and attributes (e.g., screen view, first open) to simplify data collection for users.</p>
+
+<p>Visit our <a href="https://awslabs.github.io/clickstream-analytics-on-aws/en/latest/sdk-manual/swift/">Documentation site</a> and to learn more about Clickstream Swift SDK.</p>
+<h3 id='platform-support' class='heading'>Platform Support</h3>
+
+<p>The Clickstream SDK supports iOS 13+.</p>
+
+<p><a href="https://awslabs.github.io/clickstream-swift/"><strong>API Documentation</strong></a> </p>
+
+<ul>
+<li><a href="https://awslabs.github.io/clickstream-swift/Classes/ClickstreamObjc.html">Objective-C API Reference</a></li>
+</ul>
+<h2 id='integrate-sdk' class='heading'>Integrate SDK</h2>
+
+<p>Clickstream requires Xcode 13.4 or higher to build.</p>
+<h3 id='1-add-package' class='heading'>1.Add Package</h3>
+
+<p>We use <strong>Swift Package Manager</strong> to distribute Clickstream Swift SDK, open your project in Xcode and select <strong>File &gt; Add Pckages</strong>.</p>
+
+<p><img src="images/add_package.png" alt=""></p>
+
+<p>Enter the Clickstream Library for Swift GitHub repo URL (<code>https://github.com/awslabs/clickstream-swift</code>) into the search bar, you&rsquo;ll see the Clickstream Library for Swift repository rules for which version of Clickstream you want Swift Package Manager to install. Choose <strong>Up to Next Major Version</strong>, then click <strong>Add Package</strong>, make the Clickstream product checked as default, and click <strong>Add Package</strong> again.</p>
+
+<p><img src="images/add_package_url.png" alt=""></p>
+<h3 id='2-parameter-configuration' class='heading'>2.Parameter configuration</h3>
+
+<p>Downlod your <code>amplifyconfiguration.json</code> file from your Clickstream solution control plane, and paste it to your project root folder:</p>
+
+<p><img src="images/add_amplify_config_json_file.png" alt=""></p>
+
+<p>the json file will be as follows:</p>
+<pre class="highlight json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"analytics"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"plugins"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"awsClickstreamPlugin "</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"appId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"appId"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://example.com/collect"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"isCompressEvents"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"autoFlushEventsInterval"</span><span class="p">:</span><span class="w"> </span><span class="mi">10000</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"isTrackAppExceptionEvents"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+
+<p>Your <code>appId</code> and <code>endpoint</code> are already set up in it, here&rsquo;s an explanation of each property:</p>
+
+<ul>
+<li><strong>appId</strong>: the app id of your project in control plane.</li>
+<li><strong>endpoint</strong>: the endpoint url you will upload the event to AWS server.</li>
+<li><strong>isCompressEvents</strong>: whether to compress event content when uploading events, default is <code>true</code></li>
+<li><strong>autoFlushEventsInterval</strong>: event sending interval, the default is <code>10s</code></li>
+<li><strong>isTrackAppExceptionEvents</strong>: whether auto track exception event in app, default is <code>false</code></li>
+</ul>
+<h3 id='3-initialize-the-sdk' class='heading'>3.Initialize the SDK</h3>
+
+<p>Once you have configured the parameters, you need to initialize it in your app delegate&rsquo;s <code>application(_:didFinishLaunchingWithOptions:)</code> lifecycle method:</p>
+<h4 id='3-1-initialize-the-sdk-with-default-configuration' class='heading'>3.1 Initialize the SDK with default configuration</h4>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+<span class="o">...</span>
+<span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nv">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">LaunchOptionsKey</span><span class="p">:</span> <span class="kt">Any</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">initSDK</span><span class="p">()</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+        <span class="nf">assertionFailure</span><span class="p">(</span><span class="s">"Fail to initialize ClickstreamAnalytics: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre>
+<h4 id='3-2-initialize-the-sdk-with-global-attributes-and-custom-configuration' class='heading'>3.2 Initialize the SDK with global attributes and custom configuration</h4>
+
+<p>The following example code shows how to add traffic source fields as global attributes when initializing the SDK.</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+<span class="o">...</span>
+<span class="kd">func</span> <span class="nf">application</span><span class="p">(</span><span class="n">_</span> <span class="nv">application</span><span class="p">:</span> <span class="kt">UIApplication</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span> <span class="nv">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="kt">UIApplication</span><span class="o">.</span><span class="kt">LaunchOptionsKey</span><span class="p">:</span> <span class="kt">Any</span><span class="p">]?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span> <span class="p">{</span>
+    <span class="k">do</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="nv">configuration</span> <span class="o">=</span> <span class="kt">ClickstreamConfiguration</span><span class="p">()</span>
+            <span class="o">.</span><span class="nf">withAppId</span><span class="p">(</span><span class="s">"your appId"</span><span class="p">)</span>
+            <span class="o">.</span><span class="nf">withEndpoint</span><span class="p">(</span><span class="s">"https://example.com/collect"</span><span class="p">)</span>
+            <span class="o">.</span><span class="nf">withLogEvents</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+            <span class="o">.</span><span class="nf">withInitialGlobalAttributes</span><span class="p">([</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_SOURCE</span><span class="p">:</span> <span class="s">"amazon"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_MEDIUM</span><span class="p">:</span> <span class="s">"cpc"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_CAMPAIGN</span><span class="p">:</span> <span class="s">"summer_promotion"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_CAMPAIGN_ID</span><span class="p">:</span> <span class="s">"summer_promotion_01"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_TERM</span><span class="p">:</span> <span class="s">"running_shoes"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_CONTENT</span><span class="p">:</span> <span class="s">"banner_ad_1"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_CLID</span><span class="p">:</span> <span class="s">"amazon_ad_123"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">TRAFFIC_SOURCE_CLID_PLATFORM</span><span class="p">:</span> <span class="s">"amazon_ads"</span><span class="p">,</span>
+                <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">APP_INSTALL_CHANNEL</span><span class="p">:</span> <span class="s">"App Store"</span>
+            <span class="p">])</span>
+        <span class="k">try</span> <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">initSDK</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+        <span class="nf">assertionFailure</span><span class="p">(</span><span class="s">"Fail to initialize ClickstreamAnalytics: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>By default, we will use the configurations in <code>amplifyconfiguration.json</code> file. If you add a custom configuration, the added configuration items will override the default values. </p>
+
+<p>You can also add all the configuration parameters you need in the <code>initSDK</code> method without using the <code>amplifyconfiguration.json</code> file.</p>
+<h4 id='3-3-swiftui-configuration' class='heading'>3.3 SwiftUI configuration</h4>
+
+<p>If your project is developed with SwiftUI, you need to create an application delegate and attach it to your <code>App</code> through <code>UIApplicationDelegateAdaptor</code>. </p>
+<pre class="highlight swift"><code><span class="kd">@main</span>
+<span class="kd">struct</span> <span class="kt">YourApp</span><span class="p">:</span> <span class="kt">App</span> <span class="p">{</span>
+    <span class="kd">@UIApplicationDelegateAdaptor(AppDelegate.self)</span> <span class="k">var</span> <span class="nv">appDelegate</span>
+    <span class="k">var</span> <span class="nv">body</span><span class="p">:</span> <span class="n">some</span> <span class="kt">Scene</span> <span class="p">{</span>
+        <span class="kt">WindowGroup</span> <span class="p">{</span>
+            <span class="kt">YourView</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Clickstream Swift SDK depends on method swizzling to automatically record screen views. SwiftUI apps must <a href="#record-screen-view-events-manually">record screen view events manually</a>, and disable automatic tracking of screen view events by setting <code>configuration.withTrackScreenViewEvents(false)</code> when the SDK is initialized.</p>
+<h3 id='4-update-configuration' class='heading'>4. Update Configuration</h3>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="c1">// configure the sdk after initialize.</span>
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">configuration</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">getClickstreamConfiguration</span><span class="p">()</span>
+    <span class="n">configuration</span><span class="o">.</span><span class="nf">withAppId</span><span class="p">(</span><span class="s">"your appId"</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withEndpoint</span><span class="p">(</span><span class="s">"https://example.com/collect"</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withLogEvents</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withCompressEvents</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withSessionTimeoutDuration</span><span class="p">(</span><span class="mi">1800000</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withTrackAppExceptionEvents</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withTrackScreenViewEvents</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+        <span class="o">.</span><span class="nf">withTrackUserEngagementEvents</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Failed to config ClickstreamAnalytics: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+<div class="aside aside-note">
+    <p class="aside-title">Note</p>
+    <p>this configuation will override the default configuation in <code>amplifyconfiguration.json</code> file</p>
+
+</div>
+<h3 id='start-using' class='heading'>Start using</h3>
+<h4 id='recored-event' class='heading'>Recored event.</h4>
+
+<p>Add the following code where you need to complete the event report.</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="k">let</span> <span class="nv">attributes</span><span class="p">:</span> <span class="kt">ClickstreamAttribute</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">"Channel"</span><span class="p">:</span> <span class="s">"apple"</span><span class="p">,</span>
+    <span class="s">"Successful"</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="s">"ProcessDuration"</span><span class="p">:</span> <span class="mf">12.33</span><span class="p">,</span>
+    <span class="s">"UserAge"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">recordEvent</span><span class="p">(</span><span class="s">"testEvent"</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+
+<span class="c1">// for record an event with event name</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">recordEvent</span><span class="p">(</span><span class="s">"button_click"</span><span class="p">)</span>
+</code></pre>
+<h4 id='record-event-with-items' class='heading'>Record event with items</h4>
+
+<p>You can add the following code to log an event with an item.</p>
+
+<p><strong>Note: Only pipelines from version 1.1+ can handle items with custom attribute.</strong></p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="k">let</span> <span class="nv">attributes</span><span class="p">:</span> <span class="kt">ClickstreamAttribute</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Item</span><span class="o">.</span><span class="kt">ITEM_ID</span><span class="p">:</span> <span class="s">"123"</span><span class="p">,</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Item</span><span class="o">.</span><span class="kt">CURRENCY</span><span class="p">:</span> <span class="s">"USD"</span><span class="p">,</span>
+    <span class="s">"event_category"</span><span class="p">:</span> <span class="s">"recommended"</span>
+<span class="p">]</span>
+
+<span class="k">let</span> <span class="nv">item_book</span><span class="p">:</span> <span class="kt">ClickstreamAttribute</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Item</span><span class="o">.</span><span class="kt">ITEM_ID</span><span class="p">:</span> <span class="mi">123</span><span class="p">,</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Item</span><span class="o">.</span><span class="kt">ITEM_NAME</span><span class="p">:</span> <span class="s">"Nature"</span><span class="p">,</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Item</span><span class="o">.</span><span class="kt">ITEM_CATEGORY</span><span class="p">:</span> <span class="s">"book"</span><span class="p">,</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Item</span><span class="o">.</span><span class="kt">PRICE</span><span class="p">:</span> <span class="mf">99.9</span><span class="p">,</span>
+    <span class="s">"book_publisher"</span><span class="p">:</span> <span class="s">"Nature Research"</span>
+<span class="p">]</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">recordEvent</span><span class="p">(</span><span class="s">"view_item"</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="p">[</span><span class="n">item_book</span><span class="p">])</span>
+</code></pre>
+<h4 id='record-screen-view-events-manually' class='heading'>Record Screen View events manually</h4>
+
+<p>By default, SDK will automatically track the preset <code>_screen_view</code> event when ViewController triggers <code>viewDidAppear</code>.</p>
+
+<p>You can also manually record screen view events whether or not automatic screen view tracking is enabled, add the following code to record a screen view event with two attributes.</p>
+
+<ul>
+<li><code>SCREEN_NAME</code> Required. Your screen&rsquo;s name.</li>
+<li><code>SCREEN_UNIQUE_ID</code> Optional. Set the hashValue of your ViewController or UIView. If you do not set, SDK will set a default value based on the current ViewController&rsquo;s hashValue.</li>
+</ul>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">recordEvent</span><span class="p">(</span><span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">EventName</span><span class="o">.</span><span class="kt">SCREEN_VIEW</span><span class="p">,</span> <span class="p">[</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">SCREEN_NAME</span><span class="p">:</span> <span class="s">"HomeView"</span><span class="p">,</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">SCREEN_UNIQUE_ID</span><span class="p">:</span> <span class="n">homeView</span><span class="o">.</span><span class="n">hashValue</span>
+<span class="p">])</span>
+</code></pre>
+<h4 id='add-global-attribute' class='heading'>Add global attribute</h4>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="k">let</span> <span class="nv">globalAttribute</span><span class="p">:</span> <span class="kt">ClickstreamAttribute</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="kt">Attr</span><span class="o">.</span><span class="kt">APP_INSTALL_CHANNEL</span><span class="p">:</span> <span class="s">"apple"</span><span class="p">,</span>
+    <span class="s">"class"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s">"level"</span><span class="p">:</span> <span class="mf">5.1</span><span class="p">,</span>
+    <span class="s">"isOpenNotification"</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">addGlobalAttributes</span><span class="p">(</span><span class="n">globalAttribute</span><span class="p">)</span>
+
+<span class="c1">// for delete an global attribute</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">deleteGlobalAttributes</span><span class="p">(</span><span class="s">"level"</span><span class="p">)</span>
+</code></pre>
+<h4 id='login-and-logout' class='heading'>Login and logout</h4>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="c1">// when user login usccess.</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">setUserId</span><span class="p">(</span><span class="s">"userId"</span><span class="p">)</span>
+
+<span class="c1">// when user logout</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">setUserId</span><span class="p">(</span><span class="kc">nil</span><span class="p">)</span>
+</code></pre>
+
+<p>When we log into another user, we will clear the before user&rsquo;s user attributes, after <code>setUserId()</code> you need to add new user&rsquo;s attribute.</p>
+<h4 id='add-user-attribute' class='heading'>Add user attribute</h4>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="k">let</span> <span class="nv">userAttributes</span> <span class="p">:</span> <span class="kt">ClickstreamAttribute</span><span class="o">=</span><span class="p">[</span>
+    <span class="s">"_user_age"</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
+    <span class="s">"_user_name"</span><span class="p">:</span> <span class="s">"carl"</span>
+<span class="p">]</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">addUserAttributes</span><span class="p">(</span><span class="n">userAttributes</span><span class="p">)</span>
+</code></pre>
+
+<p>Current login user‘s attributes will be cached in disk, so the next time app launch you don&rsquo;t need to set all user&rsquo;s attribute again, of course you can update the current user&rsquo;s attribute when it changes.</p>
+<h4 id='log-the-event-json-in-debug-mode' class='heading'>Log the event json in debug mode</h4>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="c1">// log the event in debug mode.</span>
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">var</span> <span class="nv">configuration</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">getClickstreamConfiguration</span><span class="p">()</span>
+    <span class="n">configuration</span><span class="o">.</span><span class="n">isLogEvents</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Failed to config ClickstreamAnalytics: </span><span class="se">\(</span><span class="n">error</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>After config <code>configuration.isLogEvents = true</code> and when you record an event, you can see the event json at your Xcode log pannel by filter <code>EventRecorder</code>.</p>
+<h4 id='send-event-immediately' class='heading'>Send event immediately</h4>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+<span class="c1">// for send event immediately.</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">flushEvents</span><span class="p">()</span>
+</code></pre>
+<h4 id='disable-sdk' class='heading'>Disable SDK</h4>
+
+<p>You can disable the SDK in the scenario you need. After disabling the SDK, the SDK will not handle the logging and sending of any events. Of course you can enable the SDK when you need to continue logging events.</p>
+<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Clickstream</span>
+
+<span class="c1">// disable SDK</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">disable</span><span class="p">()</span>
+
+<span class="c1">// enable SDK</span>
+<span class="kt">ClickstreamAnalytics</span><span class="o">.</span><span class="nf">enable</span><span class="p">()</span>
+</code></pre>
+<h2 id='how-to-build-amp-test-locally' class='heading'>How to build&amp;test locally</h2>
+<h3 id='config-your-code-format' class='heading'>Config your code format</h3>
+
+<p>Install <a href="https://github.com/nicklockwood/SwiftFormat#xcode-source-editor-extension">swiftformat plugin</a> in your Xcode, and config shortcut for code format.</p>
+<h3 id='config-your-code-lint' class='heading'>Config your code lint</h3>
+
+<p>Install <a href="https://github.com/realm/SwiftLint">swiftlint</a>, and execute the below command at the project root folder:</p>
+<pre class="highlight shell"><code>swiftlint
+</code></pre>
+<h3 id='build' class='heading'>Build</h3>
+
+<p>Open an termial window, at the root project folder to execute: </p>
+<pre class="highlight shell"><code>swift build
+</code></pre>
+<h3 id='test' class='heading'>Test</h3>
+<pre class="highlight shell"><code>swift <span class="nb">test</span>
+</code></pre>
+<h2 id='security' class='heading'>Security</h2>
+
+<p>See <a href="CONTRIBUTING.md#security-issue-notifications">CONTRIBUTING</a> for more information.</p>
+<h2 id='license' class='heading'>License</h2>
+
+<p>This library is licensed under <a href="./LICENSE">Apache 2.0 License</a>.</p>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2024 <a class="link" href="" target="_blank" rel="external noopener">Amazon Web Services</a>. All rights reserved. (Last updated: 2024-07-19)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.1</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</html>

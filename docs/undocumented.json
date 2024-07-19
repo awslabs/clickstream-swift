@@ -1,0 +1,96 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/ClickstreamAnalytics.swift",
+      "line": 111,
+      "symbol": "ClickstreamAnalytics.EventName.SCREEN_VIEW",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 73,
+      "symbol": "ClickstreamConfiguration.withAppId(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 78,
+      "symbol": "ClickstreamConfiguration.withEndpoint(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 83,
+      "symbol": "ClickstreamConfiguration.withSendEventInterval(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 88,
+      "symbol": "ClickstreamConfiguration.withTrackAppExceptionEvents(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 93,
+      "symbol": "ClickstreamConfiguration.withTrackScreenViewEvents(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 98,
+      "symbol": "ClickstreamConfiguration.withTrackUserEngagementEvents(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 103,
+      "symbol": "ClickstreamConfiguration.withCompressEvents(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 108,
+      "symbol": "ClickstreamConfiguration.withLogEvents(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 113,
+      "symbol": "ClickstreamConfiguration.withAuthCookie(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 118,
+      "symbol": "ClickstreamConfiguration.withSessionTimeoutDuration(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 123,
+      "symbol": "ClickstreamConfiguration.withInitialGlobalAttributes(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/runner/work/clickstream-swift/clickstream-swift/Sources/Clickstream/Dependency/Clickstream/ClickstreamContext.swift",
+      "line": 128,
+      "symbol": "ClickstreamConfiguration.withInitialGlobalAttributesObjc(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/runner/work/clickstream-swift/clickstream-swift"
+}
