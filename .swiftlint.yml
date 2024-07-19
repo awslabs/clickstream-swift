@@ -16,6 +16,7 @@ opt_in_rules:
 
 disabled_rules:
   - opening_brace
+  - non_optional_string_data_conversion
 
 # configurable rules can be customized from this configuration file
 closing_brace: error

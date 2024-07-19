@@ -182,7 +182,7 @@ class EventRecorderTest: XCTestCase {
         XCTAssertEqual(85.5, (userAttributes["score"] as! JsonObject)["value"] as! Double)
         XCTAssertEqual("carl", (userAttributes["_user_name"] as! JsonObject)["value"] as! String)
     }
-    
+
     func testModifyGlobalUserAttributesWillNotAffectTheEventUserAttributes() throws {
         var userInfo = JsonObject()
         let currentTimeStamp = Date().millisecondsSince1970

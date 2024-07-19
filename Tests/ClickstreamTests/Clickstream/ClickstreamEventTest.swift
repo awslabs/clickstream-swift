@@ -8,6 +8,7 @@
 @testable import Clickstream
 import Foundation
 import XCTest
+
 class ClickstreamEventTest: XCTestCase {
     let testAppId = "testAppId"
     let storage = ClickstreamContextStorage(userDefaults: UserDefaults.standard)

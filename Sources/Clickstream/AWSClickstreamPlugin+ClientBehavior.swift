@@ -69,7 +69,7 @@ extension AWSClickstreamPlugin {
     }
 
     func registerGlobalProperties(_ properties: AnalyticsProperties) {
-        properties.forEach { key, value in
+        for (key, value) in properties {
             analyticsClient.addGlobalAttribute(value, forKey: key)
         }
     }
